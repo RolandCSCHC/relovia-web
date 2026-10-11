@@ -31,7 +31,7 @@ Without a session, the app stays on the sign-in page. With a session, it opens t
 
 ## Configuration
 
-There is no environment file. The API origin is the constant in `src/app/core/api-origin.ts`. The API must allow `http://localhost:4200` in `Web:Origins`. The API's Development settings already do.
+`src/environments/environment.ts` points local development at `http://localhost:5080`. The production build replaces that file and uses `https://api.relovia.app`. The API must allow `http://localhost:4200` in `Web:Origins`. The API's Development settings already do.
 
 ## CI
 

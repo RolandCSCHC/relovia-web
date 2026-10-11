@@ -1,4 +1,6 @@
-export const apiOrigin = 'http://localhost:5080';
+import { environment } from '../../environments/environment';
+
+export const apiOrigin = environment.apiOrigin;
 
 export const googleSignInUrl = `${apiOrigin}/api/auth/google`;
 
