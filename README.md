@@ -1,59 +1,42 @@
-# Relovia
+# relovia-web
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 22.2.2.
+Angular app for Relovia. Sign-in goes through `relovia-api`. This app never handles a Google access token, refresh token, or ID token.
 
-## Development server
+Setup and local commands are in [docs/setup.md](docs/setup.md).
 
-To start a local development server, run:
+## Stack
 
-```bash
-ng serve
-```
+| Piece           | Choice                                        |
+| --------------- | --------------------------------------------- |
+| Framework       | Angular 22.2, standalone components, zoneless |
+| UI              | Angular Material 22.2, light and dark         |
+| Language        | TypeScript 6, RxJS 7                          |
+| Styles          | SCSS                                          |
+| Tests           | Vitest                                        |
+| Lint and format | ESLint, Prettier                              |
+| Node.js         | 24.21.0, pinned in `.node-version`            |
+| npm             | 11.19.0, pinned by `packageManager`           |
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Shape
 
-## Code scaffolding
+Feature folders, and no global state library.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- `src/app/core` holds the API origin, the credentialed HTTP interceptor, the session, the route guards, and the theme.
+- `src/app/sign-in` starts Google sign-in.
+- `src/app/home` is the signed-in landing page.
 
-```bash
-ng generate component component-name
-```
+Local UI state uses signals. HTTP uses RxJS.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Talking to the API
 
-```bash
-ng generate --help
-```
+The API origin is `http://localhost:5080`, in `src/app/core/api-origin.ts`.
 
-## Building
+Requests to that origin are sent with credentials. `POST`, `PUT`, `PATCH`, and `DELETE` also send `X-XSRF-TOKEN`, copied from the `XSRF-TOKEN` cookie.
 
-To build the project run:
+Google sign-in is a browser navigation to `GET /api/auth/google`, not an HTTP call from Angular. After the callback, the API redirects back here. The route guards call `GET /api/auth/me` before they choose a page. Sign-out is `POST /api/auth/logout`.
 
-```bash
-ng build
-```
+The theme choice is stored in `localStorage` under `relovia-color-scheme`.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+## Checks
 
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+`npm run lint`, `npm run format:check`, `npm test`, and `npm run build`. GitHub Actions runs those on pushes to `main` and on pull requests.
