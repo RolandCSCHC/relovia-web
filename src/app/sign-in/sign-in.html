@@ -1,0 +1,14 @@
+<mat-card appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>Sign in</mat-card-title>
+    <mat-card-subtitle>Use your Google account to continue.</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-content>
+    @if (errorMessage(); as message) {
+      <p class="error" role="alert">{{ message }}</p>
+    }
+  </mat-card-content>
+  <mat-card-actions>
+    <a matButton="filled" [href]="signInUrl">Continue with Google</a>
+  </mat-card-actions>
+</mat-card>

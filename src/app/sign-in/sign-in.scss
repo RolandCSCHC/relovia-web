@@ -1,0 +1,14 @@
+:host {
+  display: grid;
+  min-height: calc(100vh - 64px);
+  place-items: center;
+  padding: 24px;
+}
+
+mat-card {
+  width: min(100%, 28rem);
+}
+
+.error {
+  color: var(--mat-sys-error);
+}

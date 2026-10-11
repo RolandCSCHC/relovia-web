@@ -1,0 +1,21 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.brand {
+  font: var(--mat-sys-title-large);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.user {
+  margin-inline-end: 8px;
+}
+
+main {
+  flex: 1;
+}
