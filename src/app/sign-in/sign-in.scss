@@ -1,14 +1,21 @@
 :host {
-  display: grid;
-  min-height: calc(100vh - 64px);
-  place-items: center;
-  padding: 24px;
+  display: block;
 }
 
-mat-card {
-  width: min(100%, 28rem);
+.sign-in {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-5);
+  max-width: 28rem;
+}
+
+.page-lead {
+  margin-bottom: calc(var(--space-2) * -1);
 }
 
 .error {
+  margin: 0;
   color: var(--mat-sys-error);
+  font: var(--mat-sys-body-medium);
 }

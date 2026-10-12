@@ -5,7 +5,7 @@ import { provideRouter, Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { App } from './app';
 import { routes } from './app.routes';
-import { apiOrigin } from './core/api-origin';
+import { apiOrigin, googleSignInUrl } from './core/api-origin';
 import { Session } from './core/session';
 
 describe('App', () => {
@@ -29,8 +29,10 @@ describe('App', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('mat-toolbar')?.textContent).toContain('Relovia');
-    expect(compiled.querySelector('a')?.textContent).toContain('Continue with Google');
+    expect(compiled.querySelector('.wordmark')?.textContent).toContain('Relovia');
+    expect(compiled.querySelector(`a[href="${googleSignInUrl}"]`)?.textContent).toContain(
+      'Continue with Google',
+    );
     expect(compiled.querySelector('[aria-label="Switch to dark theme"]')).not.toBeNull();
     expect(compiled.textContent).not.toContain('Sign out');
   });

@@ -22,6 +22,7 @@ Setup and local commands are in [docs/setup.md](docs/setup.md).
 Feature folders, and no global state library.
 
 - `src/app/core` holds the API origin, the credentialed HTTP interceptor, the session, the route guards, and the theme.
+- `src/app/api` holds the generated Phase 1 client.
 - `src/app/sign-in` starts Google sign-in.
 - `src/app/home` is the signed-in landing page.
 
@@ -35,7 +36,18 @@ Requests to that origin are sent with credentials. `POST`, `PUT`, `PATCH`, and `
 
 Google sign-in is a browser navigation to `GET /api/auth/google`, not an HTTP call from Angular. After the callback, the API redirects back here. The route guards call `GET /api/auth/me` before they choose a page. Sign-out is `POST /api/auth/logout`.
 
-The theme choice is stored in `localStorage` under `relovia-color-scheme`.
+The theme choice is stored in `localStorage` under `relovia-color-scheme`. Page layout uses the spacing tokens in `src/styles.scss` (`--space-1` through `--space-8`, `--page-max`) and the `.page-title` and `.page-lead` classes. The shell is the top bar and the centered page column.
+
+## API client
+
+`openapi/relovia.json` is the Phase 1 OpenAPI document. `npm run api:generate` writes the Angular client to `src/app/api/generated`. That folder is generated output, so ESLint does not check it. The client uses `HttpClient`, so the credentialed interceptor still applies. Its base URL is the API origin from `src/environments`, not the localhost server written in the document.
+
+Refresh the document from a running Development API, then regenerate:
+
+```bash
+curl -fsS http://localhost:5080/openapi/v1.json -o openapi/relovia.json
+npm run api:generate
+```
 
 ## Checks
 

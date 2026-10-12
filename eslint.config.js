@@ -7,6 +7,9 @@ const eslintConfigPrettier = require('eslint-config-prettier/flat');
 
 module.exports = defineConfig([
   {
+    ignores: ['src/app/api/generated/**'],
+  },
+  {
     files: ['**/*.ts'],
     extends: [
       eslint.configs.recommended,

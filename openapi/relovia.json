@@ -1,0 +1,919 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Relovia",
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5080/"
+    }
+  ],
+  "paths": {
+    "/api/auth/google": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Starts Google sign-in.",
+        "operationId": "signInWithGoogle",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Returns the signed-in user.",
+        "operationId": "getCurrentUser",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentUserResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Revokes the current session and clears the session cookie.",
+        "operationId": "logout",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/checklist": {
+      "get": {
+        "tags": ["Checklist"],
+        "summary": "Returns the suggested checklist without writing tasks.",
+        "operationId": "getChecklistSuggestion",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecklistSuggestionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecklistSuggestionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChecklistSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Checklist"],
+        "summary": "Confirms the selected checklist tasks for a relocation.",
+        "operationId": "confirmChecklist",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmChecklistRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmChecklistRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmChecklistRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations": {
+      "get": {
+        "tags": ["Relocations"],
+        "summary": "Lists the signed-in user's relocations.",
+        "operationId": "listRelocations",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelocationResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelocationResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RelocationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Relocations"],
+        "summary": "Creates a relocation for the signed-in user.",
+        "operationId": "createRelocation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRelocationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRelocationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRelocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{id}": {
+      "get": {
+        "tags": ["Relocations"],
+        "summary": "Returns one relocation owned by the signed-in user.",
+        "operationId": "getRelocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Relocations"],
+        "summary": "Updates a relocation owned by the signed-in user.",
+        "operationId": "updateRelocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRelocationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRelocationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveRelocationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Relocations"],
+        "summary": "Deletes a relocation owned by the signed-in user.",
+        "operationId": "deleteRelocation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/tasks": {
+      "get": {
+        "tags": ["RelocationTasks"],
+        "summary": "Lists the signed-in user's tasks for a relocation, with progress.",
+        "operationId": "listRelocationTasks",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/tasks/{taskId}": {
+      "put": {
+        "tags": ["RelocationTasks"],
+        "summary": "Updates a task owned by the signed-in user.",
+        "operationId": "updateRelocationTask",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRelocationTaskRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRelocationTaskRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRelocationTaskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTaskResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTaskResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTaskResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/": {
+      "get": {
+        "tags": ["ServiceInfo"],
+        "summary": "Returns the service name.",
+        "operationId": "getServiceInfo",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceInfoResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceInfoResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceInfoResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChecklistSuggestionResponse": {
+        "required": ["relocationId", "targetDate", "templateCodes", "tasks"],
+        "type": "object",
+        "properties": {
+          "relocationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "templateCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuggestedTaskResponse"
+            }
+          }
+        }
+      },
+      "ConfirmChecklistRequest": {
+        "required": ["tasks"],
+        "type": "object",
+        "properties": {
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ConfirmChecklistTaskRequest"
+            }
+          }
+        }
+      },
+      "ConfirmChecklistTaskRequest": {
+        "required": ["code", "title", "daysBeforeMove", "phase", "priority"],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "daysBeforeMove": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/TaskPhase"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          }
+        }
+      },
+      "CurrentUserResponse": {
+        "required": [
+          "id",
+          "email",
+          "displayName",
+          "avatarUrl",
+          "preferredCurrency",
+          "preferredLanguage"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "avatarUrl": {
+            "type": ["null", "string"]
+          },
+          "preferredCurrency": {
+            "type": "string"
+          },
+          "preferredLanguage": {
+            "type": "string"
+          }
+        }
+      },
+      "RelocationPurpose": {
+        "type": "integer"
+      },
+      "RelocationResponse": {
+        "required": [
+          "id",
+          "name",
+          "originCountryCode",
+          "originCity",
+          "destinationCountryCode",
+          "destinationCity",
+          "targetDate",
+          "purpose",
+          "status",
+          "isInternational",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "originCountryCode": {
+            "type": "string"
+          },
+          "originCity": {
+            "type": "string"
+          },
+          "destinationCountryCode": {
+            "type": "string"
+          },
+          "destinationCity": {
+            "type": "string"
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/RelocationPurpose"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RelocationStatus"
+          },
+          "isInternational": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RelocationStatus": {
+        "type": "integer"
+      },
+      "RelocationTaskResponse": {
+        "required": [
+          "id",
+          "code",
+          "title",
+          "daysBeforeMove",
+          "dueDate",
+          "phase",
+          "priority",
+          "status",
+          "sourceTemplateTaskId",
+          "dependencies"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "daysBeforeMove": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/TaskPhase"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RelocationTaskStatus"
+          },
+          "sourceTemplateTaskId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TaskDependencyResponse"
+            }
+          }
+        }
+      },
+      "RelocationTasksResponse": {
+        "required": ["progress", "tasks"],
+        "type": "object",
+        "properties": {
+          "progress": {
+            "$ref": "#/components/schemas/TaskProgressResponse"
+          },
+          "tasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RelocationTaskResponse"
+            }
+          }
+        }
+      },
+      "RelocationTaskStatus": {
+        "type": "integer"
+      },
+      "SaveRelocationRequest": {
+        "required": [
+          "name",
+          "originCountryCode",
+          "originCity",
+          "destinationCountryCode",
+          "destinationCity",
+          "targetDate",
+          "purpose",
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "originCountryCode": {
+            "type": "string"
+          },
+          "originCity": {
+            "type": "string"
+          },
+          "destinationCountryCode": {
+            "type": "string"
+          },
+          "destinationCity": {
+            "type": "string"
+          },
+          "targetDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/RelocationPurpose"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RelocationStatus"
+          }
+        }
+      },
+      "ServiceInfoResponse": {
+        "required": ["name"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SuggestedTaskResponse": {
+        "required": [
+          "code",
+          "title",
+          "daysBeforeMove",
+          "dueDate",
+          "phase",
+          "priority",
+          "sourceTemplateTaskId",
+          "dependsOnCodes"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "daysBeforeMove": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/TaskPhase"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          },
+          "sourceTemplateTaskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "dependsOnCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TaskDependencyResponse": {
+        "required": ["taskId", "code", "isSatisfied"],
+        "type": "object",
+        "properties": {
+          "taskId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string"
+          },
+          "isSatisfied": {
+            "type": "boolean"
+          }
+        }
+      },
+      "TaskPhase": {
+        "type": "integer"
+      },
+      "TaskPriority": {
+        "type": "integer"
+      },
+      "TaskProgressResponse": {
+        "required": ["done", "counted", "ratio"],
+        "type": "object",
+        "properties": {
+          "done": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "counted": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "ratio": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          }
+        }
+      },
+      "UpdateRelocationTaskRequest": {
+        "required": ["title", "dueDate", "phase", "priority", "status"],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/TaskPhase"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RelocationTaskStatus"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Checklist"
+    },
+    {
+      "name": "Relocations"
+    },
+    {
+      "name": "RelocationTasks"
+    },
+    {
+      "name": "ServiceInfo"
+    }
+  ]
+}

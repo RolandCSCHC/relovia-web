@@ -1,14 +1,6 @@
 import { Component, computed, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import {
-  MatCard,
-  MatCardActions,
-  MatCardContent,
-  MatCardHeader,
-  MatCardSubtitle,
-  MatCardTitle,
-} from '@angular/material/card';
 import { ActivatedRoute } from '@angular/router';
 import { map } from 'rxjs';
 import { googleSignInUrl } from '../core/api-origin';
@@ -23,15 +15,7 @@ const signInErrors: Record<string, string> = {
 
 @Component({
   selector: 'app-sign-in',
-  imports: [
-    MatButton,
-    MatCard,
-    MatCardActions,
-    MatCardContent,
-    MatCardHeader,
-    MatCardSubtitle,
-    MatCardTitle,
-  ],
+  imports: [MatButton],
   templateUrl: './sign-in.html',
   styleUrl: './sign-in.scss',
 })

@@ -28,6 +28,7 @@ Without a session, the app stays on the sign-in page. With a session, it opens t
 | `npm run format`       | Prettier, writing changes                                                      |
 | `npm run format:check` | Prettier, failing when a file differs                                          |
 | `npm run build`        | Production build in `dist/`                                                    |
+| `npm run api:generate` | Regenerates `src/app/api/generated` from `openapi/relovia.json`                |
 
 ## Configuration
 

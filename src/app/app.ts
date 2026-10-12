@@ -1,14 +1,13 @@
 import { Component, computed, inject } from '@angular/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { MatToolbar } from '@angular/material/toolbar';
-import { Router, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Session } from './core/session';
 import { Theme } from './core/theme';
 
 @Component({
   selector: 'app-root',
-  imports: [MatButton, MatIcon, MatIconButton, MatToolbar, RouterOutlet],
+  imports: [MatButton, MatIcon, MatIconButton, RouterLink, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

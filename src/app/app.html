@@ -1,19 +1,21 @@
-<mat-toolbar>
-  <span class="brand">Relovia</span>
-  <span class="spacer"></span>
-  @if (session.user(); as user) {
-    <span class="user">{{ user.displayName }}</span>
-    <button matButton type="button" (click)="signOut()">Sign out</button>
-  }
-  <button
-    matIconButton
-    type="button"
-    (click)="theme.toggle()"
-    [attr.aria-label]="themeToggleLabel()"
-  >
-    <mat-icon>{{ themeIcon() }}</mat-icon>
-  </button>
-</mat-toolbar>
-<main>
-  <router-outlet />
-</main>
+<div class="shell">
+  <header class="topbar">
+    <a class="wordmark" routerLink="/">Relovia</a>
+    <span class="spacer"></span>
+    @if (session.user(); as user) {
+      <span class="user">{{ user.displayName }}</span>
+      <button matButton type="button" (click)="signOut()">Sign out</button>
+    }
+    <button
+      matIconButton
+      type="button"
+      (click)="theme.toggle()"
+      [attr.aria-label]="themeToggleLabel()"
+    >
+      <mat-icon>{{ themeIcon() }}</mat-icon>
+    </button>
+  </header>
+  <main class="page">
+    <router-outlet />
+  </main>
+</div>
