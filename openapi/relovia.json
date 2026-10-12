@@ -600,7 +600,8 @@
         }
       },
       "RelocationPurpose": {
-        "type": "integer"
+        "enum": ["Work", "Study", "Family", "Lifestyle", "Other"],
+        "type": "string"
       },
       "RelocationResponse": {
         "required": [
@@ -662,7 +663,8 @@
         }
       },
       "RelocationStatus": {
-        "type": "integer"
+        "enum": ["Draft", "Active", "Completed", "Archived"],
+        "type": "string"
       },
       "RelocationTaskResponse": {
         "required": [
@@ -735,7 +737,8 @@
         }
       },
       "RelocationTaskStatus": {
-        "type": "integer"
+        "enum": ["Todo", "InProgress", "Done", "Skipped"],
+        "type": "string"
       },
       "SaveRelocationRequest": {
         "required": [
@@ -849,10 +852,12 @@
         }
       },
       "TaskPhase": {
-        "type": "integer"
+        "enum": ["Preparation", "Housing", "Administration", "Finances", "Moving", "Settlement"],
+        "type": "string"
       },
       "TaskPriority": {
-        "type": "integer"
+        "enum": ["Low", "Normal", "High"],
+        "type": "string"
       },
       "TaskProgressResponse": {
         "required": ["done", "counted", "ratio"],

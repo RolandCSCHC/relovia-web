@@ -32,7 +32,7 @@ export type CurrentUserResponse = {
   preferredLanguage: string;
 };
 
-export type RelocationPurpose = number;
+export type RelocationPurpose = 'Work' | 'Study' | 'Family' | 'Lifestyle' | 'Other';
 
 export type RelocationResponse = {
   id: string;
@@ -49,7 +49,7 @@ export type RelocationResponse = {
   updatedAt: string;
 };
 
-export type RelocationStatus = number;
+export type RelocationStatus = 'Draft' | 'Active' | 'Completed' | 'Archived';
 
 export type RelocationTaskResponse = {
   id: string;
@@ -69,7 +69,7 @@ export type RelocationTasksResponse = {
   tasks: Array<RelocationTaskResponse>;
 };
 
-export type RelocationTaskStatus = number;
+export type RelocationTaskStatus = 'Todo' | 'InProgress' | 'Done' | 'Skipped';
 
 export type SaveRelocationRequest = {
   name: string;
@@ -103,9 +103,10 @@ export type TaskDependencyResponse = {
   isSatisfied: boolean;
 };
 
-export type TaskPhase = number;
+export type TaskPhase =
+  'Preparation' | 'Housing' | 'Administration' | 'Finances' | 'Moving' | 'Settlement';
 
-export type TaskPriority = number;
+export type TaskPriority = 'Low' | 'Normal' | 'High';
 
 export type TaskProgressResponse = {
   done: number | string;
