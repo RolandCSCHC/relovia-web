@@ -1,6 +1,7 @@
 <label class="field">
   <span>
-    {{ label() }}{{ required() ? ' ' : '' }}@if (required()) {
+    {{ label() }}{{ required() ? ' ' : '' }}
+    @if (required()) {
       <span class="required" aria-hidden="true">*</span>
     }
   </span>
