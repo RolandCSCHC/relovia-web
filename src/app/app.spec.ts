@@ -29,7 +29,8 @@ describe('App', () => {
     fixture.detectChanges();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.wordmark')?.textContent).toContain('Relovia');
+    expect(compiled.querySelector('.wordmark')?.getAttribute('aria-label')).toBe('Relovia');
+    expect(compiled.querySelector('.wordmark text')?.textContent).toContain('Relovia');
     expect(compiled.querySelector(`a[href="${googleSignInUrl}"]`)?.textContent).toContain(
       'Continue with Google',
     );

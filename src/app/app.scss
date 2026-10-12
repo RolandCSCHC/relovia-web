@@ -20,10 +20,16 @@
 }
 
 .wordmark {
-  color: inherit;
-  font: var(--mat-sys-headline-small);
-  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  color: light-dark(#071c44, var(--mat-sys-on-surface));
   text-decoration: none;
+
+  svg {
+    display: block;
+    height: 2.5rem;
+    width: auto;
+  }
 }
 
 .spacer {
@@ -45,6 +51,10 @@
 @media (max-width: 40rem) {
   .topbar {
     padding-inline: var(--space-4);
+  }
+
+  .wordmark svg {
+    height: 2.15rem;
   }
 
   .page {

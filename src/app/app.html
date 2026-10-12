@@ -1,6 +1,21 @@
 <div class="shell">
   <header class="topbar">
-    <a class="wordmark" routerLink="/">Relovia</a>
+    <a class="wordmark" routerLink="/" aria-label="Relovia">
+      <svg viewBox="0 0 220 44" aria-hidden="true">
+        <image href="logo-icon.png" x="-20.3" y="-17" width="73.6" height="73.6" />
+        <text
+          x="46"
+          y="39"
+          font-family="Arial, Helvetica, sans-serif"
+          font-size="48"
+          font-weight="700"
+          letter-spacing="-1.5"
+          fill="currentColor"
+        >
+          Relovia
+        </text>
+      </svg>
+    </a>
     <span class="spacer"></span>
     @if (session.user(); as user) {
       <span class="user">{{ user.displayName }}</span>
