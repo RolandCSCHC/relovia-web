@@ -1,0 +1,104 @@
+@if (page.error()) {
+  <h1 class="page-title">Checklist</h1>
+  <p class="error-text">{{ page.error()?.message }}</p>
+  <a matButton routerLink="/">Back to relocations</a>
+} @else if (page.hasValue()) {
+  <h1 class="page-title">Review checklist</h1>
+  @if (page.value().confirmed) {
+    <p class="page-lead">This checklist is already confirmed.</p>
+    <a matButton="filled" [routerLink]="['/relocations', page.value().relocation.id]">View tasks</a>
+  } @else {
+    <p class="page-lead">
+      @if (page.value().suggestion?.templateCodes?.length) {
+        Based on {{ page.value().suggestion?.templateCodes?.join(', ') }}.
+      }
+      Include the tasks you want. You can change the title, timing, phase, and priority before they
+      become yours.
+    </p>
+    @if (drafts().length === 0) {
+      <p class="meta empty">No tasks were suggested for this move.</p>
+    } @else {
+      <ul class="stack">
+        @for (task of drafts(); track task.code) {
+          <li class="panel" [class.is-off]="!task.selected">
+            <label class="check">
+              <input
+                type="checkbox"
+                [checked]="task.selected"
+                (change)="toggle(task.code, $event)"
+              />
+              Include {{ task.title }}
+            </label>
+            <label class="field">
+              Title
+              <input
+                [value]="task.title"
+                maxlength="200"
+                [disabled]="!task.selected"
+                (input)="update(task.code, 'title', valueOf($event))"
+              />
+            </label>
+            <div class="place">
+              <label class="field">
+                Days before the move
+                <input
+                  type="number"
+                  step="1"
+                  [value]="task.daysBeforeMove"
+                  [disabled]="!task.selected"
+                  (input)="update(task.code, 'daysBeforeMove', valueOf($event))"
+                />
+              </label>
+              <label class="field">
+                Phase
+                <select
+                  [value]="task.phase"
+                  [disabled]="!task.selected"
+                  (change)="updateChoice(task.code, 'phase', valueOf($event))"
+                >
+                  @for (option of phases; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="field">
+                Priority
+                <select
+                  [value]="task.priority"
+                  [disabled]="!task.selected"
+                  (change)="updateChoice(task.code, 'priority', valueOf($event))"
+                >
+                  @for (option of priorities; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            <p class="meta">
+              Due {{ due(page.value().relocation.targetDate, task.daysBeforeMove) }}
+            </p>
+            @if (dependencyNote(task); as note) {
+              <p class="meta">{{ note }}</p>
+            }
+          </li>
+        }
+      </ul>
+    }
+    @if (selectedCount() === 0) {
+      <p class="meta empty">
+        No tasks selected. Confirming now leaves the checklist open so you can review it again.
+      </p>
+    }
+    @for (message of formErrors(); track message) {
+      <p class="error-text" role="alert">{{ message }}</p>
+    }
+    <div class="actions confirm">
+      <button matButton="filled" type="button" [disabled]="saving()" (click)="confirm()">
+        {{ saving() ? 'Confirming…' : 'Confirm checklist' }}
+      </button>
+      <a matButton [routerLink]="['/relocations', page.value().relocation.id]">Cancel</a>
+    </div>
+  }
+} @else {
+  <p class="page-lead">Loading checklist…</p>
+}

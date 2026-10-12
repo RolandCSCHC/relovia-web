@@ -22,9 +22,10 @@ Setup and local commands are in [docs/setup.md](docs/setup.md).
 Feature folders, and no global state library.
 
 - `src/app/core` holds the API origin, the credentialed HTTP interceptor, the session, the route guards, and the theme.
-- `src/app/api` holds the generated Phase 1 client.
+- `src/app/api` holds the generated Phase 1 client and the small wrapper the screens call.
 - `src/app/sign-in` starts Google sign-in.
-- `src/app/home` is the signed-in landing page.
+- `src/app/home` lists relocations and their progress.
+- `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks.
 
 Local UI state uses signals. HTTP uses RxJS.
 

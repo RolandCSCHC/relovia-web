@@ -1,0 +1,17 @@
+@if (taskCount() === 0) {
+  <p class="meta">Checklist not confirmed</p>
+} @else if (counted() === 0) {
+  <p class="meta">No tasks count toward progress</p>
+} @else {
+  <p class="meta">{{ done() }} of {{ counted() }} done</p>
+  <div
+    class="meter"
+    role="meter"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    [attr.aria-valuenow]="percent()"
+    [attr.aria-label]="done() + ' of ' + counted() + ' done'"
+  >
+    <span class="meter-fill" [style.width.%]="percent()"></span>
+  </div>
+}

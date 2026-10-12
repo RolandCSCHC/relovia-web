@@ -1,0 +1,159 @@
+@if (id() && existing.error()) {
+  <h1 class="page-title">Relocation</h1>
+  <p class="error-text">{{ existing.error()?.message }}</p>
+  <a matButton routerLink="/">Back to relocations</a>
+} @else if (id() && !existing.hasValue()) {
+  <p class="page-lead">Loading relocation…</p>
+} @else {
+  <h1 class="page-title">{{ id() ? 'Edit relocation' : 'New relocation' }}</h1>
+  <p class="page-lead">
+    Origin, destination, purpose, and target date decide which checklist is suggested.
+  </p>
+  <form class="form" novalidate (submit)="save($event)">
+    <label class="field">
+      Name
+      <input
+        id="name"
+        [value]="draft().name"
+        maxlength="200"
+        [attr.aria-invalid]="fieldErrors()['name'] ? true : null"
+        [attr.aria-describedby]="fieldErrors()['name'] ? 'name-error' : null"
+        (input)="update('name', valueOf($event))"
+      />
+    </label>
+    @if (fieldErrors()['name']; as message) {
+      <p id="name-error" class="error-text">{{ message }}</p>
+    }
+
+    <fieldset class="group">
+      <legend>Origin</legend>
+      <div class="place">
+        <label class="field">
+          Country
+          <select
+            id="origin-country"
+            [value]="draft().originCountryCode"
+            [attr.aria-invalid]="fieldErrors()['originCountryCode'] ? true : null"
+            [attr.aria-describedby]="
+              fieldErrors()['originCountryCode'] ? 'origin-country-error' : null
+            "
+            (change)="updateCountry('originCountryCode', $event)"
+          >
+            <option value="">Select a country</option>
+            @for (country of countries; track country.code) {
+              <option [value]="country.code">{{ country.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          City
+          <input
+            id="origin-city"
+            [value]="draft().originCity"
+            maxlength="200"
+            [attr.aria-invalid]="fieldErrors()['originCity'] ? true : null"
+            [attr.aria-describedby]="fieldErrors()['originCity'] ? 'origin-city-error' : null"
+            (input)="update('originCity', valueOf($event))"
+          />
+        </label>
+      </div>
+      @if (fieldErrors()['originCountryCode']; as message) {
+        <p id="origin-country-error" class="error-text">{{ message }}</p>
+      }
+      @if (fieldErrors()['originCity']; as message) {
+        <p id="origin-city-error" class="error-text">{{ message }}</p>
+      }
+    </fieldset>
+
+    <fieldset class="group">
+      <legend>Destination</legend>
+      <div class="place">
+        <label class="field">
+          Country
+          <select
+            id="destination-country"
+            [value]="draft().destinationCountryCode"
+            [attr.aria-invalid]="fieldErrors()['destinationCountryCode'] ? true : null"
+            [attr.aria-describedby]="
+              fieldErrors()['destinationCountryCode'] ? 'destination-country-error' : null
+            "
+            (change)="updateCountry('destinationCountryCode', $event)"
+          >
+            <option value="">Select a country</option>
+            @for (country of countries; track country.code) {
+              <option [value]="country.code">{{ country.name }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          City
+          <input
+            id="destination-city"
+            [value]="draft().destinationCity"
+            maxlength="200"
+            [attr.aria-invalid]="fieldErrors()['destinationCity'] ? true : null"
+            [attr.aria-describedby]="
+              fieldErrors()['destinationCity'] ? 'destination-city-error' : null
+            "
+            (input)="update('destinationCity', valueOf($event))"
+          />
+        </label>
+      </div>
+      @if (fieldErrors()['destinationCountryCode']; as message) {
+        <p id="destination-country-error" class="error-text">{{ message }}</p>
+      }
+      @if (fieldErrors()['destinationCity']; as message) {
+        <p id="destination-city-error" class="error-text">{{ message }}</p>
+      }
+    </fieldset>
+
+    <label class="field">
+      Target date
+      <input
+        id="target-date"
+        type="date"
+        [value]="draft().targetDate"
+        [attr.aria-invalid]="fieldErrors()['targetDate'] ? true : null"
+        [attr.aria-describedby]="fieldErrors()['targetDate'] ? 'target-date-error' : null"
+        (input)="update('targetDate', valueOf($event))"
+      />
+    </label>
+    @if (fieldErrors()['targetDate']; as message) {
+      <p id="target-date-error" class="error-text">{{ message }}</p>
+    }
+
+    <div class="place">
+      <label class="field">
+        Purpose
+        <select
+          id="purpose"
+          [value]="draft().purpose"
+          (change)="update('purpose', purposeOf($event))"
+        >
+          @for (option of purposes; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        Status
+        <select id="status" [value]="draft().status" (change)="update('status', statusOf($event))">
+          @for (option of statuses; track option.value) {
+            <option [value]="option.value">{{ option.label }}</option>
+          }
+        </select>
+      </label>
+    </div>
+
+    @if (formError(); as message) {
+      <p class="error-text" role="alert">{{ message }}</p>
+    }
+
+    <div class="actions">
+      <button matButton="filled" type="submit" [disabled]="saving()">
+        {{ saving() ? 'Saving…' : 'Save relocation' }}
+      </button>
+      <a matButton [routerLink]="id() ? ['/relocations', id()] : ['/']">Cancel</a>
+    </div>
+  </form>
+}

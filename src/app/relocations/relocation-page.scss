@@ -1,0 +1,25 @@
+.summary {
+  margin-top: var(--space-4);
+}
+
+.confirm-delete,
+.empty-tasks {
+  margin-top: var(--space-5);
+}
+
+.task-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.task-line h2 {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+}
+
+.status {
+  min-width: 10rem;
+}

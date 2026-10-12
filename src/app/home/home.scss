@@ -1,0 +1,37 @@
+.loading,
+.retry {
+  margin-top: var(--space-6);
+}
+
+.moves {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+  gap: var(--space-4);
+  margin: var(--space-6) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.move {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  height: 100%;
+  box-sizing: border-box;
+  padding: var(--space-5);
+  border: 1px solid var(--mat-sys-outline-variant);
+  border-radius: 1rem;
+  background: var(--mat-sys-surface-container-low);
+  color: inherit;
+  text-decoration: none;
+}
+
+.move:hover {
+  border-color: var(--mat-sys-outline);
+}
+
+.move h2 {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+  letter-spacing: -0.02em;
+}

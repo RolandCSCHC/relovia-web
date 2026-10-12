@@ -1,4 +1,37 @@
-@if (session.user(); as user) {
-  <h1 class="page-title">Hello, {{ user.displayName }}</h1>
-  <p class="page-lead">Your relocations will show up here.</p>
+<div class="heading-row">
+  <div>
+    <h1 class="page-title">Relocations</h1>
+    <p class="page-lead">Each move keeps its own checklist and tasks.</p>
+  </div>
+  <a matButton="filled" routerLink="/relocations/new">New relocation</a>
+</div>
+
+@if (cards.error()) {
+  <p class="error-text">Relocations could not be loaded.</p>
+  <button class="retry" matButton type="button" (click)="cards.reload()">Try again</button>
+} @else if (cards.isLoading() && cards.value().length === 0) {
+  <p class="page-lead loading">Loading relocations…</p>
+} @else if (cards.value().length === 0) {
+  <p class="page-lead loading">You have no relocations yet.</p>
+} @else {
+  <ul class="moves">
+    @for (card of cards.value(); track card.relocation.id) {
+      <li>
+        <a class="move" [routerLink]="['/relocations', card.relocation.id]">
+          <h2>{{ card.relocation.name }}</h2>
+          <p class="meta">
+            {{ place(card.relocation, 'origin') }} to {{ place(card.relocation, 'destination') }}
+          </p>
+          <p class="meta">
+            {{ formatDate(card.relocation.targetDate) }} · {{ scope(card.relocation) }} ·
+            {{ purpose(card.relocation) }} · {{ status(card.relocation) }}
+          </p>
+          <app-task-progress
+            [progress]="card.tasks.progress"
+            [taskCount]="card.tasks.tasks.length"
+          />
+        </a>
+      </li>
+    }
+  </ul>
 }
