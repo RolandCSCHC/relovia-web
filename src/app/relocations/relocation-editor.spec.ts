@@ -18,6 +18,8 @@ describe('RelocationEditor', () => {
         {
           provide: ReloviaClient,
           useValue: {
+            listCities: (country: string) =>
+              Promise.resolve(country === 'CL' ? ['Santiago'] : ['Berlin']),
             createRelocation: (body: SaveRelocationRequest) => {
               created = body;
               return Promise.resolve({
@@ -64,9 +66,13 @@ describe('RelocationEditor', () => {
     expect(root.querySelector('#destination-country')?.textContent).toContain('Germany');
     setValue(root.querySelector('#name'), 'Berlin move');
     setSelect(root.querySelector('#origin-country'), 'CL');
-    setValue(root.querySelector('#origin-city'), 'Santiago');
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    setSelect(root.querySelector('#origin-city'), 'Santiago');
     setSelect(root.querySelector('#destination-country'), 'DE');
-    setValue(root.querySelector('#destination-city'), 'Berlin');
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    setSelect(root.querySelector('#destination-city'), 'Berlin');
     setValue(root.querySelector('#target-date'), '2026-12-01');
     harness.detectChanges();
     root.querySelector('form')?.dispatchEvent(new Event('submit', { cancelable: true }));
@@ -92,6 +98,7 @@ describe('RelocationEditor', () => {
         {
           provide: ReloviaClient,
           useValue: {
+            listCities: () => Promise.resolve([]),
             createRelocation: () => {
               saved = true;
               return Promise.reject(new Error('should not save'));

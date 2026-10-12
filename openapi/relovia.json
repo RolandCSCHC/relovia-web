@@ -161,6 +161,44 @@
         }
       }
     },
+    "/api/places/cities": {
+      "get": {
+        "tags": ["Cities"],
+        "summary": "Lists city names for a country.",
+        "operationId": "listCities",
+        "parameters": [
+          {
+            "name": "country",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitySearchResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitySearchResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CitySearchResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/relocations": {
       "get": {
         "tags": ["Relocations"],
@@ -620,6 +658,18 @@
           }
         }
       },
+      "CitySearchResponse": {
+        "required": ["cities"],
+        "type": "object",
+        "properties": {
+          "cities": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "ConfirmChecklistRequest": {
         "required": ["tasks"],
         "type": "object",
@@ -1016,6 +1066,9 @@
     },
     {
       "name": "Checklist"
+    },
+    {
+      "name": "Cities"
     },
     {
       "name": "Relocations"

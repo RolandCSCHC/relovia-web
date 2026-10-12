@@ -48,18 +48,16 @@
             }
           </select>
         </label>
-        <label class="field">
-          <span>City <span class="required" aria-hidden="true">*</span></span>
-          <input
-            id="origin-city"
-            aria-required="true"
-            [value]="draft().originCity"
-            maxlength="200"
-            [attr.aria-invalid]="fieldErrors()['originCity'] ? true : null"
-            [attr.aria-describedby]="fieldErrors()['originCity'] ? 'origin-city-error' : null"
-            (input)="update('originCity', valueOf($event))"
-          />
-        </label>
+        <app-city-field
+          inputId="origin-city"
+          label="City"
+          [required]="true"
+          [countryCode]="draft().originCountryCode"
+          [value]="draft().originCity"
+          [invalid]="!!fieldErrors()['originCity']"
+          [describedBy]="fieldErrors()['originCity'] ? 'origin-city-error' : null"
+          (valueChange)="update('originCity', $event)"
+        />
       </div>
       @if (fieldErrors()['originCountryCode']; as message) {
         <p id="origin-country-error" class="error-text">{{ message }}</p>
@@ -90,19 +88,15 @@
             }
           </select>
         </label>
-        <label class="field">
-          City
-          <input
-            id="destination-city"
-            [value]="draft().destinationCity"
-            maxlength="200"
-            [attr.aria-invalid]="fieldErrors()['destinationCity'] ? true : null"
-            [attr.aria-describedby]="
-              fieldErrors()['destinationCity'] ? 'destination-city-error' : null
-            "
-            (input)="update('destinationCity', valueOf($event))"
-          />
-        </label>
+        <app-city-field
+          inputId="destination-city"
+          label="City"
+          [countryCode]="draft().destinationCountryCode"
+          [value]="draft().destinationCity"
+          [invalid]="!!fieldErrors()['destinationCity']"
+          [describedBy]="fieldErrors()['destinationCity'] ? 'destination-city-error' : null"
+          (valueChange)="update('destinationCity', $event)"
+        />
       </div>
       @if (fieldErrors()['destinationCountryCode']; as message) {
         <p id="destination-country-error" class="error-text">{{ message }}</p>

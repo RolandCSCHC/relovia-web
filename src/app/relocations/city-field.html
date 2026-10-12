@@ -1,0 +1,24 @@
+<label class="field">
+  <span>
+    {{ label() }}{{ required() ? ' ' : '' }}@if (required()) {
+      <span class="required" aria-hidden="true">*</span>
+    }
+  </span>
+  <select
+    [id]="inputId()"
+    [value]="value()"
+    [disabled]="!countryCode() || loading()"
+    [attr.aria-required]="required() ? true : null"
+    [attr.aria-invalid]="invalid() || error() ? true : null"
+    [attr.aria-describedby]="describedBy()"
+    (change)="onChange($event)"
+  >
+    <option value="">{{ loading() ? 'Loading cities…' : 'Select a city' }}</option>
+    @for (city of cities(); track city) {
+      <option [value]="city">{{ city }}</option>
+    }
+  </select>
+</label>
+@if (error(); as message) {
+  <p class="error-text">{{ message }}</p>
+}

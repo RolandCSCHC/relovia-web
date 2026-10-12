@@ -21,6 +21,8 @@ import type {
   GetRelocationResponses,
   GetServiceInfoData,
   GetServiceInfoResponses,
+  ListCitiesData,
+  ListCitiesResponses,
   ListRelocationsData,
   ListRelocationsResponses,
   ListRelocationTasksData,
@@ -110,6 +112,17 @@ export const confirmChecklist = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Lists city names for a country.
+ */
+export const listCities = <ThrowOnError extends boolean = false>(
+  options?: Options<ListCitiesData, ThrowOnError>,
+): RequestResult<ListCitiesResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<ListCitiesResponses, unknown, ThrowOnError>({
+    url: '/api/places/cities',
+    ...options,
   });
 
 /**

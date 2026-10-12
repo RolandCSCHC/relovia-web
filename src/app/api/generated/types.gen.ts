@@ -11,6 +11,10 @@ export type ChecklistSuggestionResponse = {
   tasks: Array<SuggestedTaskResponse>;
 };
 
+export type CitySearchResponse = {
+  cities: Array<string>;
+};
+
 export type ConfirmChecklistRequest = {
   tasks: Array<ConfirmChecklistTaskRequest>;
 };
@@ -209,6 +213,24 @@ export type ConfirmChecklistResponses = {
 };
 
 export type ConfirmChecklistResponse = ConfirmChecklistResponses[keyof ConfirmChecklistResponses];
+
+export type ListCitiesData = {
+  body?: never;
+  path?: never;
+  query?: {
+    country?: string;
+  };
+  url: '/api/places/cities';
+};
+
+export type ListCitiesResponses = {
+  /**
+   * OK
+   */
+  200: CitySearchResponse;
+};
+
+export type ListCitiesResponse = ListCitiesResponses[keyof ListCitiesResponses];
 
 export type ListRelocationsData = {
   body?: never;

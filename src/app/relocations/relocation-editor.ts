@@ -5,6 +5,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { map } from 'rxjs';
 import type { RelocationPurpose, RelocationStatus } from '../api/generated';
 import { ApiError, ReloviaClient } from '../api/relovia-client';
+import { CityField } from './city-field';
 import { countries } from './countries';
 import { purposes, relocationStatuses } from './labels';
 import {
@@ -16,7 +17,7 @@ import {
 
 @Component({
   selector: 'app-relocation-editor',
-  imports: [MatButton, RouterLink],
+  imports: [CityField, MatButton, RouterLink],
   templateUrl: './relocation-editor.html',
 })
 export class RelocationEditor {
@@ -92,7 +93,19 @@ export class RelocationEditor {
   }
 
   protected updateCountry(key: 'originCountryCode' | 'destinationCountryCode', event: Event): void {
-    this.update(key, this.valueOf(event).toUpperCase());
+    const code = this.valueOf(event).toUpperCase();
+    const cityKey = key === 'originCountryCode' ? 'originCity' : 'destinationCity';
+    this.draft.update((draft) => ({ ...draft, [key]: code, [cityKey]: '' }));
+    this.fieldErrors.update((errors) => {
+      if (!(key in errors) && !(cityKey in errors)) {
+        return errors;
+      }
+
+      const next = { ...errors };
+      delete next[key];
+      delete next[cityKey];
+      return next;
+    });
   }
 
   protected async save(event: Event): Promise<void> {

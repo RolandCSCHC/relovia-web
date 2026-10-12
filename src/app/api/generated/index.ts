@@ -10,6 +10,7 @@ export {
   getCurrentUser,
   getRelocation,
   getServiceInfo,
+  listCities,
   listRelocations,
   listRelocationTasks,
   logout,
@@ -20,6 +21,7 @@ export {
 } from './sdk.gen';
 export type {
   ChecklistSuggestionResponse,
+  CitySearchResponse,
   ClientOptions,
   ConfirmChecklistData,
   ConfirmChecklistRequest,
@@ -50,6 +52,9 @@ export type {
   GetServiceInfoData,
   GetServiceInfoResponse,
   GetServiceInfoResponses,
+  ListCitiesData,
+  ListCitiesResponse,
+  ListCitiesResponses,
   ListRelocationsData,
   ListRelocationsResponse,
   ListRelocationsResponses,

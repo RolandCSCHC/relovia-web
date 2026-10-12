@@ -30,6 +30,18 @@ export class ApiError extends Error {
 export class ReloviaClient {
   private readonly client = createClient(createClientConfig({ httpClient: inject(HttpClient) }));
 
+  async listCities(country: string): Promise<string[]> {
+    const result = await this.unwrap(
+      reloviaApi.listCities({
+        client: this.client,
+        query: { country },
+        throwOnError: true,
+      }),
+      'Cities could not be loaded.',
+    );
+    return result.cities;
+  }
+
   listRelocations(): Promise<RelocationResponse[]> {
     return this.unwrap(
       reloviaApi.listRelocations({ client: this.client, throwOnError: true }),
