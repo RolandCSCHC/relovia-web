@@ -5,6 +5,7 @@ import * as reloviaApi from './generated/sdk.gen';
 import type {
   ChecklistSuggestionResponse,
   ConfirmChecklistRequest,
+  CreateRelocationTaskRequest,
   RelocationResponse,
   RelocationTaskResponse,
   RelocationTasksResponse,
@@ -116,6 +117,33 @@ export class ReloviaClient {
       }),
       'The task could not be saved.',
     );
+  }
+
+  createTask(
+    relocationId: string,
+    body: CreateRelocationTaskRequest,
+  ): Promise<RelocationTaskResponse> {
+    return this.unwrap(
+      reloviaApi.createRelocationTask({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The task could not be saved.',
+    );
+  }
+
+  async deleteTask(relocationId: string, taskId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteRelocationTask({
+        client: this.client,
+        path: { relocationId, taskId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The task could not be deleted.');
+    }
   }
 
   private async unwrap<T>(request: Promise<{ data: T }>, fallback: string): Promise<T> {

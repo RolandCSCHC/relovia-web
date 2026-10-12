@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
 import type {
+  CreateRelocationTaskRequest,
   RelocationResponse,
   RelocationTasksResponse,
   UpdateRelocationTaskRequest,
@@ -65,7 +66,99 @@ describe('RelocationPage', () => {
     });
     expect(root.textContent).toContain('1 of 1 done');
   });
+
+  it('adds a task and deletes one', async () => {
+    let created: CreateRelocationTaskRequest | undefined;
+    let deleted: string | undefined;
+    const tasks = taskList();
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([{ path: 'relocations/:id', component: RelocationPage }]),
+        {
+          provide: ReloviaClient,
+          useValue: {
+            getRelocation: () => Promise.resolve(relocation()),
+            listTasks: () => Promise.resolve(tasks),
+            createTask: (_relocationId: string, body: CreateRelocationTaskRequest) => {
+              created = body;
+              tasks.tasks = [
+                ...tasks.tasks,
+                {
+                  ...tasks.tasks[0],
+                  id: '0199f0a1-7c00-7000-8000-000000000022',
+                  code: 'pack-the-kitchen',
+                  title: body.title,
+                  dueDate: body.dueDate ?? null,
+                  phase: body.phase,
+                  priority: body.priority,
+                  status: 'Todo',
+                  dependencies: [],
+                },
+              ];
+              return Promise.resolve(tasks.tasks[1]);
+            },
+            deleteTask: (_relocationId: string, taskId: string) => {
+              deleted = taskId;
+              tasks.tasks = tasks.tasks.filter((task) => task.id !== taskId);
+              return Promise.resolve();
+            },
+          },
+        },
+      ],
+    });
+
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl(`/relocations/${relocationId}`);
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    const root = harness.routeNativeElement!;
+
+    clickButton(root, 'Add task');
+    harness.detectChanges();
+    setValue(root.querySelector('#new-task-title'), 'Pack the kitchen');
+    harness.detectChanges();
+    root.querySelector('.task-form')?.dispatchEvent(new Event('submit', { cancelable: true }));
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+
+    expect(created).toMatchObject({
+      title: 'Pack the kitchen',
+      dueDate: null,
+      phase: 'Preparation',
+      priority: 'Normal',
+    });
+    expect(root.textContent).toContain('Pack the kitchen');
+
+    clickButton(root, 'Delete task');
+    harness.detectChanges();
+    clickButton(root, 'Delete task');
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+
+    expect(deleted).toBe('0199f0a1-7c00-7000-8000-000000000021');
+    expect(root.textContent).not.toContain('Give notice');
+  });
 });
+
+function clickButton(root: HTMLElement, name: string): void {
+  const button = [...root.querySelectorAll('button')].find(
+    (item) => item.textContent?.trim() === name,
+  );
+  if (!(button instanceof HTMLButtonElement)) {
+    throw new Error(`Missing button ${name}`);
+  }
+
+  button.click();
+}
+
+function setValue(input: Element | null, value: string): void {
+  if (!(input instanceof HTMLInputElement)) {
+    throw new Error('Missing input');
+  }
+
+  input.value = value;
+  input.dispatchEvent(new Event('input'));
+}
 
 function relocation(): RelocationResponse {
   return {

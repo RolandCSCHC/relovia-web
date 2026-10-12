@@ -23,6 +23,13 @@ export type ConfirmChecklistTaskRequest = {
   priority: TaskPriority;
 };
 
+export type CreateRelocationTaskRequest = {
+  title: string;
+  dueDate?: null | string;
+  phase: TaskPhase;
+  priority: TaskPriority;
+};
+
 export type CurrentUserResponse = {
   id: string;
   email: string;
@@ -305,6 +312,42 @@ export type ListRelocationTasksResponses = {
 
 export type ListRelocationTasksResponse =
   ListRelocationTasksResponses[keyof ListRelocationTasksResponses];
+
+export type CreateRelocationTaskData = {
+  body: CreateRelocationTaskRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/tasks';
+};
+
+export type CreateRelocationTaskResponses = {
+  /**
+   * OK
+   */
+  200: RelocationTaskResponse;
+};
+
+export type CreateRelocationTaskResponse =
+  CreateRelocationTaskResponses[keyof CreateRelocationTaskResponses];
+
+export type DeleteRelocationTaskData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    taskId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/tasks/{taskId}';
+};
+
+export type DeleteRelocationTaskResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
 
 export type UpdateRelocationTaskData = {
   body: UpdateRelocationTaskRequest;

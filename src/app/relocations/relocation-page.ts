@@ -31,13 +31,12 @@ export class RelocationPage {
   protected readonly priorities = priorities;
   protected readonly taskStatuses = taskStatuses;
   protected readonly editingId = signal<string | null>(null);
-  protected readonly editDraft = signal({
-    title: '',
-    dueDate: '',
-    phase: phases[0].value,
-    priority: priorities[1].value,
-  });
+  protected readonly editDraft = signal(emptyTaskDraft());
   protected readonly editError = signal<string | null>(null);
+  protected readonly adding = signal(false);
+  protected readonly addDraft = signal(emptyTaskDraft());
+  protected readonly addError = signal<string | null>(null);
+  protected readonly deletingTaskId = signal<string | null>(null);
   protected readonly actionError = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly confirmingDelete = signal(false);
@@ -97,8 +96,62 @@ export class RelocationPage {
     return `After ${notes.join(', ')}`;
   }
 
+  protected startAdd(): void {
+    this.adding.set(true);
+    this.addError.set(null);
+    this.addDraft.set(emptyTaskDraft());
+    this.editingId.set(null);
+    this.deletingTaskId.set(null);
+  }
+
+  protected updateAdd(key: 'title' | 'dueDate', value: string): void {
+    this.addDraft.update((draft) => ({ ...draft, [key]: value }));
+  }
+
+  protected updateAddPhase(value: string): void {
+    this.addDraft.update((draft) => ({ ...draft, phase: value as TaskPhase }));
+  }
+
+  protected updateAddPriority(value: string): void {
+    this.addDraft.update((draft) => ({ ...draft, priority: value as TaskPriority }));
+  }
+
+  protected async saveAdd(): Promise<void> {
+    const id = this.id();
+    const title = this.addDraft().title.trim();
+    if (!id) {
+      return;
+    }
+
+    const titleError = titleProblem(title);
+    if (titleError) {
+      this.addError.set(titleError);
+      return;
+    }
+
+    this.saving.set(true);
+    this.addError.set(null);
+    try {
+      const draft = this.addDraft();
+      await this.api.createTask(id, {
+        title,
+        dueDate: draft.dueDate || null,
+        phase: draft.phase,
+        priority: draft.priority,
+      });
+      this.adding.set(false);
+      this.tasks.reload();
+    } catch (error) {
+      this.addError.set(this.failure(error, 'The task could not be saved.'));
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   protected startEdit(task: RelocationTaskResponse): void {
     this.editingId.set(task.id);
+    this.adding.set(false);
+    this.deletingTaskId.set(null);
     this.editError.set(null);
     this.editDraft.set({
       title: task.title,
@@ -159,13 +212,9 @@ export class RelocationPage {
       return;
     }
 
-    if (!title) {
-      this.editError.set('Title is required.');
-      return;
-    }
-
-    if (title.length > 200) {
-      this.editError.set('Title must be 200 characters or fewer.');
+    const titleError = titleProblem(title);
+    if (titleError) {
+      this.editError.set(titleError);
       return;
     }
 
@@ -183,6 +232,25 @@ export class RelocationPage {
       this.tasks.reload();
     } catch (error) {
       this.editError.set(this.failure(error, 'The task could not be saved.'));
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
+  protected async removeTask(task: RelocationTaskResponse): Promise<void> {
+    const id = this.id();
+    if (!id) {
+      return;
+    }
+
+    this.saving.set(true);
+    this.actionError.set(null);
+    try {
+      await this.api.deleteTask(id, task.id);
+      this.deletingTaskId.set(null);
+      this.tasks.reload();
+    } catch (error) {
+      this.actionError.set(this.failure(error, 'The task could not be deleted.'));
     } finally {
       this.saving.set(false);
     }
@@ -208,4 +276,30 @@ export class RelocationPage {
   private failure(error: unknown, fallback: string): string {
     return error instanceof ApiError ? error.message : fallback;
   }
+}
+
+function emptyTaskDraft(): {
+  title: string;
+  dueDate: string;
+  phase: TaskPhase;
+  priority: TaskPriority;
+} {
+  return {
+    title: '',
+    dueDate: '',
+    phase: phases[0].value,
+    priority: priorities[1].value,
+  };
+}
+
+function titleProblem(title: string): string | null {
+  if (!title) {
+    return 'Title is required.';
+  }
+
+  if (title.length > 200) {
+    return 'Title must be 200 characters or fewer.';
+  }
+
+  return null;
 }

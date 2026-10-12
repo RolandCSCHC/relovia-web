@@ -7,8 +7,12 @@ import type {
   ConfirmChecklistResponses,
   CreateRelocationData,
   CreateRelocationResponses,
+  CreateRelocationTaskData,
+  CreateRelocationTaskResponses,
   DeleteRelocationData,
   DeleteRelocationResponses,
+  DeleteRelocationTaskData,
+  DeleteRelocationTaskResponses,
   GetChecklistSuggestionData,
   GetChecklistSuggestionResponses,
   GetCurrentUserData,
@@ -179,6 +183,32 @@ export const listRelocationTasks = <ThrowOnError extends boolean = false>(
 ): RequestResult<ListRelocationTasksResponses, unknown, ThrowOnError> =>
   (options.client ?? client).get<ListRelocationTasksResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/tasks',
+    ...options,
+  });
+
+/**
+ * Adds a task to the signed-in user's relocation.
+ */
+export const createRelocationTask = <ThrowOnError extends boolean = false>(
+  options: Options<CreateRelocationTaskData, ThrowOnError>,
+): RequestResult<CreateRelocationTaskResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateRelocationTaskResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/tasks',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes a task owned by the signed-in user.
+ */
+export const deleteRelocationTask = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteRelocationTaskData, ThrowOnError>,
+): RequestResult<DeleteRelocationTaskResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteRelocationTaskResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/tasks/{taskId}',
     ...options,
   });
 

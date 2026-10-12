@@ -45,9 +45,72 @@
     <p class="error-text" role="alert">{{ message }}</p>
   }
 
+  @if (!adding()) {
+    <div class="actions task-toolbar">
+      <button matButton="outlined" type="button" (click)="startAdd()">Add task</button>
+    </div>
+  } @else {
+    <form class="panel fields task-form" (submit)="saveAdd(); $event.preventDefault()">
+      <label class="field">
+        <span>Title <span class="required" aria-hidden="true">*</span></span>
+        <input
+          id="new-task-title"
+          aria-required="true"
+          [value]="addDraft().title"
+          maxlength="200"
+          (input)="updateAdd('title', editValue($event))"
+        />
+      </label>
+      <label class="field">
+        Due date
+        <input
+          id="new-task-due"
+          type="date"
+          [value]="addDraft().dueDate"
+          (input)="updateAdd('dueDate', editValue($event))"
+        />
+      </label>
+      <div class="place">
+        <label class="field">
+          <span>Phase <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="new-task-phase"
+            aria-required="true"
+            [value]="addDraft().phase"
+            (change)="updateAddPhase(editValue($event))"
+          >
+            @for (option of phases; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Priority <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="new-task-priority"
+            aria-required="true"
+            [value]="addDraft().priority"
+            (change)="updateAddPriority(editValue($event))"
+          >
+            @for (option of priorities; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      @if (addError(); as message) {
+        <p class="error-text" role="alert">{{ message }}</p>
+      }
+      <div class="actions">
+        <button matButton="filled" type="submit" [disabled]="saving()">Save task</button>
+        <button matButton type="button" (click)="adding.set(false)">Cancel</button>
+      </div>
+    </form>
+  }
+
   @if (tasks.value().tasks.length === 0) {
     <div class="panel empty-tasks">
-      <p class="meta">Confirm a checklist before tasks show up here.</p>
+      <p class="meta">Confirm a checklist, or add a task of your own.</p>
       <a matButton="filled" [routerLink]="['/relocations', relocation.value().id, 'checklist']">
         Review checklist
       </a>
@@ -81,13 +144,32 @@
           @if (dependencyNote(task, tasks.value().tasks); as note) {
             <p class="meta">{{ note }}</p>
           }
-          @if (editingId() !== task.id) {
-            <button matButton type="button" (click)="startEdit(task)">Edit task</button>
+          @if (deletingTaskId() === task.id) {
+            <p class="meta">Delete this task?</p>
+            <div class="actions">
+              <button
+                matButton="outlined"
+                type="button"
+                [disabled]="saving()"
+                (click)="removeTask(task)"
+              >
+                Delete task
+              </button>
+              <button matButton type="button" (click)="deletingTaskId.set(null)">Cancel</button>
+            </div>
+          } @else if (editingId() !== task.id) {
+            <div class="actions">
+              <button matButton type="button" (click)="startEdit(task)">Edit task</button>
+              <button matButton type="button" (click)="deletingTaskId.set(task.id)">
+                Delete task
+              </button>
+            </div>
           } @else {
             <form class="fields" (submit)="saveEdit(task); $event.preventDefault()">
               <label class="field">
-                Title
+                <span>Title <span class="required" aria-hidden="true">*</span></span>
                 <input
+                  aria-required="true"
                   [value]="editDraft().title"
                   maxlength="200"
                   (input)="updateEdit('title', editValue($event))"
@@ -103,16 +185,21 @@
               </label>
               <div class="place">
                 <label class="field">
-                  Phase
-                  <select [value]="editDraft().phase" (change)="updatePhase(editValue($event))">
+                  <span>Phase <span class="required" aria-hidden="true">*</span></span>
+                  <select
+                    aria-required="true"
+                    [value]="editDraft().phase"
+                    (change)="updatePhase(editValue($event))"
+                  >
                     @for (option of phases; track option.value) {
                       <option [value]="option.value">{{ option.label }}</option>
                     }
                   </select>
                 </label>
                 <label class="field">
-                  Priority
+                  <span>Priority <span class="required" aria-hidden="true">*</span></span>
                   <select
+                    aria-required="true"
                     [value]="editDraft().priority"
                     (change)="updatePriority(editValue($event))"
                   >

@@ -403,9 +403,97 @@
             }
           }
         }
+      },
+      "post": {
+        "tags": ["RelocationTasks"],
+        "summary": "Adds a task to the signed-in user's relocation.",
+        "operationId": "createRelocationTask",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRelocationTaskRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRelocationTaskRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRelocationTaskRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTaskResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTaskResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTaskResponse"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/relocations/{relocationId}/tasks/{taskId}": {
+      "delete": {
+        "tags": ["RelocationTasks"],
+        "summary": "Deletes a task owned by the signed-in user.",
+        "operationId": "deleteRelocationTask",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
       "put": {
         "tags": ["RelocationTasks"],
         "summary": "Updates a task owned by the signed-in user.",
@@ -558,6 +646,25 @@
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": ["integer", "string"],
             "format": "int32"
+          },
+          "phase": {
+            "$ref": "#/components/schemas/TaskPhase"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/TaskPriority"
+          }
+        }
+      },
+      "CreateRelocationTaskRequest": {
+        "required": ["title", "phase", "priority"],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "dueDate": {
+            "type": ["null", "string"],
+            "format": "date"
           },
           "phase": {
             "$ref": "#/components/schemas/TaskPhase"
