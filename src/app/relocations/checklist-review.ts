@@ -94,10 +94,14 @@ export class ChecklistReview {
     );
   }
 
-  protected due(targetDate: string, daysBeforeMove: string): string {
+  protected due(targetDate: string | null, daysBeforeMove: string): string {
+    if (!targetDate) {
+      return 'Set a target date to give this a due date.';
+    }
+
     return /^-?\d+$/.test(daysBeforeMove.trim())
-      ? formatDate(dueOn(targetDate, Number(daysBeforeMove)))
-      : 'Set a whole number of days';
+      ? `Due ${formatDate(dueOn(targetDate, Number(daysBeforeMove)))}`
+      : 'Set a whole number of days.';
   }
 
   protected dependencyNote(task: DraftTask): string {

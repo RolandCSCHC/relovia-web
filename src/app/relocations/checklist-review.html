@@ -75,7 +75,7 @@
               </label>
             </div>
             <p class="meta">
-              Due {{ due(page.value().relocation.targetDate, task.daysBeforeMove) }}
+              {{ due(page.value().relocation.targetDate, task.daysBeforeMove) }}
             </p>
             @if (dependencyNote(task); as note) {
               <p class="meta">{{ note }}</p>

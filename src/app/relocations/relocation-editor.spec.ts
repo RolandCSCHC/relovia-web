@@ -110,6 +110,21 @@ describe('RelocationEditor', () => {
 
     expect(root.textContent).toContain('Select a country.');
     expect(saved).toBe(false);
+    for (const id of [
+      'name',
+      'origin-country',
+      'origin-city',
+      'destination-country',
+      'purpose',
+      'status',
+    ]) {
+      expect(root.querySelector(`#${id}`)?.closest('label')?.textContent).toContain('*');
+      expect(root.querySelector(`#${id}`)?.getAttribute('aria-required')).toBe('true');
+    }
+    expect(root.querySelector('#destination-city')?.closest('label')?.textContent).not.toContain(
+      '*',
+    );
+    expect(root.querySelector('#target-date')?.closest('label')?.textContent).not.toContain('*');
   });
 });
 

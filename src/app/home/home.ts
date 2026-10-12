@@ -30,13 +30,22 @@ export class Home {
     },
   });
 
-  protected readonly formatDate = formatDate;
+  protected details(relocation: RelocationResponse): string {
+    return [
+      relocation.targetDate ? formatDate(relocation.targetDate) : null,
+      this.scope(relocation),
+      this.purpose(relocation),
+      this.status(relocation),
+    ]
+      .filter((part) => part !== null)
+      .join(' · ');
+  }
 
   protected place(relocation: RelocationResponse, end: 'origin' | 'destination'): string {
     const city = end === 'origin' ? relocation.originCity : relocation.destinationCity;
     const country =
       end === 'origin' ? relocation.originCountryCode : relocation.destinationCountryCode;
-    return `${city}, ${countryName(country)}`;
+    return city.trim() ? `${city}, ${countryName(country)}` : countryName(country);
   }
 
   protected purpose(relocation: RelocationResponse): string {

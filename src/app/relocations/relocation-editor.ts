@@ -59,7 +59,7 @@ export class RelocationEditor {
         originCity: relocation.originCity,
         destinationCountryCode: relocation.destinationCountryCode,
         destinationCity: relocation.destinationCity,
-        targetDate: relocation.targetDate,
+        targetDate: relocation.targetDate ?? '',
         purpose: relocation.purpose,
         status: relocation.status,
       });

@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5080/"
+      "url": "http://localhost:5081/"
     }
   ],
   "paths": {
@@ -515,7 +515,7 @@
             "format": "uuid"
           },
           "targetDate": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date"
           },
           "templateCodes": {
@@ -640,7 +640,7 @@
             "type": "string"
           },
           "targetDate": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date"
           },
           "purpose": {
@@ -697,7 +697,7 @@
             "format": "int32"
           },
           "dueDate": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date"
           },
           "phase": {
@@ -747,7 +747,6 @@
           "originCity",
           "destinationCountryCode",
           "destinationCity",
-          "targetDate",
           "purpose",
           "status"
         ],
@@ -769,7 +768,7 @@
             "type": "string"
           },
           "targetDate": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date"
           },
           "purpose": {
@@ -814,7 +813,7 @@
             "format": "int32"
           },
           "dueDate": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date"
           },
           "phase": {
@@ -881,14 +880,14 @@
         }
       },
       "UpdateRelocationTaskRequest": {
-        "required": ["title", "dueDate", "phase", "priority", "status"],
+        "required": ["title", "phase", "priority", "status"],
         "type": "object",
         "properties": {
           "title": {
             "type": "string"
           },
           "dueDate": {
-            "type": "string",
+            "type": ["null", "string"],
             "format": "date"
           },
           "phase": {

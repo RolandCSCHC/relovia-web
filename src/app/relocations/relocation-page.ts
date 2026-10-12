@@ -59,12 +59,19 @@ export class RelocationPage {
     const city = end === 'origin' ? relocation.originCity : relocation.destinationCity;
     const country =
       end === 'origin' ? relocation.originCountryCode : relocation.destinationCountryCode;
-    return `${city}, ${countryName(country)}`;
+    return city.trim() ? `${city}, ${countryName(country)}` : countryName(country);
   }
 
   protected summary(relocation: RelocationResponse): string {
     const scope = relocation.isInternational ? 'International' : 'Domestic';
-    return `${formatDate(relocation.targetDate)} · ${scope} · ${labelFor(purposes, relocation.purpose)} · ${labelFor(relocationStatuses, relocation.status)}`;
+    return [
+      relocation.targetDate ? formatDate(relocation.targetDate) : null,
+      scope,
+      labelFor(purposes, relocation.purpose),
+      labelFor(relocationStatuses, relocation.status),
+    ]
+      .filter((part) => part !== null)
+      .join(' · ');
   }
 
   protected phaseLabel(task: RelocationTaskResponse): string {
@@ -95,7 +102,7 @@ export class RelocationPage {
     this.editError.set(null);
     this.editDraft.set({
       title: task.title,
-      dueDate: task.dueDate,
+      dueDate: task.dueDate ?? '',
       phase: task.phase,
       priority: task.priority,
     });
@@ -162,17 +169,12 @@ export class RelocationPage {
       return;
     }
 
-    if (!draft.dueDate) {
-      this.editError.set('Due date is required.');
-      return;
-    }
-
     this.saving.set(true);
     this.editError.set(null);
     try {
       await this.api.updateTask(id, task.id, {
         title,
-        dueDate: draft.dueDate,
+        dueDate: draft.dueDate || null,
         phase: draft.phase,
         priority: draft.priority,
         status: task.status,

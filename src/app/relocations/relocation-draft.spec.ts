@@ -20,8 +20,26 @@ describe('relocation draft', () => {
       name: 'Berlin move',
       originCountryCode: 'CL',
       destinationCountryCode: 'DE',
+      destinationCity: 'Berlin',
+      targetDate: '2026-12-01',
       purpose: 'Work',
       status: 'Draft',
+    });
+  });
+
+  it('leaves the destination city and target date empty', () => {
+    const draft = {
+      ...emptyRelocationDraft(),
+      name: 'Offer pending',
+      originCountryCode: 'CL',
+      originCity: 'Santiago',
+      destinationCountryCode: 'DE',
+    };
+
+    expect(relocationErrors(draft)).toEqual({});
+    expect(relocationRequest(draft)).toMatchObject({
+      destinationCity: '',
+      targetDate: null,
     });
   });
 });

@@ -7,13 +7,15 @@
 } @else {
   <h1 class="page-title">{{ id() ? 'Edit relocation' : 'New relocation' }}</h1>
   <p class="page-lead">
-    Origin, destination, purpose, and target date decide which checklist is suggested.
+    Origin, destination, and purpose decide which checklist is suggested. Destination city and
+    target date can wait.
   </p>
   <form class="form" novalidate (submit)="save($event)">
     <label class="field">
-      Name
+      <span>Name <span class="required" aria-hidden="true">*</span></span>
       <input
         id="name"
+        aria-required="true"
         [value]="draft().name"
         maxlength="200"
         [attr.aria-invalid]="fieldErrors()['name'] ? true : null"
@@ -29,9 +31,10 @@
       <legend>Origin</legend>
       <div class="place">
         <label class="field">
-          Country
+          <span>Country <span class="required" aria-hidden="true">*</span></span>
           <select
             id="origin-country"
+            aria-required="true"
             [value]="draft().originCountryCode"
             [attr.aria-invalid]="fieldErrors()['originCountryCode'] ? true : null"
             [attr.aria-describedby]="
@@ -46,9 +49,10 @@
           </select>
         </label>
         <label class="field">
-          City
+          <span>City <span class="required" aria-hidden="true">*</span></span>
           <input
             id="origin-city"
+            aria-required="true"
             [value]="draft().originCity"
             maxlength="200"
             [attr.aria-invalid]="fieldErrors()['originCity'] ? true : null"
@@ -69,9 +73,10 @@
       <legend>Destination</legend>
       <div class="place">
         <label class="field">
-          Country
+          <span>Country <span class="required" aria-hidden="true">*</span></span>
           <select
             id="destination-country"
+            aria-required="true"
             [value]="draft().destinationCountryCode"
             [attr.aria-invalid]="fieldErrors()['destinationCountryCode'] ? true : null"
             [attr.aria-describedby]="
@@ -124,9 +129,10 @@
 
     <div class="place">
       <label class="field">
-        Purpose
+        <span>Purpose <span class="required" aria-hidden="true">*</span></span>
         <select
           id="purpose"
+          aria-required="true"
           [value]="draft().purpose"
           (change)="update('purpose', purposeOf($event))"
         >
@@ -136,8 +142,13 @@
         </select>
       </label>
       <label class="field">
-        Status
-        <select id="status" [value]="draft().status" (change)="update('status', statusOf($event))">
+        <span>Status <span class="required" aria-hidden="true">*</span></span>
+        <select
+          id="status"
+          aria-required="true"
+          [value]="draft().status"
+          (change)="update('status', statusOf($event))"
+        >
           @for (option of statuses; track option.value) {
             <option [value]="option.value">{{ option.label }}</option>
           }

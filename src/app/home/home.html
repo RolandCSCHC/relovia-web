@@ -22,10 +22,7 @@
           <p class="meta">
             {{ place(card.relocation, 'origin') }} to {{ place(card.relocation, 'destination') }}
           </p>
-          <p class="meta">
-            {{ formatDate(card.relocation.targetDate) }} · {{ scope(card.relocation) }} ·
-            {{ purpose(card.relocation) }} · {{ status(card.relocation) }}
-          </p>
+          <p class="meta">{{ details(card.relocation) }}</p>
           <app-task-progress
             [progress]="card.tasks.progress"
             [taskCount]="card.tasks.tasks.length"

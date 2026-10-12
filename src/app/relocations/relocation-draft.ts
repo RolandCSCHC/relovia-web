@@ -31,10 +31,7 @@ export function relocationErrors(draft: RelocationDraft): Record<string, string>
   requireCountry(errors, 'originCountryCode', draft.originCountryCode);
   requireText(errors, 'originCity', draft.originCity, 'Origin city');
   requireCountry(errors, 'destinationCountryCode', draft.destinationCountryCode);
-  requireText(errors, 'destinationCity', draft.destinationCity, 'Destination city');
-  if (!draft.targetDate) {
-    errors['targetDate'] = 'Target date is required.';
-  }
+  optionalText(errors, 'destinationCity', draft.destinationCity, 'Destination city');
 
   return errors;
 }
@@ -46,7 +43,7 @@ export function relocationRequest(draft: RelocationDraft): SaveRelocationRequest
     originCity: draft.originCity.trim(),
     destinationCountryCode: draft.destinationCountryCode.trim().toUpperCase(),
     destinationCity: draft.destinationCity.trim(),
-    targetDate: draft.targetDate,
+    targetDate: draft.targetDate || null,
     purpose: draft.purpose,
     status: draft.status,
   };
@@ -65,6 +62,17 @@ function requireText(
   }
 
   if (text.length > 200) {
+    errors[key] = `${label} must be 200 characters or fewer.`;
+  }
+}
+
+function optionalText(
+  errors: Record<string, string>,
+  key: string,
+  value: string,
+  label: string,
+): void {
+  if (value.trim().length > 200) {
     errors[key] = `${label} must be 200 characters or fewer.`;
   }
 }

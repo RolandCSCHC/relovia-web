@@ -73,8 +73,10 @@
             </label>
           </div>
           <p class="meta">
-            Due {{ formatDate(task.dueDate) }} · {{ phaseLabel(task) }} ·
-            {{ priorityLabel(task) }}
+            @if (task.dueDate) {
+              Due {{ formatDate(task.dueDate) }} ·
+            }
+            {{ phaseLabel(task) }} · {{ priorityLabel(task) }}
           </p>
           @if (dependencyNote(task, tasks.value().tasks); as note) {
             <p class="meta">{{ note }}</p>
