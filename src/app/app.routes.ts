@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { BudgetPage } from './budget/budget-page';
-import { authGuard, guestGuard } from './core/auth.guard';
+import { authGuard, guestGuard, waitingGuard } from './core/auth.guard';
+import { EarlyAccess } from './early-access/early-access';
 import { Home } from './home/home';
 import { ChecklistReview } from './relocations/checklist-review';
 import { RelocationEditor } from './relocations/relocation-editor';
@@ -9,6 +10,7 @@ import { SignIn } from './sign-in/sign-in';
 
 export const routes: Routes = [
   { path: 'sign-in', canActivate: [guestGuard], component: SignIn },
+  { path: 'early-access', canActivate: [waitingGuard], component: EarlyAccess },
   { path: '', canActivate: [authGuard], component: Home },
   { path: 'relocations/new', canActivate: [authGuard], component: RelocationEditor },
   { path: 'relocations/:id/edit', canActivate: [authGuard], component: RelocationEditor },

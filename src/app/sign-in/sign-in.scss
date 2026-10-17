@@ -7,11 +7,15 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-5);
-  max-width: 28rem;
+  max-width: 32rem;
 }
 
 .page-lead {
   margin-bottom: calc(var(--space-2) * -1);
+}
+
+.explain {
+  margin: 0;
 }
 
 .error {

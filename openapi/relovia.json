@@ -25,7 +25,7 @@
     "/api/auth/me": {
       "get": {
         "tags": ["Auth"],
-        "summary": "Returns the signed-in user.",
+        "summary": "Returns the signed-in user and whether they can use the app yet.",
         "operationId": "getCurrentUser",
         "responses": {
           "200": {
@@ -1481,7 +1481,8 @@
           "displayName",
           "avatarUrl",
           "preferredCurrency",
-          "preferredLanguage"
+          "preferredLanguage",
+          "hasAccess"
         ],
         "type": "object",
         "properties": {
@@ -1503,6 +1504,9 @@
           },
           "preferredLanguage": {
             "type": "string"
+          },
+          "hasAccess": {
+            "type": "boolean"
           }
         }
       },

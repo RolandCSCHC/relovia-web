@@ -91,7 +91,7 @@ export const signInWithGoogle = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Returns the signed-in user.
+ * Returns the signed-in user and whether they can use the app yet.
  */
 export const getCurrentUser = <ThrowOnError extends boolean = false>(
   options?: Options<GetCurrentUserData, ThrowOnError>,

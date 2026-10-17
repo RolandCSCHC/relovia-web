@@ -75,6 +75,7 @@ export type CurrentUserResponse = {
   avatarUrl: null | string;
   preferredCurrency: string;
   preferredLanguage: string;
+  hasAccess: boolean;
 };
 
 export type ExpenseResponse = {

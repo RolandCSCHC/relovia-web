@@ -23,7 +23,8 @@ Feature folders, and no global state library.
 
 - `src/app/core` holds the API origin, the credentialed HTTP interceptor, the session, the route guards, and the theme.
 - `src/app/api` holds the generated client and the small wrapper the screens call.
-- `src/app/sign-in` starts Google sign-in.
+- `src/app/sign-in` is the welcome page. It says the app is a work in progress and starts Google sign-in, which also tells the developer you are interested.
+- `src/app/early-access` thanks signed-in people who do not have access yet. `GET /api/auth/me` returns `hasAccess`, and `authGuard` sends everyone without it here.
 - `src/app/home` lists relocations and their progress.
 - `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks.
 - `src/app/budget` sets the budget currency, manages categories and estimates, compares them with spending, and records estimates and expenses in any currency. Totals are shown in the budget currency using the API's converted amounts, and amounts are formatted as the currency code plus `$` (`CLP $30,944,444`, `NZD $1,200.00`).
