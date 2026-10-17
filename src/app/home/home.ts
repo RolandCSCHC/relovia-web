@@ -35,7 +35,6 @@ export class Home {
       relocation.targetDate ? formatDate(relocation.targetDate) : null,
       this.scope(relocation),
       this.purpose(relocation),
-      this.status(relocation),
     ]
       .filter((part) => part !== null)
       .join(' · ');

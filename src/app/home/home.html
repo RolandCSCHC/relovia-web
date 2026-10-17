@@ -18,6 +18,9 @@
     @for (card of cards.value(); track card.relocation.id) {
       <li>
         <a class="move" [routerLink]="['/relocations', card.relocation.id]">
+          <span class="chip" [class.strong]="card.relocation.status === 'Active'">{{
+            status(card.relocation)
+          }}</span>
           <h2>{{ card.relocation.name }}</h2>
           <p class="meta">
             {{ place(card.relocation, 'origin') }} to {{ place(card.relocation, 'destination') }}

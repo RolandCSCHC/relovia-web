@@ -15,14 +15,19 @@
   gap: var(--space-3);
   min-height: 4.25rem;
   padding-inline: var(--space-6);
+  border-top: 0.3rem solid var(--mat-sys-primary);
   border-bottom: 1px solid var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface);
+  background: color-mix(in srgb, var(--mat-sys-surface) 85%, transparent);
+  backdrop-filter: blur(12px);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .wordmark {
   display: flex;
   align-items: center;
-  color: light-dark(#071c44, var(--mat-sys-on-surface));
+  color: light-dark(#0b3a22, var(--mat-sys-on-surface));
   text-decoration: none;
 
   svg {

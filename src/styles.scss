@@ -1,5 +1,6 @@
 // The shell sets color-scheme on the document element. Material colors follow it
 // through the light-dark() values from mat.theme().
+@use 'sass:map';
 @use '@angular/material' as mat;
 
 :root {
@@ -14,14 +15,12 @@
   --page-max: 72rem;
 }
 
-html {
-  height: 100%;
-  color-scheme: light;
+@mixin base($primary, $tertiary) {
   @include mat.theme(
     (
       color: (
-        primary: mat.$spring-green-palette,
-        tertiary: mat.$orange-palette,
+        primary: $primary,
+        tertiary: $tertiary,
       ),
       typography: (
         plain-family: (
@@ -42,8 +41,82 @@ html {
   );
 }
 
+// Overrides the Material system colors with an explicit light and dark set.
+@mixin colors($light, $dark) {
+  @each $key, $value in $light {
+    --mat-sys-#{$key}: light-dark(#{$value}, #{map.get($dark, $key)});
+  }
+}
+
+// Evergreen: sand surfaces, forest green, gold.
+$evergreen-light: (
+  primary: #17623c,
+  on-primary: #ffffff,
+  primary-container: #c8ecd3,
+  on-primary-container: #00210f,
+  secondary-container: #dbe8d4,
+  on-secondary-container: #142616,
+  tertiary: #b87a00,
+  on-tertiary: #ffffff,
+  tertiary-container: #ffe9b0,
+  on-tertiary-container: #3d2800,
+  surface: #f1efe3,
+  background: #f1efe3,
+  surface-container-lowest: #fcfbf6,
+  surface-container-low: #f8f7ef,
+  surface-container: #e6e4d4,
+  surface-container-high: #dcdac8,
+  surface-container-highest: #d0cebc,
+  on-surface: #182019,
+  on-surface-variant: #4a574c,
+  outline: #788679,
+  outline-variant: #cdd2c0,
+);
+$evergreen-dark: (
+  primary: #8fd5a6,
+  on-primary: #003919,
+  primary-container: #17512f,
+  on-primary-container: #c8ecd3,
+  secondary-container: #2c4430,
+  on-secondary-container: #d3e8d2,
+  tertiary: #f0bf4a,
+  on-tertiary: #3f2a00,
+  tertiary-container: #5c4000,
+  on-tertiary-container: #ffe9b0,
+  surface: #0d140f,
+  background: #0d140f,
+  surface-container-lowest: #080e0a,
+  surface-container-low: #121a14,
+  surface-container: #172019,
+  surface-container-high: #1e2a21,
+  surface-container-highest: #26342a,
+  on-surface: #e3ece3,
+  on-surface-variant: #b0bfb2,
+  outline: #7c8c7f,
+  outline-variant: #2e4033,
+);
+
+html {
+  height: 100%;
+  color-scheme: light;
+  --radius: 0.75rem;
+  --title-color: var(--mat-sys-primary);
+  --mat-button-filled-container-shape: 0.6rem;
+  --mat-button-outlined-container-shape: 0.6rem;
+  --mat-button-text-container-shape: 0.6rem;
+  @include base(mat.$green-palette, mat.$yellow-palette);
+  @include colors($evergreen-light, $evergreen-dark);
+}
+
 body {
-  background-color: var(--mat-sys-surface);
+  background:
+    radial-gradient(
+      70rem 28rem at 50% -8rem,
+      color-mix(in srgb, var(--mat-sys-primary-container) 60%, transparent),
+      transparent
+    ),
+    var(--mat-sys-surface);
+  background-repeat: no-repeat;
   color: var(--mat-sys-on-surface);
   font: var(--mat-sys-body-large);
   margin: 0;
@@ -57,8 +130,12 @@ app-root {
 
 .page-title {
   margin: 0 0 var(--space-3);
-  font: var(--mat-sys-headline-large);
-  letter-spacing: -0.02em;
+  color: var(--title-color);
+  font-family: var(--mat-sys-headline-large-font);
+  font-size: clamp(2rem, 1.4rem + 2vw, 2.9rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
 }
 
 .page-lead {
@@ -123,7 +200,7 @@ app-root {
   margin: 0;
   padding: var(--space-4);
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 1rem;
+  border-radius: var(--radius);
 }
 
 .group legend {
@@ -135,8 +212,9 @@ app-root {
   gap: var(--space-3);
   padding: var(--space-5);
   border: 1px solid var(--mat-sys-outline-variant);
-  border-radius: 1rem;
+  border-radius: var(--radius);
   background: var(--mat-sys-surface-container-low);
+  box-shadow: var(--mat-sys-level1);
 }
 
 .place {
@@ -203,7 +281,7 @@ app-root {
 }
 
 .meter {
-  height: 0.35rem;
+  height: 0.5rem;
   overflow: hidden;
   border-radius: 999px;
   background: var(--mat-sys-surface-container-highest);
@@ -212,11 +290,33 @@ app-root {
 .meter-fill {
   display: block;
   height: 100%;
-  background: var(--mat-sys-primary);
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
 }
 
 @media (max-width: 40rem) {
   .place {
     grid-template-columns: 1fr;
   }
+}
+
+// A small label for a value such as a phase, a priority, or a status.
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  font: var(--mat-sys-label-medium);
+}
+
+.chip.accent {
+  background: var(--mat-sys-tertiary-container);
+  color: var(--mat-sys-on-tertiary-container);
+}
+
+.chip.strong {
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
 }

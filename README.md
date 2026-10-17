@@ -37,7 +37,7 @@ Requests to that origin are sent with credentials. `POST`, `PUT`, `PATCH`, and `
 
 Google sign-in is a browser navigation to `GET /api/auth/google`, not an HTTP call from Angular. After the callback, the API redirects back here. The route guards call `GET /api/auth/me` before they choose a page. Sign-out is `POST /api/auth/logout`.
 
-The theme choice is stored in `localStorage` under `relovia-color-scheme`. Page layout uses the spacing tokens in `src/styles.scss` (`--space-1` through `--space-8`, `--page-max`) and the `.page-title` and `.page-lead` classes. The shell is the top bar and the centered page column.
+The theme choice is stored in `localStorage` under `relovia-color-scheme`. Page layout uses the spacing tokens in `src/styles.scss` (`--space-1` through `--space-8`, `--page-max`) and the `.page-title` and `.page-lead` classes. The shell is the top bar and the centered page column. The Evergreen palette is a set of explicit light and dark Material system colors in `src/styles.scss`; `.chip` is the small label.
 
 ## API client
 

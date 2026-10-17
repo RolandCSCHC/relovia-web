@@ -118,7 +118,7 @@
   } @else {
     <ol class="stack">
       @for (task of tasks.value().tasks; track task.id) {
-        <li class="panel">
+        <li class="panel task" [attr.data-status]="task.status">
           <div class="task-line">
             <h2>{{ task.title }}</h2>
             <label class="field status">
@@ -135,12 +135,15 @@
               </select>
             </label>
           </div>
-          <p class="meta">
+          <div class="task-tags">
             @if (task.dueDate) {
-              Due {{ formatDate(task.dueDate) }} ·
+              <span class="meta">Due {{ formatDate(task.dueDate) }}</span>
             }
-            {{ phaseLabel(task) }} · {{ priorityLabel(task) }}
-          </p>
+            <span class="chip">{{ phaseLabel(task) }}</span>
+            <span class="chip" [class.accent]="task.priority === 'High'">{{
+              priorityLabel(task)
+            }}</span>
+          </div>
           @if (dependencyNote(task, tasks.value().tasks); as note) {
             <p class="meta">{{ note }}</p>
           }
