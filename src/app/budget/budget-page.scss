@@ -1,0 +1,97 @@
+// Only spacing. Panels using this class are flex columns, and their gap needs `display: flex`.
+.section {
+  margin-top: var(--space-5);
+}
+
+.panel-title {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--space-4);
+}
+
+.figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.figure strong {
+  font: var(--mat-sys-headline-small);
+  font-variant-numeric: tabular-nums;
+}
+
+.figure.over strong,
+.over-text {
+  color: var(--mat-sys-error);
+}
+
+.categories {
+  margin-top: var(--space-5);
+}
+
+.category-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.category-line h2 {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.inline-form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.category-figures {
+  font-variant-numeric: tabular-nums;
+}
+
+.over-fill {
+  background: var(--mat-sys-error);
+}
+
+.estimates {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.estimate {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-block: var(--space-2);
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
+
+.estimate-form {
+  display: flex;
+  flex: 1 1 100%;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.estimate-amount {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-inline-start: auto;
+  font-variant-numeric: tabular-nums;
+}

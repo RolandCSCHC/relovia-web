@@ -1,0 +1,165 @@
+<section class="expenses" aria-labelledby="expenses-heading">
+  <div class="heading-row">
+    <h2 id="expenses-heading" class="section-title">Expenses</h2>
+    @if (!draft()) {
+      <button matButton="outlined" type="button" (click)="startAdd()">Add expense</button>
+    }
+  </div>
+
+  @if (draft(); as form) {
+    <form class="panel fields expense-form" (submit)="save(); $event.preventDefault()">
+      <label class="field">
+        <span>Description <span class="required" aria-hidden="true">*</span></span>
+        <input
+          id="expense-description"
+          aria-required="true"
+          maxlength="200"
+          [value]="form.description"
+          (input)="update('description', value($event))"
+        />
+      </label>
+      <div class="place">
+        <label class="field">
+          <span>Amount <span class="required" aria-hidden="true">*</span></span>
+          <input
+            id="expense-amount"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            aria-required="true"
+            [value]="form.amount"
+            (input)="update('amount', value($event))"
+          />
+        </label>
+        <label class="field">
+          <span>Currency <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="expense-currency"
+            aria-required="true"
+            (change)="update('currencyCode', value($event))"
+          >
+            @for (currency of currencies; track currency.code) {
+              <option [value]="currency.code" [selected]="currency.code === form.currencyCode">
+                {{ currency.label }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="place">
+        <label class="field">
+          <span>Category <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="expense-category"
+            aria-required="true"
+            (change)="update('categoryId', value($event))"
+          >
+            @for (category of budget().categories; track category.id) {
+              <option [value]="category.id" [selected]="category.id === form.categoryId">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Paid on <span class="required" aria-hidden="true">*</span></span>
+          <input
+            id="expense-paid-on"
+            type="date"
+            aria-required="true"
+            [value]="form.paidOn"
+            (input)="update('paidOn', value($event))"
+          />
+        </label>
+      </div>
+      <label class="field">
+        Task
+        <select id="expense-task" (change)="update('taskId', value($event))">
+          <option value="" [selected]="!form.taskId">No task</option>
+          @for (task of tasks(); track task.id) {
+            <option [value]="task.id" [selected]="task.id === form.taskId">{{ task.title }}</option>
+          }
+        </select>
+      </label>
+      <label class="field">
+        Notes
+        <textarea
+          id="expense-notes"
+          rows="2"
+          maxlength="1000"
+          [value]="form.notes"
+          (input)="update('notes', value($event))"
+        ></textarea>
+      </label>
+      @if (error(); as message) {
+        <p class="error-text" role="alert">{{ message }}</p>
+      }
+      <div class="actions">
+        <button matButton="filled" type="submit" [disabled]="saving()">Save expense</button>
+        <button matButton type="button" (click)="draft.set(null)">Cancel</button>
+      </div>
+    </form>
+  } @else if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  @if (expenses.error()) {
+    <p class="error-text" role="alert">{{ expenses.error()?.message }}</p>
+  } @else if (expenses.hasValue()) {
+    @if (expenses.value().length === 0) {
+      <p class="meta empty">No expenses yet. Record what you pay in the currency you paid it in.</p>
+    } @else {
+      <ul class="stack expense-list">
+        @for (expense of expenses.value(); track expense.id) {
+          <li class="panel expense">
+            <div class="expense-line">
+              <h3>{{ expense.description }}</h3>
+              <span class="amounts">
+                <strong class="amount">{{
+                  formatMoney(expense.amount, expense.currencyCode, { exact: true })
+                }}</strong>
+                @if (conversion(expense); as note) {
+                  <span class="meta">{{ note }}</span>
+                }
+              </span>
+            </div>
+            <div class="expense-tags">
+              <span class="meta">{{ formatDate(expense.paidOn) }}</span>
+              <span class="chip">{{ categoryName(expense) }}</span>
+              @if (taskTitle(expense); as title) {
+                <span class="chip">Task: {{ title }}</span>
+              }
+            </div>
+            @if (expense.notes) {
+              <p class="meta">{{ expense.notes }}</p>
+            }
+            @if (deletingId() === expense.id) {
+              <p class="meta">Delete this expense?</p>
+              <div class="actions">
+                <button
+                  matButton="outlined"
+                  type="button"
+                  [disabled]="saving()"
+                  (click)="remove(expense)"
+                >
+                  Delete expense
+                </button>
+                <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+              </div>
+            } @else if (draft()?.id !== expense.id) {
+              <div class="actions">
+                <button matButton type="button" (click)="startEdit(expense)">Edit expense</button>
+                <button matButton type="button" (click)="deletingId.set(expense.id)">
+                  Delete expense
+                </button>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    <p class="meta">Loading expenses…</p>
+  }
+</section>
