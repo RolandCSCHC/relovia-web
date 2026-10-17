@@ -22,10 +22,11 @@ Setup and local commands are in [docs/setup.md](docs/setup.md).
 Feature folders, and no global state library.
 
 - `src/app/core` holds the API origin, the credentialed HTTP interceptor, the session, the route guards, and the theme.
-- `src/app/api` holds the generated Phase 1 client and the small wrapper the screens call.
+- `src/app/api` holds the generated client and the small wrapper the screens call.
 - `src/app/sign-in` starts Google sign-in.
 - `src/app/home` lists relocations and their progress.
 - `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks.
+- `src/app/budget` sets the budget currency, manages categories and estimates, compares them with spending, and records estimates and expenses in any currency. Totals are shown in the budget currency using the API's converted amounts, and amounts are formatted as the currency code plus `$` (`CLP $30,944,444`, `NZD $1,200.00`).
 
 Local UI state uses signals. HTTP uses RxJS.
 
@@ -41,7 +42,7 @@ The theme choice is stored in `localStorage` under `relovia-color-scheme`. Page 
 
 ## API client
 
-`openapi/relovia.json` is the Phase 1 OpenAPI document. `npm run api:generate` writes the Angular client to `src/app/api/generated`. That folder is generated output, so ESLint does not check it. The client uses `HttpClient`, so the credentialed interceptor still applies. Its base URL is the API origin from `src/environments`, not the localhost server written in the document.
+`openapi/relovia.json` is the OpenAPI document. `npm run api:generate` writes the Angular client to `src/app/api/generated`. That folder is generated output, so ESLint does not check it. The client uses `HttpClient`, so the credentialed interceptor still applies. Its base URL is the API origin from `src/environments`, not the localhost server written in the document.
 
 Refresh the document from a running Development API, then regenerate:
 
