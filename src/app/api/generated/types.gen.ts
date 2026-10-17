@@ -4,6 +4,40 @@ export type ClientOptions = {
   baseUrl: 'http://localhost:5081/' | (string & {});
 };
 
+export type BudgetCategoryResponse = {
+  id: string;
+  name: string;
+  estimates: Array<BudgetEstimateResponse>;
+  estimated: number | string;
+  actual: number | string;
+  remaining: number | string;
+  expenseCount: number | string;
+};
+
+export type BudgetEstimateResponse = {
+  id: string;
+  categoryId: string;
+  label: string;
+  amount: number | string;
+  currencyCode: string;
+  convertedAmount: null | number | string;
+};
+
+export type BudgetResponse = {
+  currencyCode: null | string;
+  categories: Array<BudgetCategoryResponse>;
+  totals: BudgetTotalsResponse;
+  unconverted: Array<UnconvertedAmountsResponse>;
+  ratesAsOf: null | string;
+  ratesUnavailable: boolean;
+};
+
+export type BudgetTotalsResponse = {
+  estimated: number | string;
+  actual: number | string;
+  remaining: number | string;
+};
+
 export type ChecklistSuggestionResponse = {
   relocationId: string;
   targetDate: null | string;
@@ -41,6 +75,18 @@ export type CurrentUserResponse = {
   avatarUrl: null | string;
   preferredCurrency: string;
   preferredLanguage: string;
+};
+
+export type ExpenseResponse = {
+  id: string;
+  categoryId: string;
+  taskId: null | string;
+  description: string;
+  amount: number | string;
+  currencyCode: string;
+  convertedAmount: null | number | string;
+  paidOn: string;
+  notes: null | string;
 };
 
 export type RelocationPurpose = 'Work' | 'Study' | 'Family' | 'Lifestyle' | 'Other';
@@ -81,6 +127,31 @@ export type RelocationTasksResponse = {
 };
 
 export type RelocationTaskStatus = 'Todo' | 'InProgress' | 'Done' | 'Skipped';
+
+export type SaveBudgetCategoryRequest = {
+  name: string;
+};
+
+export type SaveBudgetEstimateRequest = {
+  categoryId: string;
+  label: string;
+  amount: number | string;
+  currencyCode: string;
+};
+
+export type SaveBudgetRequest = {
+  currencyCode: string;
+};
+
+export type SaveExpenseRequest = {
+  categoryId: string;
+  taskId?: null | string;
+  description: string;
+  amount: number | string;
+  currencyCode: string;
+  paidOn: string;
+  notes?: null | string;
+};
 
 export type SaveRelocationRequest = {
   name: string;
@@ -123,6 +194,14 @@ export type TaskProgressResponse = {
   done: number | string;
   counted: number | string;
   ratio: number | string;
+};
+
+export type UnconvertedAmountsResponse = {
+  currencyCode: string;
+  expenseCount: number | string;
+  expenseTotal: number | string;
+  estimateCount: number | string;
+  estimateTotal: number | string;
 };
 
 export type UpdateRelocationTaskRequest = {
@@ -176,6 +255,154 @@ export type LogoutResponses = {
    */
   200: unknown;
 };
+
+export type GetBudgetData = {
+  body?: never;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget';
+};
+
+export type GetBudgetResponses = {
+  /**
+   * OK
+   */
+  200: BudgetResponse;
+};
+
+export type GetBudgetResponse = GetBudgetResponses[keyof GetBudgetResponses];
+
+export type SaveBudgetData = {
+  body: SaveBudgetRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget';
+};
+
+export type SaveBudgetResponses = {
+  /**
+   * OK
+   */
+  200: BudgetResponse;
+};
+
+export type SaveBudgetResponse = SaveBudgetResponses[keyof SaveBudgetResponses];
+
+export type CreateBudgetCategoryData = {
+  body: SaveBudgetCategoryRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/categories';
+};
+
+export type CreateBudgetCategoryResponses = {
+  /**
+   * OK
+   */
+  200: BudgetCategoryResponse;
+};
+
+export type CreateBudgetCategoryResponse =
+  CreateBudgetCategoryResponses[keyof CreateBudgetCategoryResponses];
+
+export type DeleteBudgetCategoryData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    categoryId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/categories/{categoryId}';
+};
+
+export type DeleteBudgetCategoryResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
+
+export type UpdateBudgetCategoryData = {
+  body: SaveBudgetCategoryRequest;
+  path: {
+    relocationId: string;
+    categoryId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/categories/{categoryId}';
+};
+
+export type UpdateBudgetCategoryResponses = {
+  /**
+   * OK
+   */
+  200: BudgetCategoryResponse;
+};
+
+export type UpdateBudgetCategoryResponse =
+  UpdateBudgetCategoryResponses[keyof UpdateBudgetCategoryResponses];
+
+export type CreateBudgetEstimateData = {
+  body: SaveBudgetEstimateRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/estimates';
+};
+
+export type CreateBudgetEstimateResponses = {
+  /**
+   * OK
+   */
+  200: BudgetEstimateResponse;
+};
+
+export type CreateBudgetEstimateResponse =
+  CreateBudgetEstimateResponses[keyof CreateBudgetEstimateResponses];
+
+export type DeleteBudgetEstimateData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    estimateId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/estimates/{estimateId}';
+};
+
+export type DeleteBudgetEstimateResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
+
+export type UpdateBudgetEstimateData = {
+  body: SaveBudgetEstimateRequest;
+  path: {
+    relocationId: string;
+    estimateId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/estimates/{estimateId}';
+};
+
+export type UpdateBudgetEstimateResponses = {
+  /**
+   * OK
+   */
+  200: BudgetEstimateResponse;
+};
+
+export type UpdateBudgetEstimateResponse =
+  UpdateBudgetEstimateResponses[keyof UpdateBudgetEstimateResponses];
 
 export type GetChecklistSuggestionData = {
   body?: never;
@@ -231,6 +458,78 @@ export type ListCitiesResponses = {
 };
 
 export type ListCitiesResponse = ListCitiesResponses[keyof ListCitiesResponses];
+
+export type ListExpensesData = {
+  body?: never;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/expenses';
+};
+
+export type ListExpensesResponses = {
+  /**
+   * OK
+   */
+  200: Array<ExpenseResponse>;
+};
+
+export type ListExpensesResponse = ListExpensesResponses[keyof ListExpensesResponses];
+
+export type CreateExpenseData = {
+  body: SaveExpenseRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/expenses';
+};
+
+export type CreateExpenseResponses = {
+  /**
+   * OK
+   */
+  200: ExpenseResponse;
+};
+
+export type CreateExpenseResponse = CreateExpenseResponses[keyof CreateExpenseResponses];
+
+export type DeleteExpenseData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    expenseId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/expenses/{expenseId}';
+};
+
+export type DeleteExpenseResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
+
+export type UpdateExpenseData = {
+  body: SaveExpenseRequest;
+  path: {
+    relocationId: string;
+    expenseId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/expenses/{expenseId}';
+};
+
+export type UpdateExpenseResponses = {
+  /**
+   * OK
+   */
+  200: ExpenseResponse;
+};
+
+export type UpdateExpenseResponse = UpdateExpenseResponses[keyof UpdateExpenseResponses];
 
 export type ListRelocationsData = {
   body?: never;

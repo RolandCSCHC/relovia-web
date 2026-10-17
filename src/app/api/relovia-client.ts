@@ -3,12 +3,20 @@ import { inject, Injectable } from '@angular/core';
 import { createClient } from './generated/client';
 import * as reloviaApi from './generated/sdk.gen';
 import type {
+  BudgetCategoryResponse,
+  BudgetEstimateResponse,
+  BudgetResponse,
   ChecklistSuggestionResponse,
   ConfirmChecklistRequest,
   CreateRelocationTaskRequest,
+  ExpenseResponse,
   RelocationResponse,
   RelocationTaskResponse,
   RelocationTasksResponse,
+  SaveBudgetCategoryRequest,
+  SaveBudgetEstimateRequest,
+  SaveBudgetRequest,
+  SaveExpenseRequest,
   SaveRelocationRequest,
   UpdateRelocationTaskRequest,
 } from './generated/types.gen';
@@ -155,6 +163,158 @@ export class ReloviaClient {
       });
     } catch (error) {
       throw toApiError(error, 'The task could not be deleted.');
+    }
+  }
+
+  getBudget(relocationId: string): Promise<BudgetResponse> {
+    return this.unwrap(
+      reloviaApi.getBudget({ client: this.client, path: { relocationId }, throwOnError: true }),
+      'The budget could not be loaded.',
+    );
+  }
+
+  saveBudget(relocationId: string, body: SaveBudgetRequest): Promise<BudgetResponse> {
+    return this.unwrap(
+      reloviaApi.saveBudget({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The budget could not be saved.',
+    );
+  }
+
+  createBudgetCategory(
+    relocationId: string,
+    body: SaveBudgetCategoryRequest,
+  ): Promise<BudgetCategoryResponse> {
+    return this.unwrap(
+      reloviaApi.createBudgetCategory({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The category could not be saved.',
+    );
+  }
+
+  updateBudgetCategory(
+    relocationId: string,
+    categoryId: string,
+    body: SaveBudgetCategoryRequest,
+  ): Promise<BudgetCategoryResponse> {
+    return this.unwrap(
+      reloviaApi.updateBudgetCategory({
+        client: this.client,
+        path: { relocationId, categoryId },
+        body,
+        throwOnError: true,
+      }),
+      'The category could not be saved.',
+    );
+  }
+
+  async deleteBudgetCategory(relocationId: string, categoryId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteBudgetCategory({
+        client: this.client,
+        path: { relocationId, categoryId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The category could not be deleted.');
+    }
+  }
+
+  createBudgetEstimate(
+    relocationId: string,
+    body: SaveBudgetEstimateRequest,
+  ): Promise<BudgetEstimateResponse> {
+    return this.unwrap(
+      reloviaApi.createBudgetEstimate({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The estimate could not be saved.',
+    );
+  }
+
+  updateBudgetEstimate(
+    relocationId: string,
+    estimateId: string,
+    body: SaveBudgetEstimateRequest,
+  ): Promise<BudgetEstimateResponse> {
+    return this.unwrap(
+      reloviaApi.updateBudgetEstimate({
+        client: this.client,
+        path: { relocationId, estimateId },
+        body,
+        throwOnError: true,
+      }),
+      'The estimate could not be saved.',
+    );
+  }
+
+  async deleteBudgetEstimate(relocationId: string, estimateId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteBudgetEstimate({
+        client: this.client,
+        path: { relocationId, estimateId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The estimate could not be deleted.');
+    }
+  }
+
+  listExpenses(relocationId: string): Promise<ExpenseResponse[]> {
+    return this.unwrap(
+      reloviaApi.listExpenses({ client: this.client, path: { relocationId }, throwOnError: true }),
+      'Expenses could not be loaded.',
+    );
+  }
+
+  createExpense(relocationId: string, body: SaveExpenseRequest): Promise<ExpenseResponse> {
+    return this.unwrap(
+      reloviaApi.createExpense({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The expense could not be saved.',
+    );
+  }
+
+  updateExpense(
+    relocationId: string,
+    expenseId: string,
+    body: SaveExpenseRequest,
+  ): Promise<ExpenseResponse> {
+    return this.unwrap(
+      reloviaApi.updateExpense({
+        client: this.client,
+        path: { relocationId, expenseId },
+        body,
+        throwOnError: true,
+      }),
+      'The expense could not be saved.',
+    );
+  }
+
+  async deleteExpense(relocationId: string, expenseId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteExpense({
+        client: this.client,
+        path: { relocationId, expenseId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The expense could not be deleted.');
     }
   }
 

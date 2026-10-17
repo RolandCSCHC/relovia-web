@@ -63,6 +63,422 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/budget": {
+      "get": {
+        "tags": ["Budget"],
+        "summary": "Returns the relocation's budget with estimates compared to actual expenses.",
+        "operationId": "getBudget",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Budget"],
+        "summary": "Sets up the budget with its currency, or changes the currency while it has no estimates.",
+        "operationId": "saveBudget",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/budget/categories": {
+      "post": {
+        "tags": ["Budget"],
+        "summary": "Adds a budget category.",
+        "operationId": "createBudgetCategory",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetCategoryRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetCategoryRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetCategoryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetCategoryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetCategoryResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/budget/categories/{categoryId}": {
+      "put": {
+        "tags": ["Budget"],
+        "summary": "Renames a budget category.",
+        "operationId": "updateBudgetCategory",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetCategoryRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetCategoryRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetCategoryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetCategoryResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetCategoryResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetCategoryResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Budget"],
+        "summary": "Deletes a budget category and its estimates. Categories with expenses are refused.",
+        "operationId": "deleteBudgetCategory",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "categoryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/budget/estimates": {
+      "post": {
+        "tags": ["Budget"],
+        "summary": "Adds an estimate in the budget currency.",
+        "operationId": "createBudgetEstimate",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetEstimateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetEstimateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetEstimateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetEstimateResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetEstimateResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetEstimateResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/budget/estimates/{estimateId}": {
+      "put": {
+        "tags": ["Budget"],
+        "summary": "Updates an estimate.",
+        "operationId": "updateBudgetEstimate",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "estimateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetEstimateRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetEstimateRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveBudgetEstimateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetEstimateResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetEstimateResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetEstimateResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Budget"],
+        "summary": "Deletes an estimate.",
+        "operationId": "deleteBudgetEstimate",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "estimateId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/relocations/{relocationId}/checklist": {
       "get": {
         "tags": ["Checklist"],
@@ -195,6 +611,212 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/expenses": {
+      "get": {
+        "tags": ["Expenses"],
+        "summary": "Lists the relocation's expenses, newest first, in the currency they were paid in.",
+        "operationId": "listExpenses",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExpenseResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExpenseResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ExpenseResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Expenses"],
+        "summary": "Records an expense with its original amount and currency.",
+        "operationId": "createExpense",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExpenseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExpenseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/expenses/{expenseId}": {
+      "put": {
+        "tags": ["Expenses"],
+        "summary": "Updates an expense.",
+        "operationId": "updateExpense",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expenseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExpenseRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExpenseRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveExpenseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Expenses"],
+        "summary": "Deletes an expense.",
+        "operationId": "deleteExpense",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expenseId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -632,6 +1254,134 @@
   },
   "components": {
     "schemas": {
+      "BudgetCategoryResponse": {
+        "required": ["id", "name", "estimates", "estimated", "actual", "remaining", "expenseCount"],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "estimates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BudgetEstimateResponse"
+            }
+          },
+          "estimated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "actual": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "remaining": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "expenseCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          }
+        }
+      },
+      "BudgetEstimateResponse": {
+        "required": ["id", "categoryId", "label", "amount", "currencyCode", "convertedAmount"],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "convertedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          }
+        }
+      },
+      "BudgetResponse": {
+        "required": [
+          "currencyCode",
+          "categories",
+          "totals",
+          "unconverted",
+          "ratesAsOf",
+          "ratesUnavailable"
+        ],
+        "type": "object",
+        "properties": {
+          "currencyCode": {
+            "type": ["null", "string"]
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BudgetCategoryResponse"
+            }
+          },
+          "totals": {
+            "$ref": "#/components/schemas/BudgetTotalsResponse"
+          },
+          "unconverted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnconvertedAmountsResponse"
+            }
+          },
+          "ratesAsOf": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          },
+          "ratesUnavailable": {
+            "type": "boolean"
+          }
+        }
+      },
+      "BudgetTotalsResponse": {
+        "required": ["estimated", "actual", "remaining"],
+        "type": "object",
+        "properties": {
+          "estimated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "actual": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "remaining": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          }
+        }
+      },
       "ChecklistSuggestionResponse": {
         "required": ["relocationId", "targetDate", "templateCodes", "tasks"],
         "type": "object",
@@ -753,6 +1503,57 @@
           },
           "preferredLanguage": {
             "type": "string"
+          }
+        }
+      },
+      "ExpenseResponse": {
+        "required": [
+          "id",
+          "categoryId",
+          "taskId",
+          "description",
+          "amount",
+          "currencyCode",
+          "convertedAmount",
+          "paidOn",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "convertedAmount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "notes": {
+            "type": ["null", "string"]
           }
         }
       },
@@ -897,6 +1698,77 @@
         "enum": ["Todo", "InProgress", "Done", "Skipped"],
         "type": "string"
       },
+      "SaveBudgetCategoryRequest": {
+        "required": ["name"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SaveBudgetEstimateRequest": {
+        "required": ["categoryId", "label", "amount", "currencyCode"],
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": "string"
+          }
+        }
+      },
+      "SaveBudgetRequest": {
+        "required": ["currencyCode"],
+        "type": "object",
+        "properties": {
+          "currencyCode": {
+            "type": "string"
+          }
+        }
+      },
+      "SaveExpenseRequest": {
+        "required": ["categoryId", "description", "amount", "currencyCode", "paidOn"],
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "taskId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "description": {
+            "type": "string"
+          },
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
       "SaveRelocationRequest": {
         "required": [
           "name",
@@ -1036,6 +1908,41 @@
           }
         }
       },
+      "UnconvertedAmountsResponse": {
+        "required": [
+          "currencyCode",
+          "expenseCount",
+          "expenseTotal",
+          "estimateCount",
+          "estimateTotal"
+        ],
+        "type": "object",
+        "properties": {
+          "currencyCode": {
+            "type": "string"
+          },
+          "expenseCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "expenseTotal": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "estimateCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "estimateTotal": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          }
+        }
+      },
       "UpdateRelocationTaskRequest": {
         "required": ["title", "phase", "priority", "status"],
         "type": "object",
@@ -1065,10 +1972,16 @@
       "name": "Auth"
     },
     {
+      "name": "Budget"
+    },
+    {
       "name": "Checklist"
     },
     {
       "name": "Cities"
+    },
+    {
+      "name": "Expenses"
     },
     {
       "name": "Relocations"

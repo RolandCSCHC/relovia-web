@@ -5,14 +5,28 @@ import { client } from './client.gen';
 import type {
   ConfirmChecklistData,
   ConfirmChecklistResponses,
+  CreateBudgetCategoryData,
+  CreateBudgetCategoryResponses,
+  CreateBudgetEstimateData,
+  CreateBudgetEstimateResponses,
+  CreateExpenseData,
+  CreateExpenseResponses,
   CreateRelocationData,
   CreateRelocationResponses,
   CreateRelocationTaskData,
   CreateRelocationTaskResponses,
+  DeleteBudgetCategoryData,
+  DeleteBudgetCategoryResponses,
+  DeleteBudgetEstimateData,
+  DeleteBudgetEstimateResponses,
+  DeleteExpenseData,
+  DeleteExpenseResponses,
   DeleteRelocationData,
   DeleteRelocationResponses,
   DeleteRelocationTaskData,
   DeleteRelocationTaskResponses,
+  GetBudgetData,
+  GetBudgetResponses,
   GetChecklistSuggestionData,
   GetChecklistSuggestionResponses,
   GetCurrentUserData,
@@ -23,14 +37,24 @@ import type {
   GetServiceInfoResponses,
   ListCitiesData,
   ListCitiesResponses,
+  ListExpensesData,
+  ListExpensesResponses,
   ListRelocationsData,
   ListRelocationsResponses,
   ListRelocationTasksData,
   ListRelocationTasksResponses,
   LogoutData,
   LogoutResponses,
+  SaveBudgetData,
+  SaveBudgetResponses,
   SignInWithGoogleData,
   SignInWithGoogleResponses,
+  UpdateBudgetCategoryData,
+  UpdateBudgetCategoryResponses,
+  UpdateBudgetEstimateData,
+  UpdateBudgetEstimateResponses,
+  UpdateExpenseData,
+  UpdateExpenseResponses,
   UpdateRelocationData,
   UpdateRelocationResponses,
   UpdateRelocationTaskData,
@@ -89,6 +113,114 @@ export const logout = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Returns the relocation's budget with estimates compared to actual expenses.
+ */
+export const getBudget = <ThrowOnError extends boolean = false>(
+  options: Options<GetBudgetData, ThrowOnError>,
+): RequestResult<GetBudgetResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<GetBudgetResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget',
+    ...options,
+  });
+
+/**
+ * Sets up the budget with its currency, or changes the currency while it has no estimates.
+ */
+export const saveBudget = <ThrowOnError extends boolean = false>(
+  options: Options<SaveBudgetData, ThrowOnError>,
+): RequestResult<SaveBudgetResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<SaveBudgetResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Adds a budget category.
+ */
+export const createBudgetCategory = <ThrowOnError extends boolean = false>(
+  options: Options<CreateBudgetCategoryData, ThrowOnError>,
+): RequestResult<CreateBudgetCategoryResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateBudgetCategoryResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/categories',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes a budget category and its estimates. Categories with expenses are refused.
+ */
+export const deleteBudgetCategory = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteBudgetCategoryData, ThrowOnError>,
+): RequestResult<DeleteBudgetCategoryResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteBudgetCategoryResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/categories/{categoryId}',
+    ...options,
+  });
+
+/**
+ * Renames a budget category.
+ */
+export const updateBudgetCategory = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateBudgetCategoryData, ThrowOnError>,
+): RequestResult<UpdateBudgetCategoryResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateBudgetCategoryResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/categories/{categoryId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Adds an estimate in the budget currency.
+ */
+export const createBudgetEstimate = <ThrowOnError extends boolean = false>(
+  options: Options<CreateBudgetEstimateData, ThrowOnError>,
+): RequestResult<CreateBudgetEstimateResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateBudgetEstimateResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/estimates',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes an estimate.
+ */
+export const deleteBudgetEstimate = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteBudgetEstimateData, ThrowOnError>,
+): RequestResult<DeleteBudgetEstimateResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteBudgetEstimateResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/estimates/{estimateId}',
+    ...options,
+  });
+
+/**
+ * Updates an estimate.
+ */
+export const updateBudgetEstimate = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateBudgetEstimateData, ThrowOnError>,
+): RequestResult<UpdateBudgetEstimateResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateBudgetEstimateResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/estimates/{estimateId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Returns the suggested checklist without writing tasks.
  */
 export const getChecklistSuggestion = <ThrowOnError extends boolean = false>(
@@ -123,6 +255,58 @@ export const listCities = <ThrowOnError extends boolean = false>(
   (options?.client ?? client).get<ListCitiesResponses, unknown, ThrowOnError>({
     url: '/api/places/cities',
     ...options,
+  });
+
+/**
+ * Lists the relocation's expenses, newest first, in the currency they were paid in.
+ */
+export const listExpenses = <ThrowOnError extends boolean = false>(
+  options: Options<ListExpensesData, ThrowOnError>,
+): RequestResult<ListExpensesResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<ListExpensesResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/expenses',
+    ...options,
+  });
+
+/**
+ * Records an expense with its original amount and currency.
+ */
+export const createExpense = <ThrowOnError extends boolean = false>(
+  options: Options<CreateExpenseData, ThrowOnError>,
+): RequestResult<CreateExpenseResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateExpenseResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/expenses',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes an expense.
+ */
+export const deleteExpense = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteExpenseData, ThrowOnError>,
+): RequestResult<DeleteExpenseResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteExpenseResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/expenses/{expenseId}',
+    ...options,
+  });
+
+/**
+ * Updates an expense.
+ */
+export const updateExpense = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateExpenseData, ThrowOnError>,
+): RequestResult<UpdateExpenseResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateExpenseResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/expenses/{expenseId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });
 
 /**
