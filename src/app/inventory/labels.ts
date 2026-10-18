@@ -1,5 +1,6 @@
 import type {
   AcquisitionStatus,
+  Furnishing,
   ItemCategory,
   ItemPriority,
   ItemRoom,
@@ -7,6 +8,11 @@ import type {
   PackingStatus,
 } from '../api/generated/types.gen';
 import type { LabeledValue } from '../relocations/labels';
+
+export const furnishings: readonly LabeledValue<Furnishing>[] = [
+  { value: 'Furnished', label: 'Furnished' },
+  { value: 'Unfurnished', label: 'Unfurnished' },
+];
 
 export const acquisitions: readonly LabeledValue<AcquisitionStatus>[] = [
   { value: 'Owned', label: 'Owned' },

@@ -1,0 +1,85 @@
+<section class="panel" aria-labelledby="starter-title">
+  <h2 id="starter-title">Start from a list</h2>
+  <p class="meta">
+    Pick the kind of home, and a room if you only want that room. These are things to buy. Anything
+    already on your list is left out. Prices are added afterwards.
+  </p>
+  <div class="place choices">
+    <label class="field">
+      Home
+      <select id="starter-furnishing" (change)="chooseFurnishing(value($event))">
+        <option value="" [selected]="furnishing() === null">Choose</option>
+        @for (option of furnishings; track option.value) {
+          <option [value]="option.value" [selected]="option.value === furnishing()">
+            {{ option.label }}
+          </option>
+        }
+      </select>
+    </label>
+    <label class="field">
+      Room
+      <select id="starter-room" (change)="chooseRoom(value($event))">
+        <option value="" [selected]="room() === ''">All rooms</option>
+        @for (option of rooms; track option.value) {
+          <option [value]="option.value" [selected]="option.value === room()">
+            {{ option.label }}
+          </option>
+        }
+      </select>
+    </label>
+  </div>
+
+  @if (furnishing()) {
+    @if (suggestion.isLoading()) {
+      <p class="meta">Loading the list…</p>
+    } @else if (suggestion.error(); as loadError) {
+      <p class="error-text" role="alert">{{ loadError.message }}</p>
+    } @else if (suggestion.hasValue() && drafts().length === 0) {
+      @if (suggestion.value().templateCodes.length === 0) {
+        <p class="meta empty">Nothing on this list.</p>
+      } @else {
+        <p class="meta empty">Everything on this list is already in your inventory.</p>
+      }
+    } @else if (groups().length > 0) {
+      @for (group of groups(); track group.room) {
+        <h3>{{ group.room }}</h3>
+        <ul class="stack suggestion">
+          @for (item of group.items; track item.code) {
+            <li>
+              <label class="check">
+                <input
+                  type="checkbox"
+                  [checked]="item.selected"
+                  (change)="toggle(item.code, $event)"
+                />
+                {{ item.name }}
+                @if (asCount(item.quantity) !== 1) {
+                  <span class="meta">× {{ asCount(item.quantity) }}</span>
+                }
+              </label>
+              <p class="meta">{{ labelFor(categories, item.category) }}</p>
+            </li>
+          }
+        </ul>
+      }
+    }
+  }
+
+  @if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+  <div class="actions">
+    @if (drafts().length > 0 && !suggestion.isLoading()) {
+      <button
+        id="starter-confirm"
+        matButton="filled"
+        type="button"
+        [disabled]="saving() || selectedCount() === 0"
+        (click)="confirm()"
+      >
+        Add selected
+      </button>
+    }
+    <button matButton type="button" (click)="closed.emit()">Cancel</button>
+  </div>
+</section>

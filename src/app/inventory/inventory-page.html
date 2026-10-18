@@ -34,10 +34,21 @@
         </select>
       </label>
     }
-    @if (!draft()) {
+    @if (!draft() && !starterOpen()) {
+      <button matButton="outlined" type="button" (click)="startFromList()">
+        Start from a list
+      </button>
       <button matButton="outlined" type="button" (click)="startAdd()">Add item</button>
     }
   </div>
+
+  @if (starterOpen() && relocation.hasValue()) {
+    <app-inventory-starter
+      [relocationId]="relocation.value().id"
+      (closed)="starterOpen.set(false)"
+      (confirmed)="starterConfirmed()"
+    />
+  }
 
   @if (draft(); as form) {
     <form class="panel fields item-form" (submit)="save(); $event.preventDefault()">
@@ -216,11 +227,11 @@
     <p class="error-text" role="alert">{{ message }}</p>
   }
 
-  @if (items.value().length === 0) {
-    <p class="meta empty">Nothing here yet. Add what you own, and what you still need to buy.</p>
-  } @else if (groups().length === 0) {
+  @if (items.value().length === 0 && !starterOpen()) {
+    <p class="meta empty">Nothing here yet. Add what you own, or start from a list.</p>
+  } @else if (items.value().length > 0 && groups().length === 0) {
     <p class="meta empty">Nothing matches this filter.</p>
-  } @else {
+  } @else if (groups().length > 0) {
     @for (group of groups(); track group.room) {
       <section class="room" [attr.aria-label]="group.room">
         <h2>{{ group.room }}</h2>

@@ -1,0 +1,29 @@
+:host {
+  display: block;
+  margin-top: var(--space-5);
+}
+
+h2,
+h3 {
+  margin: 0;
+}
+
+h2 {
+  font: var(--mat-sys-title-large);
+}
+
+h3 {
+  margin-top: var(--space-5);
+  font: var(--mat-sys-title-medium);
+}
+
+.choices,
+.suggestion,
+.actions {
+  margin-top: var(--space-4);
+}
+
+.suggestion {
+  padding: 0;
+  list-style: none;
+}

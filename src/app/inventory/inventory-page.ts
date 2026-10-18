@@ -29,6 +29,7 @@ import {
   packingStatuses,
   type ItemFilter,
 } from './labels';
+import { InventoryStarter } from './inventory-starter';
 
 interface ItemDraft {
   id: string | null;
@@ -56,7 +57,7 @@ interface RoomGroup {
 
 @Component({
   selector: 'app-inventory-page',
-  imports: [MatButton, RouterLink],
+  imports: [InventoryStarter, MatButton, RouterLink],
   templateUrl: './inventory-page.html',
   styleUrl: './inventory-page.scss',
 })
@@ -75,6 +76,7 @@ export class InventoryPage {
   protected readonly labelFor = labelFor;
   protected readonly asCount = asCount;
   protected readonly filter = signal<ItemFilter>('All');
+  protected readonly starterOpen = signal(false);
   protected readonly draft = signal<ItemDraft | null>(null);
   protected readonly deletingId = signal<string | null>(null);
   protected readonly error = signal<string | null>(null);
@@ -142,9 +144,22 @@ export class InventoryPage {
     }
   }
 
+  protected startFromList(): void {
+    this.error.set(null);
+    this.deletingId.set(null);
+    this.draft.set(null);
+    this.starterOpen.set(true);
+  }
+
+  protected starterConfirmed(): void {
+    this.starterOpen.set(false);
+    void this.items.reload();
+  }
+
   protected startAdd(): void {
     this.error.set(null);
     this.deletingId.set(null);
+    this.starterOpen.set(false);
     this.draft.set({ ...emptyDraft(), budgetCategoryId: this.defaultBudgetCategoryId() });
   }
 

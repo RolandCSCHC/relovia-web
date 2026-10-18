@@ -45,6 +45,7 @@ describe('InventoryPage', () => {
     const root = harness.routeNativeElement!;
 
     expect(root.textContent).toContain('Nothing here yet');
+    expect(root.textContent).toContain('Start from a list');
     clickButton(root, 'Add item');
     harness.detectChanges();
     setValue(root.querySelector('#item-name'), 'Sofa');
