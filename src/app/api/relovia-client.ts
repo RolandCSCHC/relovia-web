@@ -8,9 +8,13 @@ import type {
   BudgetResponse,
   ChecklistSuggestionResponse,
   ConfirmChecklistRequest,
+  ConfirmInventoryListRequest,
   CreateRelocationTaskRequest,
   ExpenseResponse,
+  Furnishing,
   InventoryItemResponse,
+  InventorySuggestionResponse,
+  ItemRoom,
   RelocationResponse,
   RelocationTaskResponse,
   RelocationTasksResponse,
@@ -305,6 +309,37 @@ export class ReloviaClient {
         throwOnError: true,
       }),
       'The expense could not be saved.',
+    );
+  }
+
+  getInventorySuggestion(
+    relocationId: string,
+    furnishing: Furnishing,
+    room: ItemRoom | null,
+  ): Promise<InventorySuggestionResponse> {
+    return this.unwrap(
+      reloviaApi.getInventorySuggestion({
+        client: this.client,
+        path: { relocationId },
+        query: room ? { furnishing, room } : { furnishing },
+        throwOnError: true,
+      }),
+      'The list could not be loaded.',
+    );
+  }
+
+  confirmInventoryList(
+    relocationId: string,
+    body: ConfirmInventoryListRequest,
+  ): Promise<InventoryItemResponse[]> {
+    return this.unwrap(
+      reloviaApi.confirmInventoryList({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The list could not be added.',
     );
   }
 

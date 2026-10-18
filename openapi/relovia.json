@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5081/"
+      "url": "http://localhost:5080/"
     }
   ],
   "paths": {
@@ -928,6 +928,127 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/inventory/suggestion": {
+      "get": {
+        "tags": ["Inventory"],
+        "summary": "Returns a room shopping list without writing items. Items already stored under the same code are left out.",
+        "operationId": "getInventorySuggestion",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "furnishing",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/Furnishing"
+            }
+          },
+          {
+            "name": "room",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/ItemRoom"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventorySuggestionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventorySuggestionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventorySuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Inventory"],
+        "summary": "Adds the selected list items as things to buy. Items already stored under the same code are skipped.",
+        "operationId": "confirmInventoryList",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmInventoryListRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmInventoryListRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmInventoryListRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/relocations/{relocationId}/inventory/{itemId}": {
       "put": {
         "tags": ["Inventory"],
@@ -1680,6 +1801,31 @@
           }
         }
       },
+      "ConfirmInventoryListRequest": {
+        "required": ["furnishing", "codes"],
+        "type": "object",
+        "properties": {
+          "furnishing": {
+            "$ref": "#/components/schemas/Furnishing"
+          },
+          "room": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemRoom"
+              }
+            ]
+          },
+          "codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "CreateRelocationTaskRequest": {
         "required": ["title", "phase", "priority"],
         "type": "object",
@@ -1786,6 +1932,10 @@
           }
         }
       },
+      "Furnishing": {
+        "enum": ["Furnished", "Unfurnished"],
+        "type": "string"
+      },
       "InventoryItemResponse": {
         "required": [
           "id",
@@ -1801,7 +1951,9 @@
           "actualPrice",
           "currencyCode",
           "budgetCategoryId",
-          "notes"
+          "notes",
+          "code",
+          "sourceTemplateItemId"
         ],
         "type": "object",
         "properties": {
@@ -1882,6 +2034,44 @@
           },
           "notes": {
             "type": ["null", "string"]
+          },
+          "code": {
+            "type": ["null", "string"]
+          },
+          "sourceTemplateItemId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          }
+        }
+      },
+      "InventorySuggestionResponse": {
+        "required": ["furnishing", "room", "templateCodes", "items"],
+        "type": "object",
+        "properties": {
+          "furnishing": {
+            "$ref": "#/components/schemas/Furnishing"
+          },
+          "room": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemRoom"
+              }
+            ]
+          },
+          "templateCodes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SuggestedInventoryItemResponse"
+            }
           }
         }
       },
@@ -2286,6 +2476,44 @@
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": ["null", "number", "string"],
             "format": "double"
+          }
+        }
+      },
+      "SuggestedInventoryItemResponse": {
+        "required": [
+          "code",
+          "name",
+          "category",
+          "room",
+          "quantity",
+          "priority",
+          "sourceTemplateItemId"
+        ],
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "$ref": "#/components/schemas/ItemCategory"
+          },
+          "room": {
+            "$ref": "#/components/schemas/ItemRoom"
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ItemPriority"
+          },
+          "sourceTemplateItemId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },

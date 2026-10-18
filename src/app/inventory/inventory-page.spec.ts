@@ -332,6 +332,8 @@ function sofa(): InventoryItemResponse {
     currencyCode: 'EUR',
     budgetCategoryId: null,
     notes: null,
+    code: null,
+    sourceTemplateItemId: null,
   };
 }
 
@@ -351,5 +353,7 @@ function lamp(): InventoryItemResponse {
     currencyCode: null,
     budgetCategoryId: null,
     notes: 'Warm light',
+    code: null,
+    sourceTemplateItemId: null,
   };
 }

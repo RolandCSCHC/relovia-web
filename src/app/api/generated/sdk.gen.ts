@@ -5,6 +5,8 @@ import { client } from './client.gen';
 import type {
   ConfirmChecklistData,
   ConfirmChecklistResponses,
+  ConfirmInventoryListData,
+  ConfirmInventoryListResponses,
   CreateBudgetCategoryData,
   CreateBudgetCategoryResponses,
   CreateBudgetEstimateData,
@@ -35,6 +37,8 @@ import type {
   GetChecklistSuggestionResponses,
   GetCurrentUserData,
   GetCurrentUserResponses,
+  GetInventorySuggestionData,
+  GetInventorySuggestionResponses,
   GetRelocationData,
   GetRelocationResponses,
   GetServiceInfoData,
@@ -336,6 +340,32 @@ export const createInventoryItem = <ThrowOnError extends boolean = false>(
 ): RequestResult<CreateInventoryItemResponses, unknown, ThrowOnError> =>
   (options.client ?? client).post<CreateInventoryItemResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/inventory',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Returns a room shopping list without writing items. Items already stored under the same code are left out.
+ */
+export const getInventorySuggestion = <ThrowOnError extends boolean = false>(
+  options: Options<GetInventorySuggestionData, ThrowOnError>,
+): RequestResult<GetInventorySuggestionResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<GetInventorySuggestionResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/inventory/suggestion',
+    ...options,
+  });
+
+/**
+ * Adds the selected list items as things to buy. Items already stored under the same code are skipped.
+ */
+export const confirmInventoryList = <ThrowOnError extends boolean = false>(
+  options: Options<ConfirmInventoryListData, ThrowOnError>,
+): RequestResult<ConfirmInventoryListResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<ConfirmInventoryListResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/inventory/suggestion',
     ...options,
     headers: {
       'Content-Type': 'application/json',
