@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, resource, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
@@ -57,7 +58,7 @@ interface RoomGroup {
 
 @Component({
   selector: 'app-inventory-page',
-  imports: [InventoryStarter, MatButton, RouterLink],
+  imports: [InventoryStarter, MatButton, NgTemplateOutlet, RouterLink],
   templateUrl: './inventory-page.html',
   styleUrl: './inventory-page.scss',
 })

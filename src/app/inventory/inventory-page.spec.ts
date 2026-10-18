@@ -197,6 +197,10 @@ describe('InventoryPage', () => {
 
     clickButton(root, 'Edit');
     harness.detectChanges();
+    const form = root.querySelector('form');
+    expect(form?.closest('.item')).not.toBeNull();
+    expect(root.querySelector('.item-form')).toBeNull();
+
     setSelect(root.querySelector('#item-action'), 'Sell');
     harness.detectChanges();
     root.querySelector('form')?.dispatchEvent(new Event('submit', { cancelable: true }));

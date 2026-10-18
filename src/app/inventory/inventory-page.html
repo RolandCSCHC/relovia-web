@@ -51,7 +51,23 @@
   }
 
   @if (draft(); as form) {
-    <form class="panel fields item-form" (submit)="save(); $event.preventDefault()">
+    @if (!form.id) {
+      <ng-container
+        [ngTemplateOutlet]="itemForm"
+        [ngTemplateOutletContext]="{ form: form, placing: 'add' }"
+      />
+    }
+  } @else if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  <ng-template #itemForm let-form="form" let-placing="placing">
+    <form
+      class="fields"
+      [class.panel]="placing === 'add'"
+      [class.item-form]="placing === 'add'"
+      (submit)="save(); $event.preventDefault()"
+    >
       <label class="field">
         <span>Name <span class="required" aria-hidden="true">*</span></span>
         <input
@@ -223,9 +239,7 @@
         <button matButton type="button" (click)="cancel()">Cancel</button>
       </div>
     </form>
-  } @else if (error(); as message) {
-    <p class="error-text" role="alert">{{ message }}</p>
-  }
+  </ng-template>
 
   @if (items.value().length === 0 && !starterOpen()) {
     <p class="meta empty">Nothing here yet. Add what you own, or start from a list.</p>
@@ -238,73 +252,87 @@
         <ul class="stack item-list">
           @for (item of group.items; track item.id) {
             <li class="panel item">
-              <div class="item-line">
-                <h3>{{ item.name }}</h3>
-                @if (asCount(item.quantity) !== 1) {
-                  <span class="meta">× {{ asCount(item.quantity) }}</span>
+              @if (draft(); as form) {
+                @if (form.id === item.id) {
+                  <ng-container
+                    [ngTemplateOutlet]="itemForm"
+                    [ngTemplateOutletContext]="{ form: form, placing: 'edit' }"
+                  />
                 }
-              </div>
-              <div class="item-tags">
-                <span class="chip" [class.accent]="item.acquisition === 'ToPurchase'">{{
-                  labelFor(acquisitions, item.acquisition)
-                }}</span>
-                @if (item.movingAction) {
-                  <span class="chip">{{ labelFor(movingActions, item.movingAction) }}</span>
-                }
-                @if (item.packingStatus) {
-                  <span class="chip">{{ labelFor(packingStatuses, item.packingStatus) }}</span>
-                }
-                @if (item.priority !== 'Normal') {
-                  <span class="chip" [class.strong]="item.priority === 'High'">{{
-                    labelFor(priorities, item.priority)
+              }
+              @if (draft()?.id !== item.id) {
+                <div class="item-line">
+                  <h3>{{ item.name }}</h3>
+                  @if (asCount(item.quantity) !== 1) {
+                    <span class="meta">× {{ asCount(item.quantity) }}</span>
+                  }
+                </div>
+                <div class="item-tags">
+                  <span class="chip" [class.accent]="item.acquisition === 'ToPurchase'">{{
+                    labelFor(acquisitions, item.acquisition)
                   }}</span>
-                }
-                @if (item.category) {
-                  <span class="meta">{{ labelFor(categories, item.category) }}</span>
-                }
-                @if (budgetCategoryName(item.budgetCategoryId); as budgetName) {
-                  <span class="meta">{{ budgetName }}</span>
-                }
-              </div>
-              @if (item.currencyCode) {
-                <p class="meta prices">
-                  @if (item.estimatedPrice !== null) {
-                    <span
-                      >Estimate
-                      {{
-                        formatMoney(item.estimatedPrice, item.currencyCode, { exact: true })
-                      }}</span
-                    >
+                  @if (item.movingAction) {
+                    <span class="chip">{{ labelFor(movingActions, item.movingAction) }}</span>
                   }
-                  @if (item.actualPrice !== null) {
-                    <span
-                      >Paid
-                      {{ formatMoney(item.actualPrice, item.currencyCode, { exact: true }) }}</span
-                    >
+                  @if (item.packingStatus) {
+                    <span class="chip">{{ labelFor(packingStatuses, item.packingStatus) }}</span>
                   }
-                </p>
-              }
-              @if (item.notes) {
-                <p class="meta">{{ item.notes }}</p>
-              }
-              @if (deletingId() === item.id) {
-                <p class="meta">Delete this item?</p>
-                <div class="actions">
-                  <button
-                    matButton="outlined"
-                    type="button"
-                    [disabled]="saving()"
-                    (click)="remove(item)"
-                  >
-                    Delete item
-                  </button>
-                  <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+                  @if (item.priority !== 'Normal') {
+                    <span class="chip" [class.strong]="item.priority === 'High'">{{
+                      labelFor(priorities, item.priority)
+                    }}</span>
+                  }
+                  @if (item.category) {
+                    <span class="meta">{{ labelFor(categories, item.category) }}</span>
+                  }
+                  @if (budgetCategoryName(item.budgetCategoryId); as budgetName) {
+                    <span class="meta">{{ budgetName }}</span>
+                  }
                 </div>
-              } @else if (draft()?.id !== item.id) {
-                <div class="actions">
-                  <button matButton type="button" (click)="startEdit(item)">Edit</button>
-                  <button matButton type="button" (click)="deletingId.set(item.id)">Delete</button>
-                </div>
+                @if (item.currencyCode) {
+                  <p class="meta prices">
+                    @if (item.estimatedPrice !== null) {
+                      <span
+                        >Estimate
+                        {{
+                          formatMoney(item.estimatedPrice, item.currencyCode, { exact: true })
+                        }}</span
+                      >
+                    }
+                    @if (item.actualPrice !== null) {
+                      <span
+                        >Paid
+                        {{
+                          formatMoney(item.actualPrice, item.currencyCode, { exact: true })
+                        }}</span
+                      >
+                    }
+                  </p>
+                }
+                @if (item.notes) {
+                  <p class="meta">{{ item.notes }}</p>
+                }
+                @if (deletingId() === item.id) {
+                  <p class="meta">Delete this item?</p>
+                  <div class="actions">
+                    <button
+                      matButton="outlined"
+                      type="button"
+                      [disabled]="saving()"
+                      (click)="remove(item)"
+                    >
+                      Delete item
+                    </button>
+                    <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+                  </div>
+                } @else if (draft()?.id !== item.id) {
+                  <div class="actions">
+                    <button matButton type="button" (click)="startEdit(item)">Edit</button>
+                    <button matButton type="button" (click)="deletingId.set(item.id)">
+                      Delete
+                    </button>
+                  </div>
+                }
               }
             </li>
           }
