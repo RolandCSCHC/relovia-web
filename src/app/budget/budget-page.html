@@ -250,6 +250,59 @@
             </ul>
           }
 
+          @if (category.shopping.length > 0) {
+            <p class="meta">To buy</p>
+            <ul class="estimates">
+              @for (line of category.shopping; track line.itemId) {
+                <li class="estimate">
+                  <span>{{ line.name }}</span>
+                  <span class="estimate-amount">
+                    @if (line.estimatedPrice !== null) {
+                      <span
+                        >Estimate
+                        {{
+                          formatMoney(line.estimatedPrice, line.currencyCode, { exact: true })
+                        }}</span
+                      >
+                      @if (
+                        converted(
+                          {
+                            currencyCode: line.currencyCode,
+                            convertedAmount: line.convertedEstimated,
+                          },
+                          currency
+                        );
+                        as note
+                      ) {
+                        <span class="meta">{{ note }}</span>
+                      }
+                    }
+                    @if (line.actualPrice !== null) {
+                      <span
+                        >Paid
+                        {{
+                          formatMoney(line.actualPrice, line.currencyCode, { exact: true })
+                        }}</span
+                      >
+                      @if (
+                        converted(
+                          {
+                            currencyCode: line.currencyCode,
+                            convertedAmount: line.convertedActual,
+                          },
+                          currency
+                        );
+                        as note
+                      ) {
+                        <span class="meta">{{ note }}</span>
+                      }
+                    }
+                  </span>
+                </li>
+              }
+            </ul>
+          }
+
           @if (estimateEditor(); as form) {
             @if (form.id === null && form.categoryId === category.id) {
               <ng-container

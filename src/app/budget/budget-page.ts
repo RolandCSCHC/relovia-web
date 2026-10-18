@@ -110,6 +110,20 @@ export class BudgetPage {
           );
         }
 
+        const shopping = asCount(row.shoppingCount);
+        if (shopping > 0) {
+          const money = [
+            toAmount(row.shoppingEstimated) > 0
+              ? `${formatMoney(row.shoppingEstimated, row.currencyCode)} estimated`
+              : null,
+            toAmount(row.shoppingSpent) > 0
+              ? `${formatMoney(row.shoppingSpent, row.currencyCode)} spent`
+              : null,
+          ].filter((part) => part !== null);
+          const itemWord = shopping === 1 ? 'item' : 'items';
+          parts.push(`${money.join(' and ') || 'shopping'} (${shopping} ${itemWord} to buy)`);
+        }
+
         return parts.join(' and ');
       })
       .join('; ');

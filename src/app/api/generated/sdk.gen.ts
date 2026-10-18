@@ -11,6 +11,8 @@ import type {
   CreateBudgetEstimateResponses,
   CreateExpenseData,
   CreateExpenseResponses,
+  CreateInventoryItemData,
+  CreateInventoryItemResponses,
   CreateRelocationData,
   CreateRelocationResponses,
   CreateRelocationTaskData,
@@ -21,6 +23,8 @@ import type {
   DeleteBudgetEstimateResponses,
   DeleteExpenseData,
   DeleteExpenseResponses,
+  DeleteInventoryItemData,
+  DeleteInventoryItemResponses,
   DeleteRelocationData,
   DeleteRelocationResponses,
   DeleteRelocationTaskData,
@@ -39,6 +43,8 @@ import type {
   ListCitiesResponses,
   ListExpensesData,
   ListExpensesResponses,
+  ListInventoryItemsData,
+  ListInventoryItemsResponses,
   ListRelocationsData,
   ListRelocationsResponses,
   ListRelocationTasksData,
@@ -55,6 +61,8 @@ import type {
   UpdateBudgetEstimateResponses,
   UpdateExpenseData,
   UpdateExpenseResponses,
+  UpdateInventoryItemData,
+  UpdateInventoryItemResponses,
   UpdateRelocationData,
   UpdateRelocationResponses,
   UpdateRelocationTaskData,
@@ -113,7 +121,7 @@ export const logout = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Returns the relocation's budget with estimates compared to actual expenses.
+ * Returns the relocation's budget. Estimates, expenses, and prices of items still to buy are compared in the budget currency.
  */
 export const getBudget = <ThrowOnError extends boolean = false>(
   options: Options<GetBudgetData, ThrowOnError>,
@@ -154,7 +162,7 @@ export const createBudgetCategory = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Deletes a budget category and its estimates. Categories with expenses are refused.
+ * Deletes a budget category and its estimates. Categories with expenses or shopping items are refused.
  */
 export const deleteBudgetCategory = <ThrowOnError extends boolean = false>(
   options: Options<DeleteBudgetCategoryData, ThrowOnError>,
@@ -302,6 +310,58 @@ export const updateExpense = <ThrowOnError extends boolean = false>(
 ): RequestResult<UpdateExpenseResponses, unknown, ThrowOnError> =>
   (options.client ?? client).put<UpdateExpenseResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/expenses/{expenseId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Lists the relocation's belongings, by room and then by name.
+ */
+export const listInventoryItems = <ThrowOnError extends boolean = false>(
+  options: Options<ListInventoryItemsData, ThrowOnError>,
+): RequestResult<ListInventoryItemsResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<ListInventoryItemsResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/inventory',
+    ...options,
+  });
+
+/**
+ * Adds a belonging. A bring item with no packing status starts as not packed.
+ */
+export const createInventoryItem = <ThrowOnError extends boolean = false>(
+  options: Options<CreateInventoryItemData, ThrowOnError>,
+): RequestResult<CreateInventoryItemResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateInventoryItemResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/inventory',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes a belonging.
+ */
+export const deleteInventoryItem = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteInventoryItemData, ThrowOnError>,
+): RequestResult<DeleteInventoryItemResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteInventoryItemResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/inventory/{itemId}',
+    ...options,
+  });
+
+/**
+ * Updates a belonging. Prices stay as entered.
+ */
+export const updateInventoryItem = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateInventoryItemData, ThrowOnError>,
+): RequestResult<UpdateInventoryItemResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateInventoryItemResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/inventory/{itemId}',
     ...options,
     headers: {
       'Content-Type': 'application/json',

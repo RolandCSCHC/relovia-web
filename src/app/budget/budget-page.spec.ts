@@ -57,6 +57,8 @@ describe('BudgetPage', () => {
     expect(root.textContent).toContain('Not counted, because there is no exchange rate to EUR');
     expect(root.textContent).toMatch(/900\D000/);
     expect(root.textContent).toContain('Deposit');
+    expect(root.textContent).toContain('To buy');
+    expect(root.textContent).toContain('Lamp');
   });
 
   it('shows an estimate in its own currency next to what it comes to in the budget currency', async () => {
@@ -305,6 +307,17 @@ function comparedBudget(): BudgetResponse {
         actual: 3000,
         remaining: -2000,
         expenseCount: 2,
+        shopping: [
+          {
+            itemId: '0199f0a1-7c00-7000-8000-000000000042',
+            name: 'Lamp',
+            estimatedPrice: 45.5,
+            actualPrice: null,
+            currencyCode: 'USD',
+            convertedEstimated: 22.75,
+            convertedActual: null,
+          },
+        ],
       },
       {
         id: movingId,
@@ -323,6 +336,7 @@ function comparedBudget(): BudgetResponse {
         actual: 200,
         remaining: 800,
         expenseCount: 1,
+        shopping: [],
       },
     ],
     totals: { estimated: 2000, actual: 3200, remaining: -1200 },
@@ -333,6 +347,9 @@ function comparedBudget(): BudgetResponse {
         expenseTotal: 900000,
         estimateCount: 0,
         estimateTotal: 0,
+        shoppingCount: 0,
+        shoppingEstimated: 0,
+        shoppingSpent: 0,
       },
     ],
     ratesAsOf: '2026-10-17T00:00:00+00:00',

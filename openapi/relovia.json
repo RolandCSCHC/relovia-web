@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5081/"
+      "url": "http://127.0.0.1:5081/"
     }
   ],
   "paths": {
@@ -66,7 +66,7 @@
     "/api/relocations/{relocationId}/budget": {
       "get": {
         "tags": ["Budget"],
-        "summary": "Returns the relocation's budget with estimates compared to actual expenses.",
+        "summary": "Returns the relocation's budget. Estimates, expenses, and prices of items still to buy are compared in the budget currency.",
         "operationId": "getBudget",
         "parameters": [
           {
@@ -291,7 +291,7 @@
       },
       "delete": {
         "tags": ["Budget"],
-        "summary": "Deletes a budget category and its estimates. Categories with expenses are refused.",
+        "summary": "Deletes a budget category and its estimates. Categories with expenses or shopping items are refused.",
         "operationId": "deleteBudgetCategory",
         "parameters": [
           {
@@ -821,6 +821,212 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/inventory": {
+      "get": {
+        "tags": ["Inventory"],
+        "summary": "Lists the relocation's belongings, by room and then by name.",
+        "operationId": "listInventoryItems",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Inventory"],
+        "summary": "Adds a belonging. A bring item with no packing status starts as not packed.",
+        "operationId": "createInventoryItem",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInventoryItemRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInventoryItemRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInventoryItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/inventory/{itemId}": {
+      "put": {
+        "tags": ["Inventory"],
+        "summary": "Updates a belonging. Prices stay as entered.",
+        "operationId": "updateInventoryItem",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInventoryItemRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInventoryItemRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveInventoryItemRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Inventory"],
+        "summary": "Deletes a belonging.",
+        "operationId": "deleteInventoryItem",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/relocations": {
       "get": {
         "tags": ["Relocations"],
@@ -1254,8 +1460,21 @@
   },
   "components": {
     "schemas": {
+      "AcquisitionStatus": {
+        "enum": ["Owned", "ToPurchase"],
+        "type": "string"
+      },
       "BudgetCategoryResponse": {
-        "required": ["id", "name", "estimates", "estimated", "actual", "remaining", "expenseCount"],
+        "required": [
+          "id",
+          "name",
+          "estimates",
+          "estimated",
+          "actual",
+          "remaining",
+          "expenseCount",
+          "shopping"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -1290,6 +1509,12 @@
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": ["integer", "string"],
             "format": "int32"
+          },
+          "shopping": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ShoppingLineResponse"
+            }
           }
         }
       },
@@ -1561,6 +1786,125 @@
           }
         }
       },
+      "InventoryItemResponse": {
+        "required": [
+          "id",
+          "name",
+          "category",
+          "room",
+          "quantity",
+          "acquisition",
+          "movingAction",
+          "packingStatus",
+          "priority",
+          "estimatedPrice",
+          "actualPrice",
+          "currencyCode",
+          "budgetCategoryId",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemCategory"
+              }
+            ]
+          },
+          "room": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemRoom"
+              }
+            ]
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "acquisition": {
+            "$ref": "#/components/schemas/AcquisitionStatus"
+          },
+          "movingAction": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MovingAction"
+              }
+            ]
+          },
+          "packingStatus": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PackingStatus"
+              }
+            ]
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ItemPriority"
+          },
+          "estimatedPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "actualPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": ["null", "string"]
+          },
+          "budgetCategoryId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "ItemCategory": {
+        "enum": ["Furniture", "Appliances", "Linens", "Cookware", "Electronics", "Decor", "Other"],
+        "type": "string"
+      },
+      "ItemPriority": {
+        "enum": ["Low", "Normal", "High"],
+        "type": "string"
+      },
+      "ItemRoom": {
+        "enum": ["Kitchen", "Bathroom", "Bedroom", "LivingRoom", "DiningRoom", "Office", "Other"],
+        "type": "string"
+      },
+      "MovingAction": {
+        "enum": ["Bring", "Sell", "Donate", "Store", "Discard"],
+        "type": "string"
+      },
+      "PackingStatus": {
+        "enum": ["NotPacked", "Packed", "Unpacked"],
+        "type": "string"
+      },
       "RelocationPurpose": {
         "enum": ["Work", "Study", "Family", "Lifestyle", "Other"],
         "type": "string"
@@ -1773,6 +2117,86 @@
           }
         }
       },
+      "SaveInventoryItemRequest": {
+        "required": ["name", "quantity", "acquisition", "priority"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemCategory"
+              }
+            ]
+          },
+          "room": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ItemRoom"
+              }
+            ]
+          },
+          "quantity": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "acquisition": {
+            "$ref": "#/components/schemas/AcquisitionStatus"
+          },
+          "movingAction": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MovingAction"
+              }
+            ]
+          },
+          "packingStatus": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PackingStatus"
+              }
+            ]
+          },
+          "priority": {
+            "$ref": "#/components/schemas/ItemPriority"
+          },
+          "estimatedPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "actualPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": ["null", "string"]
+          },
+          "budgetCategoryId": {
+            "type": ["null", "string"],
+            "format": "uuid"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
       "SaveRelocationRequest": {
         "required": [
           "name",
@@ -1818,6 +2242,50 @@
         "properties": {
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "ShoppingLineResponse": {
+        "required": [
+          "itemId",
+          "name",
+          "estimatedPrice",
+          "actualPrice",
+          "currencyCode",
+          "convertedEstimated",
+          "convertedActual"
+        ],
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "estimatedPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "actualPrice": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": "string"
+          },
+          "convertedEstimated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "convertedActual": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
           }
         }
       },
@@ -1918,7 +2386,10 @@
           "expenseCount",
           "expenseTotal",
           "estimateCount",
-          "estimateTotal"
+          "estimateTotal",
+          "shoppingCount",
+          "shoppingEstimated",
+          "shoppingSpent"
         ],
         "type": "object",
         "properties": {
@@ -1941,6 +2412,21 @@
             "format": "int32"
           },
           "estimateTotal": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "shoppingCount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          },
+          "shoppingEstimated": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["number", "string"],
+            "format": "double"
+          },
+          "shoppingSpent": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": ["number", "string"],
             "format": "double"
@@ -1986,6 +2472,9 @@
     },
     {
       "name": "Expenses"
+    },
+    {
+      "name": "Inventory"
     },
     {
       "name": "Relocations"
