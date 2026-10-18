@@ -1,0 +1,307 @@
+@if (relocation.error() || items.error() || budget.error()) {
+  <h1 class="page-title">Inventory</h1>
+  <p class="error-text">
+    {{ relocation.error()?.message ?? items.error()?.message ?? budget.error()?.message }}
+  </p>
+  <a matButton routerLink="/">Back to relocations</a>
+} @else if (relocation.hasValue() && items.hasValue() && budget.hasValue()) {
+  <div class="heading-row">
+    <div>
+      <h1 class="page-title">Inventory</h1>
+      <p class="page-lead">{{ relocation.value().name }}</p>
+    </div>
+    <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id]"
+      >Back to relocation</a
+    >
+  </div>
+  <p class="meta summary">
+    What you own, what you still need to buy, and what happens to each thing in the move.
+  </p>
+  @if (items.value().length > 0) {
+    <p class="meta summary">{{ summary(items.value()) }}</p>
+  }
+
+  <div class="toolbar">
+    @if (items.value().length > 0) {
+      <label class="field filter">
+        Show
+        <select id="inventory-filter" (change)="setFilter(value($event))">
+          @for (option of filters; track option.value) {
+            <option [value]="option.value" [selected]="option.value === filter()">
+              {{ option.label }}
+            </option>
+          }
+        </select>
+      </label>
+    }
+    @if (!draft()) {
+      <button matButton="outlined" type="button" (click)="startAdd()">Add item</button>
+    }
+  </div>
+
+  @if (draft(); as form) {
+    <form class="panel fields item-form" (submit)="save(); $event.preventDefault()">
+      <label class="field">
+        <span>Name <span class="required" aria-hidden="true">*</span></span>
+        <input
+          id="item-name"
+          aria-required="true"
+          maxlength="200"
+          [value]="form.name"
+          (input)="updateText('name', value($event))"
+        />
+      </label>
+      <div class="place">
+        <label class="field">
+          <span>Quantity <span class="required" aria-hidden="true">*</span></span>
+          <input
+            id="item-quantity"
+            type="number"
+            min="1"
+            max="100000"
+            step="1"
+            inputmode="numeric"
+            aria-required="true"
+            [value]="form.quantity"
+            (input)="updateText('quantity', value($event))"
+          />
+        </label>
+        <label class="field">
+          <span>Priority <span class="required" aria-hidden="true">*</span></span>
+          <select id="item-priority" aria-required="true" (change)="updatePriority(value($event))">
+            @for (option of priorities; track option.value) {
+              <option [value]="option.value" [selected]="option.value === form.priority">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="place">
+        <label class="field">
+          Category
+          <select id="item-category" (change)="updateCategory(value($event))">
+            <option value="" [selected]="form.category === ''">Not set</option>
+            @for (option of categories; track option.value) {
+              <option [value]="option.value" [selected]="option.value === form.category">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          Room
+          <select id="item-room" (change)="updateRoom(value($event))">
+            <option value="" [selected]="form.room === ''">Not set</option>
+            @for (option of rooms; track option.value) {
+              <option [value]="option.value" [selected]="option.value === form.room">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+      <div class="place">
+        <label class="field">
+          <span>Ownership <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="item-acquisition"
+            aria-required="true"
+            (change)="updateAcquisition(value($event))"
+          >
+            @for (option of acquisitions; track option.value) {
+              <option [value]="option.value" [selected]="option.value === form.acquisition">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          For the move
+          <select id="item-action" (change)="updateAction(value($event))">
+            <option value="" [selected]="form.movingAction === ''">Not decided</option>
+            @for (option of movingActions; track option.value) {
+              <option [value]="option.value" [selected]="option.value === form.movingAction">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+      </div>
+      @if (form.movingAction === 'Bring') {
+        <label class="field">
+          <span>Packing <span class="required" aria-hidden="true">*</span></span>
+          <select id="item-packing" aria-required="true" (change)="updatePacking(value($event))">
+            @for (option of packingStatuses; track option.value) {
+              <option [value]="option.value" [selected]="option.value === form.packingStatus">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+      }
+      <div class="place">
+        <label class="field">
+          Estimated price
+          <input
+            id="item-estimated"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            [value]="form.estimatedPrice"
+            (input)="updateText('estimatedPrice', value($event))"
+          />
+        </label>
+        <label class="field">
+          Actual price
+          <input
+            id="item-actual"
+            type="number"
+            step="any"
+            min="0"
+            inputmode="decimal"
+            [value]="form.actualPrice"
+            (input)="updateText('actualPrice', value($event))"
+          />
+        </label>
+      </div>
+      @if (form.acquisition === 'ToPurchase' && budgetCategories().length === 0) {
+        <p class="meta">Set up the budget before a price can be counted.</p>
+      }
+      @if (form.acquisition === 'ToPurchase' && budgetCategories().length > 0) {
+        <label class="field">
+          Budget category
+          <select id="item-budget-category" (change)="updateBudgetCategory(value($event))">
+            @for (category of budgetCategories(); track category.id) {
+              <option [value]="category.id" [selected]="category.id === form.budgetCategoryId">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        </label>
+      }
+      @if (needsCurrency(form)) {
+        <label class="field">
+          <span>Currency <span class="required" aria-hidden="true">*</span></span>
+          <select id="item-currency" aria-required="true" (change)="updateCurrency(value($event))">
+            <option value="" [selected]="!form.currencyCode">Choose a currency</option>
+            @for (currency of currencies; track currency.code) {
+              <option [value]="currency.code" [selected]="currency.code === form.currencyCode">
+                {{ currency.label }}
+              </option>
+            }
+          </select>
+        </label>
+      }
+      <label class="field">
+        Notes
+        <textarea
+          id="item-notes"
+          rows="2"
+          maxlength="1000"
+          [value]="form.notes"
+          (input)="updateText('notes', value($event))"
+        ></textarea>
+      </label>
+      @if (error(); as message) {
+        <p class="error-text" role="alert">{{ message }}</p>
+      }
+      <div class="actions">
+        <button matButton="filled" type="submit" [disabled]="saving()">Save item</button>
+        <button matButton type="button" (click)="cancel()">Cancel</button>
+      </div>
+    </form>
+  } @else if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  @if (items.value().length === 0) {
+    <p class="meta empty">Nothing here yet. Add what you own, and what you still need to buy.</p>
+  } @else if (groups().length === 0) {
+    <p class="meta empty">Nothing matches this filter.</p>
+  } @else {
+    @for (group of groups(); track group.room) {
+      <section class="room" [attr.aria-label]="group.room">
+        <h2>{{ group.room }}</h2>
+        <ul class="stack item-list">
+          @for (item of group.items; track item.id) {
+            <li class="panel item">
+              <div class="item-line">
+                <h3>{{ item.name }}</h3>
+                @if (asCount(item.quantity) !== 1) {
+                  <span class="meta">× {{ asCount(item.quantity) }}</span>
+                }
+              </div>
+              <div class="item-tags">
+                <span class="chip" [class.accent]="item.acquisition === 'ToPurchase'">{{
+                  labelFor(acquisitions, item.acquisition)
+                }}</span>
+                @if (item.movingAction) {
+                  <span class="chip">{{ labelFor(movingActions, item.movingAction) }}</span>
+                }
+                @if (item.packingStatus) {
+                  <span class="chip">{{ labelFor(packingStatuses, item.packingStatus) }}</span>
+                }
+                @if (item.priority !== 'Normal') {
+                  <span class="chip" [class.strong]="item.priority === 'High'">{{
+                    labelFor(priorities, item.priority)
+                  }}</span>
+                }
+                @if (item.category) {
+                  <span class="meta">{{ labelFor(categories, item.category) }}</span>
+                }
+                @if (budgetCategoryName(item.budgetCategoryId); as budgetName) {
+                  <span class="meta">{{ budgetName }}</span>
+                }
+              </div>
+              @if (item.currencyCode) {
+                <p class="meta prices">
+                  @if (item.estimatedPrice !== null) {
+                    <span
+                      >Estimate
+                      {{
+                        formatMoney(item.estimatedPrice, item.currencyCode, { exact: true })
+                      }}</span
+                    >
+                  }
+                  @if (item.actualPrice !== null) {
+                    <span
+                      >Paid
+                      {{ formatMoney(item.actualPrice, item.currencyCode, { exact: true }) }}</span
+                    >
+                  }
+                </p>
+              }
+              @if (item.notes) {
+                <p class="meta">{{ item.notes }}</p>
+              }
+              @if (deletingId() === item.id) {
+                <p class="meta">Delete this item?</p>
+                <div class="actions">
+                  <button
+                    matButton="outlined"
+                    type="button"
+                    [disabled]="saving()"
+                    (click)="remove(item)"
+                  >
+                    Delete item
+                  </button>
+                  <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+                </div>
+              } @else if (draft()?.id !== item.id) {
+                <div class="actions">
+                  <button matButton type="button" (click)="startEdit(item)">Edit</button>
+                  <button matButton type="button" (click)="deletingId.set(item.id)">Delete</button>
+                </div>
+              }
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  }
+} @else {
+  <h1 class="page-title">Inventory</h1>
+  <p class="meta">Loading inventory…</p>
+}

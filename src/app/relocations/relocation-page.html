@@ -14,6 +14,9 @@
       </p>
     </div>
     <div class="actions">
+      <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'inventory']"
+        >Inventory</a
+      >
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'budget']"
         >Budget</a
       >

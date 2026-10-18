@@ -10,6 +10,7 @@ import type {
   ConfirmChecklistRequest,
   CreateRelocationTaskRequest,
   ExpenseResponse,
+  InventoryItemResponse,
   RelocationResponse,
   RelocationTaskResponse,
   RelocationTasksResponse,
@@ -17,6 +18,7 @@ import type {
   SaveBudgetEstimateRequest,
   SaveBudgetRequest,
   SaveExpenseRequest,
+  SaveInventoryItemRequest,
   SaveRelocationRequest,
   UpdateRelocationTaskRequest,
 } from './generated/types.gen';
@@ -304,6 +306,60 @@ export class ReloviaClient {
       }),
       'The expense could not be saved.',
     );
+  }
+
+  listInventoryItems(relocationId: string): Promise<InventoryItemResponse[]> {
+    return this.unwrap(
+      reloviaApi.listInventoryItems({
+        client: this.client,
+        path: { relocationId },
+        throwOnError: true,
+      }),
+      'Inventory could not be loaded.',
+    );
+  }
+
+  createInventoryItem(
+    relocationId: string,
+    body: SaveInventoryItemRequest,
+  ): Promise<InventoryItemResponse> {
+    return this.unwrap(
+      reloviaApi.createInventoryItem({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The item could not be saved.',
+    );
+  }
+
+  updateInventoryItem(
+    relocationId: string,
+    itemId: string,
+    body: SaveInventoryItemRequest,
+  ): Promise<InventoryItemResponse> {
+    return this.unwrap(
+      reloviaApi.updateInventoryItem({
+        client: this.client,
+        path: { relocationId, itemId },
+        body,
+        throwOnError: true,
+      }),
+      'The item could not be saved.',
+    );
+  }
+
+  async deleteInventoryItem(relocationId: string, itemId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteInventoryItem({
+        client: this.client,
+        path: { relocationId, itemId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The item could not be deleted.');
+    }
   }
 
   async deleteExpense(relocationId: string, expenseId: string): Promise<void> {
