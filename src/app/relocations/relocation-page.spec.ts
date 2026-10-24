@@ -47,6 +47,7 @@ describe('RelocationPage', () => {
 
     expect(root.textContent).toContain('0 of 1 done');
     expect(root.textContent).toContain('Give notice');
+    expect(root.querySelector(`a[href="/relocations/${relocationId}/documents"]`)).not.toBeNull();
     const select = root.querySelector('select');
     if (!(select instanceof HTMLSelectElement)) {
       throw new Error('Missing status select');
@@ -192,6 +193,7 @@ function taskList(): RelocationTasksResponse {
         status: 'Todo',
         sourceTemplateTaskId: null,
         dependencies: [],
+        documentIds: [],
       },
     ],
   };

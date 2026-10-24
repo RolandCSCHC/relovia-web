@@ -81,6 +81,10 @@ export class RelocationPage {
     return labelFor(priorities, task.priority);
   }
 
+  protected documentLabel(task: RelocationTaskResponse): string {
+    return task.documentIds.length === 1 ? '1 document' : `${task.documentIds.length} documents`;
+  }
+
   protected dependencyNote(
     task: RelocationTaskResponse,
     tasks: readonly RelocationTaskResponse[],

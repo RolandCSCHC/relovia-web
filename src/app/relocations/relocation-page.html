@@ -20,6 +20,9 @@
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'budget']"
         >Budget</a
       >
+      <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'documents']"
+        >Documents</a
+      >
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'edit']"
         >Edit</a
       >
@@ -37,7 +40,7 @@
 
   @if (confirmingDelete()) {
     <div class="panel confirm-delete">
-      <p class="meta">Delete this relocation and its tasks?</p>
+      <p class="meta">Delete this relocation, its tasks, and its documents?</p>
       <div class="actions">
         <button matButton="outlined" type="button" [disabled]="saving()" (click)="remove()">
           Delete relocation
@@ -149,6 +152,11 @@
             <span class="chip" [class.accent]="task.priority === 'High'">{{
               priorityLabel(task)
             }}</span>
+            @if (task.documentIds.length > 0) {
+              <a [routerLink]="['/relocations', relocation.value().id, 'documents']">{{
+                documentLabel(task)
+              }}</a>
+            }
           </div>
           @if (dependencyNote(task, tasks.value().tasks); as note) {
             <p class="meta">{{ note }}</p>
