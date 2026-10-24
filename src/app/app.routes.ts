@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { BudgetPage } from './budget/budget-page';
 import { authGuard, guestGuard, waitingGuard } from './core/auth.guard';
+import { DocumentsPage } from './documents/documents-page';
 import { InventoryPage } from './inventory/inventory-page';
 import { EarlyAccess } from './early-access/early-access';
 import { Home } from './home/home';
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'relocations/:id/checklist', canActivate: [authGuard], component: ChecklistReview },
   { path: 'relocations/:id/budget', canActivate: [authGuard], component: BudgetPage },
   { path: 'relocations/:id/inventory', canActivate: [authGuard], component: InventoryPage },
+  { path: 'relocations/:id/documents', canActivate: [authGuard], component: DocumentsPage },
   { path: 'relocations/:id', canActivate: [authGuard], component: RelocationPage },
   { path: '**', redirectTo: '' },
 ];

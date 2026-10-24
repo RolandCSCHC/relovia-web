@@ -1,0 +1,212 @@
+@if (relocation.error() || documents.error()) {
+  <h1 class="page-title">Documents</h1>
+  <p class="error-text">
+    {{ relocation.error()?.message ?? documents.error()?.message }}
+  </p>
+  <a matButton routerLink="/">Back to relocations</a>
+} @else if (relocation.hasValue() && documents.hasValue()) {
+  <div class="heading-row">
+    <div>
+      <h1 class="page-title">Documents</h1>
+      <p class="page-lead">{{ relocation.value().name }}</p>
+    </div>
+    <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id]"
+      >Back to relocation</a
+    >
+  </div>
+  <p class="meta summary">Private files for this move. PDF, JPEG, PNG, or WebP, up to 10 MB.</p>
+
+  <div class="toolbar">
+    <button matButton="outlined" type="button" (click)="startUpload()">Add document</button>
+  </div>
+
+  @if (adding()) {
+    <div class="backdrop">
+      <button type="button" class="scrim" aria-label="Close" (click)="closeUpload()"></button>
+      <form
+        class="panel upload-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="add-document-title"
+        (keydown.escape)="closeUpload()"
+        (submit)="upload(); $event.preventDefault()"
+      >
+        <h2 id="add-document-title">Add document</h2>
+        <label class="field">
+          <span>File <span class="required" aria-hidden="true">*</span></span>
+          <input
+            id="document-file"
+            type="file"
+            accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"
+            aria-required="true"
+            [disabled]="saving()"
+            (change)="rememberFile($event)"
+          />
+        </label>
+        <div class="place">
+          <label class="field">
+            Category
+            <select
+              id="upload-category"
+              [value]="uploadDraft().category"
+              (change)="updateUploadCategory(value($event))"
+            >
+              <option value="">None</option>
+              @for (option of categories; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            Expiration
+            <input
+              id="upload-expires"
+              type="date"
+              [value]="uploadDraft().expiresOn"
+              (input)="updateUploadExpiresOn(value($event))"
+            />
+          </label>
+        </div>
+        @if (tasks.hasValue()) {
+          <fieldset class="group">
+            <legend>Tasks this document supports</legend>
+            @if (tasks.value().length === 0) {
+              <p class="meta">This relocation has no tasks yet.</p>
+            } @else {
+              @for (task of tasks.value(); track task.id) {
+                <label class="check">
+                  <input
+                    type="checkbox"
+                    [checked]="uploadSupports(task)"
+                    (change)="toggleUploadTask(task.id, checked($event))"
+                  />
+                  {{ task.title }}
+                </label>
+              }
+            }
+          </fieldset>
+        } @else if (tasks.error()) {
+          <p class="error-text">Tasks could not be loaded.</p>
+        }
+        @if (uploadError(); as message) {
+          <p class="error-text" role="alert">{{ message }}</p>
+        }
+        <div class="actions">
+          <button matButton="filled" type="submit" [disabled]="saving()">Upload</button>
+          <button matButton type="button" (click)="closeUpload()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
+
+  @if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  @if (documents.value().length === 0) {
+    <div class="panel empty">
+      <p class="meta">No documents yet.</p>
+    </div>
+  } @else {
+    <ol class="stack">
+      @for (document of documents.value(); track document.id) {
+        <li class="panel document">
+          <div class="document-line">
+            <h2>{{ document.fileName }}</h2>
+            <span class="meta">{{ formatBytes(document.sizeBytes) }}</span>
+          </div>
+          <div class="document-tags">
+            @if (document.category) {
+              <span class="chip">{{ labelFor(categories, document.category) }}</span>
+            }
+            @if (document.expiresOn) {
+              <span class="chip" [class.accent]="isExpired(document.expiresOn)">
+                {{ isExpired(document.expiresOn) ? 'Expired' : 'Expires' }}
+                {{ formatDate(document.expiresOn) }}
+              </span>
+            }
+          </div>
+          @if (document.taskIds.length > 0) {
+            <p class="meta">Supports {{ supportedTitles(document) }}</p>
+          }
+          @if (deletingId() === document.id) {
+            <p class="meta">Delete this document and its file?</p>
+            <div class="actions">
+              <button
+                matButton="outlined"
+                type="button"
+                [disabled]="saving()"
+                (click)="remove(document)"
+              >
+                Delete document
+              </button>
+              <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+            </div>
+          } @else if (editingId() !== document.id) {
+            <div class="actions">
+              <button matButton type="button" (click)="download(document)">Download</button>
+              <button matButton type="button" (click)="startEdit(document)">Edit details</button>
+              <button matButton type="button" (click)="deletingId.set(document.id)">
+                Delete document
+              </button>
+            </div>
+          } @else if (draft(); as form) {
+            <form class="fields" (submit)="save(document); $event.preventDefault()">
+              <div class="place">
+                <label class="field">
+                  Category
+                  <select
+                    id="document-category"
+                    [value]="form.category"
+                    (change)="updateCategory(value($event))"
+                  >
+                    <option value="">None</option>
+                    @for (option of categories; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="field">
+                  Expiration
+                  <input
+                    id="document-expires"
+                    type="date"
+                    [value]="form.expiresOn"
+                    (input)="updateExpiresOn(value($event))"
+                  />
+                </label>
+              </div>
+              @if (tasks.hasValue()) {
+                <fieldset class="group">
+                  <legend>Tasks this document supports</legend>
+                  @if (tasks.value().length === 0) {
+                    <p class="meta">This relocation has no tasks yet.</p>
+                  } @else {
+                    @for (task of tasks.value(); track task.id) {
+                      <label class="check">
+                        <input
+                          type="checkbox"
+                          [checked]="supports(task)"
+                          (change)="toggleTask(task.id, checked($event))"
+                        />
+                        {{ task.title }}
+                      </label>
+                    }
+                  }
+                </fieldset>
+              } @else if (tasks.error()) {
+                <p class="error-text">Tasks could not be loaded.</p>
+              }
+              <div class="actions">
+                <button matButton="filled" type="submit" [disabled]="saving()">Save details</button>
+                <button matButton type="button" (click)="editingId.set(null)">Cancel</button>
+              </div>
+            </form>
+          }
+        </li>
+      }
+    </ol>
+  }
+} @else {
+  <p class="page-lead">Loading documents…</p>
+}
