@@ -57,6 +57,7 @@ describe('ChecklistReview', () => {
             status: 'Todo',
             sourceTemplateTaskId: null,
             dependencies: [],
+            documentIds: [],
           },
         ],
       });

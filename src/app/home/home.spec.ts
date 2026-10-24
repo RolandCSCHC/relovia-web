@@ -21,6 +21,7 @@ describe('Home', () => {
           status: 'Done',
           sourceTemplateTaskId: null,
           dependencies: [],
+          documentIds: [],
         },
       ],
     };
