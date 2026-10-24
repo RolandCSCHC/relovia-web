@@ -717,6 +717,105 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/documents/{documentId}": {
+      "put": {
+        "tags": ["Documents"],
+        "summary": "Sets the category, expiration date, and tasks. The file is unchanged.",
+        "operationId": "updateDocument",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDocumentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Documents"],
+        "summary": "Deletes the document and its stored file.",
+        "operationId": "deleteDocument",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "documentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/relocations/{relocationId}/documents/{documentId}/content": {
       "get": {
         "tags": ["Documents"],
@@ -752,38 +851,6 @@
               "image/png": {},
               "image/webp": {}
             }
-          }
-        }
-      }
-    },
-    "/api/relocations/{relocationId}/documents/{documentId}": {
-      "delete": {
-        "tags": ["Documents"],
-        "summary": "Deletes the document and its stored file.",
-        "operationId": "deleteDocument",
-        "parameters": [
-          {
-            "name": "relocationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "documentId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         }
       }
@@ -2054,8 +2121,32 @@
           }
         }
       },
+      "DocumentCategory": {
+        "enum": [
+          "Identity",
+          "Visa",
+          "Housing",
+          "Employment",
+          "Education",
+          "Insurance",
+          "Health",
+          "Finance",
+          "Moving",
+          "Other"
+        ],
+        "type": "string"
+      },
       "DocumentResponse": {
-        "required": ["id", "fileName", "contentType", "sizeBytes", "createdAt"],
+        "required": [
+          "id",
+          "fileName",
+          "contentType",
+          "sizeBytes",
+          "createdAt",
+          "category",
+          "expiresOn",
+          "taskIds"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -2076,6 +2167,27 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DocumentCategory"
+              }
+            ]
+          },
+          "expiresOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "taskIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -2375,7 +2487,8 @@
           "priority",
           "status",
           "sourceTemplateTaskId",
-          "dependencies"
+          "dependencies",
+          "documentIds"
         ],
         "type": "object",
         "properties": {
@@ -2415,6 +2528,13 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TaskDependencyResponse"
+            }
+          },
+          "documentIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         }
@@ -2860,6 +2980,33 @@
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": ["number", "string"],
             "format": "double"
+          }
+        }
+      },
+      "UpdateDocumentRequest": {
+        "required": ["taskIds"],
+        "type": "object",
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DocumentCategory"
+              }
+            ]
+          },
+          "expiresOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "taskIds": {
+            "type": ["null", "array"],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },

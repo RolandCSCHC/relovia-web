@@ -87,12 +87,27 @@ export type CurrentUserResponse = {
   hasAccess: boolean;
 };
 
+export type DocumentCategory =
+  | 'Identity'
+  | 'Visa'
+  | 'Housing'
+  | 'Employment'
+  | 'Education'
+  | 'Insurance'
+  | 'Health'
+  | 'Finance'
+  | 'Moving'
+  | 'Other';
+
 export type DocumentResponse = {
   id: string;
   fileName: string;
   contentType: string;
   sizeBytes: number | string;
   createdAt: string;
+  category: null | DocumentCategory;
+  expiresOn: null | string;
+  taskIds: Array<string>;
 };
 
 export type ExpenseResponse = {
@@ -179,6 +194,7 @@ export type RelocationTaskResponse = {
   status: RelocationTaskStatus;
   sourceTemplateTaskId: null | string;
   dependencies: Array<TaskDependencyResponse>;
+  documentIds: Array<string>;
 };
 
 export type RelocationTasksResponse = {
@@ -301,6 +317,12 @@ export type UnconvertedAmountsResponse = {
   shoppingCount: number | string;
   shoppingEstimated: number | string;
   shoppingSpent: number | string;
+};
+
+export type UpdateDocumentRequest = {
+  category?: null | DocumentCategory;
+  expiresOn?: null | string;
+  taskIds: null | Array<string>;
 };
 
 export type UpdateRelocationTaskRequest = {
@@ -596,6 +618,42 @@ export type CreateDocumentResponses = {
 
 export type CreateDocumentResponse = CreateDocumentResponses[keyof CreateDocumentResponses];
 
+export type DeleteDocumentData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    documentId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/documents/{documentId}';
+};
+
+export type DeleteDocumentResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
+
+export type UpdateDocumentData = {
+  body: UpdateDocumentRequest;
+  path: {
+    relocationId: string;
+    documentId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/documents/{documentId}';
+};
+
+export type UpdateDocumentResponses = {
+  /**
+   * OK
+   */
+  200: DocumentResponse;
+};
+
+export type UpdateDocumentResponse = UpdateDocumentResponses[keyof UpdateDocumentResponses];
+
 export type DownloadDocumentData = {
   body?: never;
   path: {
@@ -614,23 +672,6 @@ export type DownloadDocumentResponses = {
 };
 
 export type DownloadDocumentResponse = DownloadDocumentResponses[keyof DownloadDocumentResponses];
-
-export type DeleteDocumentData = {
-  body?: never;
-  path: {
-    relocationId: string;
-    documentId: string;
-  };
-  query?: never;
-  url: '/api/relocations/{relocationId}/documents/{documentId}';
-};
-
-export type DeleteDocumentResponses = {
-  /**
-   * OK
-   */
-  200: unknown;
-};
 
 export type ListExpensesData = {
   body?: never;

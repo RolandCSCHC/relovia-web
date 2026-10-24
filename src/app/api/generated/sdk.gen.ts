@@ -78,6 +78,8 @@ import type {
   UpdateBudgetCategoryResponses,
   UpdateBudgetEstimateData,
   UpdateBudgetEstimateResponses,
+  UpdateDocumentData,
+  UpdateDocumentResponses,
   UpdateExpenseData,
   UpdateExpenseResponses,
   UpdateInventoryItemData,
@@ -312,17 +314,6 @@ export const createDocument = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Returns the file when the signed-in user owns the relocation.
- */
-export const downloadDocument = <ThrowOnError extends boolean = false>(
-  options: Options<DownloadDocumentData, ThrowOnError>,
-): RequestResult<DownloadDocumentResponses, unknown, ThrowOnError> =>
-  (options.client ?? client).get<DownloadDocumentResponses, unknown, ThrowOnError>({
-    url: '/api/relocations/{relocationId}/documents/{documentId}/content',
-    ...options,
-  });
-
-/**
  * Deletes the document and its stored file.
  */
 export const deleteDocument = <ThrowOnError extends boolean = false>(
@@ -330,6 +321,32 @@ export const deleteDocument = <ThrowOnError extends boolean = false>(
 ): RequestResult<DeleteDocumentResponses, unknown, ThrowOnError> =>
   (options.client ?? client).delete<DeleteDocumentResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/documents/{documentId}',
+    ...options,
+  });
+
+/**
+ * Sets the category, expiration date, and tasks. The file is unchanged.
+ */
+export const updateDocument = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateDocumentData, ThrowOnError>,
+): RequestResult<UpdateDocumentResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateDocumentResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/documents/{documentId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Returns the file when the signed-in user owns the relocation.
+ */
+export const downloadDocument = <ThrowOnError extends boolean = false>(
+  options: Options<DownloadDocumentData, ThrowOnError>,
+): RequestResult<DownloadDocumentResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<DownloadDocumentResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/documents/{documentId}/content',
     ...options,
   });
 
