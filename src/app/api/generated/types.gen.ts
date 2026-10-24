@@ -87,6 +87,14 @@ export type CurrentUserResponse = {
   hasAccess: boolean;
 };
 
+export type DocumentResponse = {
+  id: string;
+  fileName: string;
+  contentType: string;
+  sizeBytes: number | string;
+  createdAt: string;
+};
+
 export type ExpenseResponse = {
   id: string;
   categoryId: string;
@@ -100,6 +108,8 @@ export type ExpenseResponse = {
 };
 
 export type Furnishing = 'Furnished' | 'Unfurnished';
+
+export type IFormFile = Blob | File;
 
 export type InventoryItemResponse = {
   id: string;
@@ -547,6 +557,80 @@ export type ListCitiesResponses = {
 };
 
 export type ListCitiesResponse = ListCitiesResponses[keyof ListCitiesResponses];
+
+export type ListDocumentsData = {
+  body?: never;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/documents';
+};
+
+export type ListDocumentsResponses = {
+  /**
+   * OK
+   */
+  200: Array<DocumentResponse>;
+};
+
+export type ListDocumentsResponse = ListDocumentsResponses[keyof ListDocumentsResponses];
+
+export type CreateDocumentData = {
+  body: {
+    File?: IFormFile;
+  };
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/documents';
+};
+
+export type CreateDocumentResponses = {
+  /**
+   * OK
+   */
+  200: DocumentResponse;
+};
+
+export type CreateDocumentResponse = CreateDocumentResponses[keyof CreateDocumentResponses];
+
+export type DownloadDocumentData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    documentId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/documents/{documentId}/content';
+};
+
+export type DownloadDocumentResponses = {
+  /**
+   * OK
+   */
+  200: Blob | File;
+};
+
+export type DownloadDocumentResponse = DownloadDocumentResponses[keyof DownloadDocumentResponses];
+
+export type DeleteDocumentData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    documentId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/documents/{documentId}';
+};
+
+export type DeleteDocumentResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
 
 export type ListExpensesData = {
   body?: never;
