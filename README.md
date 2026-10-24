@@ -28,6 +28,7 @@ Feature folders, and no global state library.
 - `src/app/home` lists relocations and their progress.
 - `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks.
 - `src/app/budget` sets the budget currency, manages categories and estimates, compares them with spending, and records estimates and expenses in any currency. Totals are shown in the budget currency using the API's converted amounts, and amounts are formatted as the currency code plus `$` (`CLP $30,944,444`, `NZD $1,200.00`).
+- `src/app/documents` keeps a relocation's private files. Add document opens a dialog for a PDF, JPEG, PNG, or WebP up to 10 MB, plus a category, an expiration date, and the tasks that file supports. Download and delete stay on this relocation.
 - `src/app/inventory` lists a relocation's belongings by room. Room and category come from fixed lists. Each item is owned or still to purchase, can be marked bring, sell, donate, store, or discard, and tracks packing only when it is being brought. A price on something still to buy is counted in a budget category (Furnishing by default). Prices stay in the currency they were entered in. Owned items are not a new cost. Start from a list to review a furnished or unfurnished shopping list, for every room or one room, and add the items you keep. Items already on the list are left out. Prices are added afterwards.
 
 Local UI state uses signals. HTTP uses RxJS.
