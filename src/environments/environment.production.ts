@@ -1,3 +1,3 @@
 export const environment = {
-  apiOrigin: 'https://api.relovia.app',
+  apiOrigin: 'https://api.relovia.rolandschlosser.dev',
 };
