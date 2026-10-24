@@ -61,6 +61,38 @@ describe('ReloviaClient', () => {
       fields: { name: 'Name is required.' },
     });
   });
+
+  it('uploads a document as a file and downloads it as a blob', async () => {
+    const relocationId = '0199f0a1-7c00-7000-8000-000000000010';
+    const documentId = '0199f0a1-7c00-7000-8000-000000000061';
+    const file = new File(['%PDF'], 'visa.pdf', { type: 'application/pdf' });
+    const client = TestBed.inject(ReloviaClient);
+    const uploaded = client.createDocument(relocationId, file);
+    const upload = await nextRequest(`${apiOrigin}/api/relocations/${relocationId}/documents`);
+
+    expect(upload.request.method).toBe('POST');
+    expect(upload.request.body).toBeInstanceOf(FormData);
+    expect((upload.request.body as FormData).get('File')).toBe(file);
+    upload.flush({
+      id: documentId,
+      fileName: 'visa.pdf',
+      contentType: 'application/pdf',
+      sizeBytes: 4,
+      createdAt: '2026-10-24T13:50:00.000Z',
+      category: null,
+      expiresOn: null,
+      taskIds: [],
+    });
+    await expect(uploaded).resolves.toMatchObject({ fileName: 'visa.pdf' });
+
+    const downloaded = client.downloadDocument(relocationId, documentId);
+    const download = await nextRequest(
+      `${apiOrigin}/api/relocations/${relocationId}/documents/${documentId}/content`,
+    );
+    expect(download.request.responseType).toBe('blob');
+    download.flush(new Blob(['%PDF']));
+    await expect(downloaded).resolves.toBeInstanceOf(Blob);
+  });
 });
 
 async function nextRequest(url: string) {

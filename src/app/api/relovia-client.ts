@@ -1,5 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { apiOrigin } from '../core/api-origin';
 import { createClient } from './generated/client';
 import * as reloviaApi from './generated/sdk.gen';
 import type {
@@ -10,6 +12,7 @@ import type {
   ConfirmChecklistRequest,
   ConfirmInventoryListRequest,
   CreateRelocationTaskRequest,
+  DocumentResponse,
   ExpenseResponse,
   Furnishing,
   InventoryItemResponse,
@@ -24,6 +27,7 @@ import type {
   SaveExpenseRequest,
   SaveInventoryItemRequest,
   SaveRelocationRequest,
+  UpdateDocumentRequest,
   UpdateRelocationTaskRequest,
 } from './generated/types.gen';
 import { createClientConfig } from './hey-api';
@@ -42,7 +46,8 @@ export class ApiError extends Error {
 
 @Injectable({ providedIn: 'root' })
 export class ReloviaClient {
-  private readonly client = createClient(createClientConfig({ httpClient: inject(HttpClient) }));
+  private readonly http = inject(HttpClient);
+  private readonly client = createClient(createClientConfig({ httpClient: this.http }));
 
   async listCities(country: string): Promise<string[]> {
     const result = await this.unwrap(
@@ -158,6 +163,70 @@ export class ReloviaClient {
       }),
       'The task could not be saved.',
     );
+  }
+
+  listDocuments(relocationId: string): Promise<DocumentResponse[]> {
+    return this.unwrap(
+      reloviaApi.listDocuments({
+        client: this.client,
+        path: { relocationId },
+        throwOnError: true,
+      }),
+      'Documents could not be loaded.',
+    );
+  }
+
+  createDocument(relocationId: string, file: File): Promise<DocumentResponse> {
+    return this.unwrap(
+      reloviaApi.createDocument({
+        client: this.client,
+        path: { relocationId },
+        body: { File: file },
+        throwOnError: true,
+      }),
+      'The file could not be uploaded.',
+    );
+  }
+
+  updateDocument(
+    relocationId: string,
+    documentId: string,
+    body: UpdateDocumentRequest,
+  ): Promise<DocumentResponse> {
+    return this.unwrap(
+      reloviaApi.updateDocument({
+        client: this.client,
+        path: { relocationId, documentId },
+        body,
+        throwOnError: true,
+      }),
+      'The document could not be saved.',
+    );
+  }
+
+  async deleteDocument(relocationId: string, documentId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteDocument({
+        client: this.client,
+        path: { relocationId, documentId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The document could not be deleted.');
+    }
+  }
+
+  async downloadDocument(relocationId: string, documentId: string): Promise<Blob> {
+    try {
+      return await firstValueFrom(
+        this.http.get(
+          `${apiOrigin}/api/relocations/${relocationId}/documents/${documentId}/content`,
+          { responseType: 'blob' },
+        ),
+      );
+    } catch (error) {
+      throw toApiError(error, 'The file could not be downloaded.');
+    }
   }
 
   async deleteTask(relocationId: string, taskId: string): Promise<void> {
