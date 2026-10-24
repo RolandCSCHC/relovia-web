@@ -34,7 +34,7 @@ Local UI state uses signals. HTTP uses RxJS.
 
 ## Talking to the API
 
-Locally the API origin is `http://localhost:5080`. The production build, served at `https://relovia.app`, uses `https://api.relovia.app`. Both come from `src/environments`.
+Locally the API origin is `http://localhost:5080`. The production build, served at `https://relovia.rolandschlosser.dev`, uses `https://api.relovia.rolandschlosser.dev`. Both come from `src/environments`.
 
 Requests to that origin are sent with credentials. `POST`, `PUT`, `PATCH`, and `DELETE` also send `X-XSRF-TOKEN`, copied from the `XSRF-TOKEN` cookie.
 
