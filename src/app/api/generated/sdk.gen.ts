@@ -56,6 +56,8 @@ import type {
   GetCurrentUserResponses,
   GetInventorySuggestionData,
   GetInventorySuggestionResponses,
+  GetNotificationPreferenceData,
+  GetNotificationPreferenceResponses,
   GetRelocationCalendarData,
   GetRelocationCalendarResponses,
   GetRelocationData,
@@ -70,12 +72,18 @@ import type {
   ListExpensesResponses,
   ListInventoryItemsData,
   ListInventoryItemsResponses,
+  ListNotificationsData,
+  ListNotificationsResponses,
   ListRelocationsData,
   ListRelocationsResponses,
   ListRelocationTasksData,
   ListRelocationTasksResponses,
   LogoutData,
   LogoutResponses,
+  MarkNotificationReadData,
+  MarkNotificationReadResponses,
+  MarkNotificationsReadData,
+  MarkNotificationsReadResponses,
   SaveBudgetData,
   SaveBudgetResponses,
   SignInWithGoogleData,
@@ -92,6 +100,8 @@ import type {
   UpdateExpenseResponses,
   UpdateInventoryItemData,
   UpdateInventoryItemResponses,
+  UpdateNotificationPreferenceData,
+  UpdateNotificationPreferenceResponses,
   UpdateRelocationData,
   UpdateRelocationResponses,
   UpdateRelocationTaskData,
@@ -533,6 +543,65 @@ export const updateInventoryItem = <ThrowOnError extends boolean = false>(
 ): RequestResult<UpdateInventoryItemResponses, unknown, ThrowOnError> =>
   (options.client ?? client).put<UpdateInventoryItemResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/inventory/{itemId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Lists the signed-in user's in-app reminders, unread first.
+ */
+export const listNotifications = <ThrowOnError extends boolean = false>(
+  options?: Options<ListNotificationsData, ThrowOnError>,
+): RequestResult<ListNotificationsResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<ListNotificationsResponses, unknown, ThrowOnError>({
+    url: '/api/notifications',
+    ...options,
+  });
+
+/**
+ * Marks one in-app reminder as read. A second call keeps the first time.
+ */
+export const markNotificationRead = <ThrowOnError extends boolean = false>(
+  options: Options<MarkNotificationReadData, ThrowOnError>,
+): RequestResult<MarkNotificationReadResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<MarkNotificationReadResponses, unknown, ThrowOnError>({
+    url: '/api/notifications/{notificationId}/read',
+    ...options,
+  });
+
+/**
+ * Marks every in-app reminder as read.
+ */
+export const markNotificationsRead = <ThrowOnError extends boolean = false>(
+  options?: Options<MarkNotificationsReadData, ThrowOnError>,
+): RequestResult<MarkNotificationsReadResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<MarkNotificationsReadResponses, unknown, ThrowOnError>({
+    url: '/api/notifications/read',
+    ...options,
+  });
+
+/**
+ * Returns how the signed-in user wants to be reminded. The default is in the app, 3 days before.
+ */
+export const getNotificationPreference = <ThrowOnError extends boolean = false>(
+  options?: Options<GetNotificationPreferenceData, ThrowOnError>,
+): RequestResult<GetNotificationPreferenceResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).get<GetNotificationPreferenceResponses, unknown, ThrowOnError>({
+    url: '/api/notifications/preferences',
+    ...options,
+  });
+
+/**
+ * Sets the channel and how many days before a date to remind the signed-in user.
+ */
+export const updateNotificationPreference = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateNotificationPreferenceData, ThrowOnError>,
+): RequestResult<UpdateNotificationPreferenceResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateNotificationPreferenceResponses, unknown, ThrowOnError>({
+    url: '/api/notifications/preferences',
     ...options,
     headers: {
       'Content-Type': 'application/json',

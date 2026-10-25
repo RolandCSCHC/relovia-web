@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:5080/"
+      "url": "http://127.0.0.1:5081/"
     }
   ],
   "paths": {
@@ -1587,6 +1587,172 @@
         }
       }
     },
+    "/api/notifications": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Lists the signed-in user's in-app reminders, unread first.",
+        "operationId": "listNotifications",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/{notificationId}/read": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Marks one in-app reminder as read. A second call keeps the first time.",
+        "operationId": "markNotificationRead",
+        "parameters": [
+          {
+            "name": "notificationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/notifications/read": {
+      "post": {
+        "tags": ["Notifications"],
+        "summary": "Marks every in-app reminder as read.",
+        "operationId": "markNotificationsRead",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/notifications/preferences": {
+      "get": {
+        "tags": ["Notifications"],
+        "summary": "Returns how the signed-in user wants to be reminded. The default is in the app, 3 days before.",
+        "operationId": "getNotificationPreference",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": ["Notifications"],
+        "summary": "Sets the channel and how many days before a date to remind the signed-in user.",
+        "operationId": "updateNotificationPreference",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveNotificationPreferenceRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveNotificationPreferenceRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveNotificationPreferenceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationPreferenceResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/relocations": {
       "get": {
         "tags": ["Relocations"],
@@ -2639,6 +2805,68 @@
         "enum": ["Bring", "Sell", "Donate", "Store", "Discard"],
         "type": "string"
       },
+      "NotificationChannel": {
+        "enum": ["None", "InApp", "Email", "Both"],
+        "type": "string"
+      },
+      "NotificationPreferenceResponse": {
+        "required": ["channel", "daysBefore"],
+        "type": "object",
+        "properties": {
+          "channel": {
+            "$ref": "#/components/schemas/NotificationChannel"
+          },
+          "daysBefore": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
+          }
+        }
+      },
+      "NotificationResponse": {
+        "required": [
+          "id",
+          "relocationId",
+          "relocationName",
+          "kind",
+          "title",
+          "occursOn",
+          "createdAt",
+          "readAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relocationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "relocationName": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReminderKind"
+          },
+          "title": {
+            "type": "string"
+          },
+          "occursOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "readAt": {
+            "type": ["null", "string"],
+            "format": "date-time"
+          }
+        }
+      },
       "PackingStatus": {
         "enum": ["NotPacked", "Packed", "Unpacked"],
         "type": "string"
@@ -2808,6 +3036,10 @@
       },
       "RelocationTaskStatus": {
         "enum": ["Todo", "InProgress", "Done", "Skipped"],
+        "type": "string"
+      },
+      "ReminderKind": {
+        "enum": ["TaskDue", "Milestone", "Appointment", "DocumentExpiration"],
         "type": "string"
       },
       "SaveBudgetCategoryRequest": {
@@ -2985,6 +3217,20 @@
           },
           "notes": {
             "type": ["null", "string"]
+          }
+        }
+      },
+      "SaveNotificationPreferenceRequest": {
+        "required": ["channel", "daysBefore"],
+        "type": "object",
+        "properties": {
+          "channel": {
+            "$ref": "#/components/schemas/NotificationChannel"
+          },
+          "daysBefore": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
           }
         }
       },
@@ -3354,6 +3600,9 @@
     },
     {
       "name": "Inventory"
+    },
+    {
+      "name": "Notifications"
     },
     {
       "name": "Relocations"
