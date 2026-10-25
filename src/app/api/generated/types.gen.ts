@@ -41,6 +41,18 @@ export type BudgetTotalsResponse = {
   remaining: number | string;
 };
 
+export type CalendarEventKind = 'Milestone' | 'Appointment';
+
+export type CalendarEventResponse = {
+  id: string;
+  title: string;
+  kind: CalendarEventKind;
+  occursOn: null | string;
+  startsAt: null | string;
+  endsAt: null | string;
+  location: null | string;
+};
+
 export type ChecklistSuggestionResponse = {
   relocationId: string;
   targetDate: null | string;
@@ -164,6 +176,11 @@ export type MovingAction = 'Bring' | 'Sell' | 'Donate' | 'Store' | 'Discard';
 
 export type PackingStatus = 'NotPacked' | 'Packed' | 'Unpacked';
 
+export type RelocationCalendarResponse = {
+  events: Array<CalendarEventResponse>;
+  taskDueDates: Array<TaskDueDateResponse>;
+};
+
 export type RelocationPurpose = 'Work' | 'Study' | 'Family' | 'Lifestyle' | 'Other';
 
 export type RelocationResponse = {
@@ -217,6 +234,15 @@ export type SaveBudgetEstimateRequest = {
 
 export type SaveBudgetRequest = {
   currencyCode: string;
+};
+
+export type SaveCalendarEventRequest = {
+  title: string;
+  kind: CalendarEventKind;
+  occursOn?: null | string;
+  startsAt?: null | string;
+  endsAt?: null | string;
+  location?: null | string;
 };
 
 export type SaveExpenseRequest = {
@@ -295,6 +321,12 @@ export type TaskDependencyResponse = {
   taskId: string;
   code: string;
   isSatisfied: boolean;
+};
+
+export type TaskDueDateResponse = {
+  taskId: string;
+  title: string;
+  dueDate: string;
 };
 
 export type TaskPhase =
@@ -524,6 +556,81 @@ export type UpdateBudgetEstimateResponses = {
 
 export type UpdateBudgetEstimateResponse =
   UpdateBudgetEstimateResponses[keyof UpdateBudgetEstimateResponses];
+
+export type GetRelocationCalendarData = {
+  body?: never;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/calendar';
+};
+
+export type GetRelocationCalendarResponses = {
+  /**
+   * OK
+   */
+  200: RelocationCalendarResponse;
+};
+
+export type GetRelocationCalendarResponse =
+  GetRelocationCalendarResponses[keyof GetRelocationCalendarResponses];
+
+export type CreateCalendarEventData = {
+  body: SaveCalendarEventRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/events';
+};
+
+export type CreateCalendarEventResponses = {
+  /**
+   * OK
+   */
+  200: CalendarEventResponse;
+};
+
+export type CreateCalendarEventResponse =
+  CreateCalendarEventResponses[keyof CreateCalendarEventResponses];
+
+export type DeleteCalendarEventData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    eventId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/events/{eventId}';
+};
+
+export type DeleteCalendarEventResponses = {
+  /**
+   * OK
+   */
+  200: unknown;
+};
+
+export type UpdateCalendarEventData = {
+  body: SaveCalendarEventRequest;
+  path: {
+    relocationId: string;
+    eventId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/events/{eventId}';
+};
+
+export type UpdateCalendarEventResponses = {
+  /**
+   * OK
+   */
+  200: CalendarEventResponse;
+};
+
+export type UpdateCalendarEventResponse =
+  UpdateCalendarEventResponses[keyof UpdateCalendarEventResponses];
 
 export type GetChecklistSuggestionData = {
   body?: never;

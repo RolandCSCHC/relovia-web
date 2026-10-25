@@ -18,6 +18,8 @@ import type {
   CreateBudgetCategoryResponses,
   CreateBudgetEstimateData,
   CreateBudgetEstimateResponses,
+  CreateCalendarEventData,
+  CreateCalendarEventResponses,
   CreateDocumentData,
   CreateDocumentResponses,
   CreateExpenseData,
@@ -32,6 +34,8 @@ import type {
   DeleteBudgetCategoryResponses,
   DeleteBudgetEstimateData,
   DeleteBudgetEstimateResponses,
+  DeleteCalendarEventData,
+  DeleteCalendarEventResponses,
   DeleteDocumentData,
   DeleteDocumentResponses,
   DeleteExpenseData,
@@ -52,6 +56,8 @@ import type {
   GetCurrentUserResponses,
   GetInventorySuggestionData,
   GetInventorySuggestionResponses,
+  GetRelocationCalendarData,
+  GetRelocationCalendarResponses,
   GetRelocationData,
   GetRelocationResponses,
   GetServiceInfoData,
@@ -78,6 +84,8 @@ import type {
   UpdateBudgetCategoryResponses,
   UpdateBudgetEstimateData,
   UpdateBudgetEstimateResponses,
+  UpdateCalendarEventData,
+  UpdateCalendarEventResponses,
   UpdateDocumentData,
   UpdateDocumentResponses,
   UpdateExpenseData,
@@ -242,6 +250,58 @@ export const updateBudgetEstimate = <ThrowOnError extends boolean = false>(
 ): RequestResult<UpdateBudgetEstimateResponses, unknown, ThrowOnError> =>
   (options.client ?? client).put<UpdateBudgetEstimateResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/budget/estimates/{estimateId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Lists calendar events and, separately, task due dates.
+ */
+export const getRelocationCalendar = <ThrowOnError extends boolean = false>(
+  options: Options<GetRelocationCalendarData, ThrowOnError>,
+): RequestResult<GetRelocationCalendarResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<GetRelocationCalendarResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/calendar',
+    ...options,
+  });
+
+/**
+ * Adds a milestone or an appointment. A task due date is left unchanged.
+ */
+export const createCalendarEvent = <ThrowOnError extends boolean = false>(
+  options: Options<CreateCalendarEventData, ThrowOnError>,
+): RequestResult<CreateCalendarEventResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateCalendarEventResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/events',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes a calendar event. The relocation's tasks stay.
+ */
+export const deleteCalendarEvent = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteCalendarEventData, ThrowOnError>,
+): RequestResult<DeleteCalendarEventResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteCalendarEventResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/events/{eventId}',
+    ...options,
+  });
+
+/**
+ * Updates a milestone or an appointment. A task due date is left unchanged.
+ */
+export const updateCalendarEvent = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateCalendarEventData, ThrowOnError>,
+): RequestResult<UpdateCalendarEventResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateCalendarEventResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/events/{eventId}',
     ...options,
     headers: {
       'Content-Type': 'application/json',
