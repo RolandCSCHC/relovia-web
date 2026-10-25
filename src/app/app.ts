@@ -4,6 +4,7 @@ import { MatIcon } from '@angular/material/icon';
 import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { Session } from './core/session';
 import { Theme } from './core/theme';
+import { NotificationInbox } from './notifications/inbox';
 
 @Component({
   selector: 'app-root',
@@ -15,6 +16,12 @@ export class App {
   private readonly router = inject(Router);
   protected readonly session = inject(Session);
   protected readonly theme = inject(Theme);
+  private readonly inbox = inject(NotificationInbox);
+  protected readonly unreadCount = this.inbox.unreadCount;
+  protected readonly notificationsLabel = computed(() => {
+    const count = this.unreadCount();
+    return count > 0 ? `Notifications, ${count} unread` : 'Notifications';
+  });
   protected readonly themeIcon = computed(() =>
     this.theme.scheme() === 'dark' ? 'light_mode' : 'dark_mode',
   );

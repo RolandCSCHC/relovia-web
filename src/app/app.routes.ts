@@ -6,6 +6,7 @@ import { DocumentsPage } from './documents/documents-page';
 import { InventoryPage } from './inventory/inventory-page';
 import { EarlyAccess } from './early-access/early-access';
 import { Home } from './home/home';
+import { NotificationsPage } from './notifications/notifications-page';
 import { ChecklistReview } from './relocations/checklist-review';
 import { RelocationEditor } from './relocations/relocation-editor';
 import { RelocationPage } from './relocations/relocation-page';
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'sign-in', canActivate: [guestGuard], component: SignIn },
   { path: 'early-access', canActivate: [waitingGuard], component: EarlyAccess },
   { path: '', canActivate: [authGuard], component: Home },
+  { path: 'notifications', canActivate: [authGuard], component: NotificationsPage },
   { path: 'relocations/new', canActivate: [authGuard], component: RelocationEditor },
   { path: 'relocations/:id/edit', canActivate: [authGuard], component: RelocationEditor },
   { path: 'relocations/:id/checklist', canActivate: [authGuard], component: ChecklistReview },

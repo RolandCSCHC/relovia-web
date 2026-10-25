@@ -36,5 +36,57 @@ describe('App', () => {
     );
     expect(compiled.querySelector('[aria-label="Switch to dark theme"]')).not.toBeNull();
     expect(compiled.textContent).not.toContain('Sign out');
+    expect(compiled.textContent).not.toContain('Notifications');
+    TestBed.inject(HttpTestingController).expectNone(`${apiOrigin}/api/notifications`);
+  });
+
+  it('shows an unread count once someone is signed in', async () => {
+    const loaded = firstValueFrom(TestBed.inject(Session).ensureLoaded());
+    TestBed.inject(HttpTestingController).expectOne(`${apiOrigin}/api/auth/me`).flush({
+      id: '0199f0a1-7c00-7000-8000-000000000001',
+      email: 'owner@example.com',
+      displayName: 'Ada',
+      avatarUrl: null,
+      preferredCurrency: 'USD',
+      preferredLanguage: 'en',
+      hasAccess: true,
+    });
+    await loaded;
+
+    const fixture = TestBed.createComponent(App);
+    fixture.detectChanges();
+    await Promise.resolve();
+    await Promise.resolve();
+    TestBed.inject(HttpTestingController)
+      .expectOne(`${apiOrigin}/api/notifications`)
+      .flush([
+        {
+          id: '0199f0a1-7c00-7000-8000-000000000041',
+          relocationId: '0199f0a1-7c00-7000-8000-000000000010',
+          relocationName: 'Wellington',
+          kind: 'TaskDue',
+          title: 'Give notice',
+          occursOn: '2026-11-03',
+          createdAt: '2026-10-25T12:00:00.000Z',
+          readAt: null,
+        },
+        {
+          id: '0199f0a1-7c00-7000-8000-000000000042',
+          relocationId: '0199f0a1-7c00-7000-8000-000000000010',
+          relocationName: 'Wellington',
+          kind: 'Milestone',
+          title: 'Move day',
+          occursOn: '2026-11-03',
+          createdAt: '2026-10-25T12:00:00.000Z',
+          readAt: '2026-10-25T13:00:00.000Z',
+        },
+      ]);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector('a[href="/notifications"]') as HTMLElement;
+    expect(link.textContent).toContain('Notifications');
+    expect(link.querySelector('.unread')?.textContent?.trim()).toBe('1');
+    expect(link.getAttribute('aria-label')).toBe('Notifications, 1 unread');
   });
 });

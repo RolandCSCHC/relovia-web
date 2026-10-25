@@ -1,0 +1,86 @@
+<h1 class="page-title">Notifications</h1>
+<p class="page-lead">Reminders for dates on your relocations.</p>
+
+@if (preference.error()) {
+  <p class="error-text">Reminder settings could not be loaded.</p>
+  <button class="retry" matButton type="button" (click)="preference.reload()">Try again</button>
+} @else {
+  <form class="panel settings" (submit)="save($event)">
+    <h2>How to be reminded</h2>
+    <div class="fields">
+      <label class="field" for="reminder-channel">
+        Channel
+        <select id="reminder-channel" [value]="draft().channel" (change)="setChannel($event)">
+          @for (channel of channels; track channel.value) {
+            <option [value]="channel.value">{{ channel.label }}</option>
+          }
+        </select>
+      </label>
+      <label class="field" for="reminder-days">
+        Days before
+        <input
+          id="reminder-days"
+          type="number"
+          min="0"
+          max="90"
+          step="1"
+          [value]="draft().daysBefore"
+          (input)="setDays($event)"
+        />
+      </label>
+    </div>
+    <p class="hint">0 reminds you on the day itself. 90 is the furthest ahead.</p>
+    @if (formError(); as message) {
+      <p class="error-text">{{ message }}</p>
+    }
+    <button matButton="filled" type="submit" [disabled]="saving() || preference.isLoading()">
+      Save
+    </button>
+  </form>
+}
+
+@if (inbox.reminders.error()) {
+  <p class="error-text">Reminders could not be loaded.</p>
+  <button class="retry" matButton type="button" (click)="inbox.reminders.reload()">
+    Try again
+  </button>
+} @else if (!inbox.reminders.hasValue() || inbox.reminders.value().length === 0) {
+  <p class="page-lead loading">
+    @if (inbox.reminders.isLoading()) {
+      Loading reminders…
+    } @else {
+      Nothing is coming up.
+    }
+  </p>
+} @else {
+  <div class="list-bar">
+    <h2>Coming up</h2>
+    @if (inbox.unreadCount() > 0) {
+      <button matButton type="button" [disabled]="marking()" (click)="markAll()">
+        Mark all read
+      </button>
+    }
+  </div>
+  <ul class="stack">
+    @for (reminder of inbox.reminders.value(); track reminder.id) {
+      <li class="panel reminder" [class.is-read]="reminder.readAt" [attr.data-kind]="reminder.kind">
+        <div>
+          <span class="chip">{{ reminderKindLabel(reminder.kind) }}</span>
+          <h3>{{ reminder.title }}</h3>
+          <p class="meta">
+            {{ formatDate(reminder.occursOn) }}
+            ·
+            <a [routerLink]="['/relocations', reminder.relocationId]">{{
+              reminder.relocationName
+            }}</a>
+          </p>
+        </div>
+        @if (!reminder.readAt) {
+          <button matButton type="button" [disabled]="marking()" (click)="markRead(reminder.id)">
+            Mark read
+          </button>
+        }
+      </li>
+    }
+  </ul>
+}

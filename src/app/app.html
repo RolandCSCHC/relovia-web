@@ -18,6 +18,12 @@
     </a>
     <span class="spacer"></span>
     @if (session.user(); as user) {
+      <a matButton routerLink="/notifications" [attr.aria-label]="notificationsLabel()">
+        Notifications
+        @if (unreadCount() > 0) {
+          <span class="unread">{{ unreadCount() }}</span>
+        }
+      </a>
       <span class="user">{{ user.displayName }}</span>
       <button matButton type="button" (click)="signOut()">Sign out</button>
     }

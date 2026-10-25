@@ -1,0 +1,55 @@
+.settings,
+.list-bar,
+.stack {
+  margin-top: var(--space-6);
+}
+
+.settings h2,
+.list-bar h2,
+.reminder h3 {
+  margin: 0;
+}
+
+.settings h2,
+.reminder h3 {
+  font: var(--mat-sys-title-medium);
+}
+
+.hint,
+.meta {
+  margin: 0;
+  color: var(--mat-sys-on-surface-variant);
+  font: var(--mat-sys-body-medium);
+}
+
+.list-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.list-bar h2 {
+  font: var(--mat-sys-title-large);
+}
+
+.reminder {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.reminder h3 {
+  margin-top: var(--space-2);
+}
+
+.reminder.is-read {
+  opacity: 0.72;
+}
+
+.retry {
+  margin-top: var(--space-4);
+}
