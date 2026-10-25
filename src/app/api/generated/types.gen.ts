@@ -582,6 +582,48 @@ export type UpdateBudgetEstimateResponses = {
 export type UpdateBudgetEstimateResponse =
   UpdateBudgetEstimateResponses[keyof UpdateBudgetEstimateResponses];
 
+export type DownloadRelocationPdfData = {
+  body?: never;
+  path: {
+    relocationId: string;
+  };
+  query?: {
+    timeZone?: string;
+  };
+  url: '/api/relocations/{relocationId}/export';
+};
+
+export type DownloadRelocationPdfResponses = {
+  /**
+   * OK
+   */
+  200: Blob | File;
+};
+
+export type DownloadRelocationPdfResponse =
+  DownloadRelocationPdfResponses[keyof DownloadRelocationPdfResponses];
+
+export type DownloadRelocationSummaryPdfData = {
+  body?: never;
+  path: {
+    relocationId: string;
+  };
+  query?: {
+    timeZone?: string;
+  };
+  url: '/api/relocations/{relocationId}/export/summary';
+};
+
+export type DownloadRelocationSummaryPdfResponses = {
+  /**
+   * OK
+   */
+  200: Blob | File;
+};
+
+export type DownloadRelocationSummaryPdfResponse =
+  DownloadRelocationSummaryPdfResponses[keyof DownloadRelocationSummaryPdfResponses];
+
 export type GetRelocationCalendarData = {
   body?: never;
   path: {

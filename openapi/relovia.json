@@ -479,6 +479,74 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/export": {
+      "get": {
+        "tags": ["Export"],
+        "summary": "Downloads the relocation as a PDF. The file is not stored.",
+        "operationId": "downloadRelocationPdf",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/export/summary": {
+      "get": {
+        "tags": ["Export"],
+        "summary": "Downloads the summary as a PDF. The file is not stored.",
+        "operationId": "downloadRelocationSummaryPdf",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
     "/api/relocations/{relocationId}/calendar": {
       "get": {
         "tags": ["Calendar"],

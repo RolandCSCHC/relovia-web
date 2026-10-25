@@ -48,6 +48,10 @@ import type {
   DeleteRelocationTaskResponses,
   DownloadDocumentData,
   DownloadDocumentResponses,
+  DownloadRelocationPdfData,
+  DownloadRelocationPdfResponses,
+  DownloadRelocationSummaryPdfData,
+  DownloadRelocationSummaryPdfResponses,
   GetBudgetData,
   GetBudgetResponses,
   GetChecklistSuggestionData,
@@ -265,6 +269,28 @@ export const updateBudgetEstimate = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Downloads the relocation as a PDF. The file is not stored.
+ */
+export const downloadRelocationPdf = <ThrowOnError extends boolean = false>(
+  options: Options<DownloadRelocationPdfData, ThrowOnError>,
+): RequestResult<DownloadRelocationPdfResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<DownloadRelocationPdfResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/export',
+    ...options,
+  });
+
+/**
+ * Downloads the summary as a PDF. The file is not stored.
+ */
+export const downloadRelocationSummaryPdf = <ThrowOnError extends boolean = false>(
+  options: Options<DownloadRelocationSummaryPdfData, ThrowOnError>,
+): RequestResult<DownloadRelocationSummaryPdfResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<DownloadRelocationSummaryPdfResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/export/summary',
+    ...options,
   });
 
 /**
