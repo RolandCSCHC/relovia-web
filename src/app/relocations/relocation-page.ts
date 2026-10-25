@@ -11,6 +11,7 @@ import type {
   TaskPriority,
 } from '../api/generated';
 import { ApiError, ReloviaClient } from '../api/relovia-client';
+import { pdfFileName, savePdf } from '../export/file-name';
 import { countryName } from './countries';
 import { formatDate } from './dates';
 import { labelFor, phases, priorities, purposes, relocationStatuses, taskStatuses } from './labels';
@@ -40,6 +41,7 @@ export class RelocationPage {
   protected readonly actionError = signal<string | null>(null);
   protected readonly saving = signal(false);
   protected readonly confirmingDelete = signal(false);
+  protected readonly downloading = signal(false);
   protected readonly id = toSignal(
     inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
   );
@@ -257,6 +259,25 @@ export class RelocationPage {
       this.actionError.set(this.failure(error, 'The task could not be deleted.'));
     } finally {
       this.saving.set(false);
+    }
+  }
+
+  protected async downloadPdf(): Promise<void> {
+    const id = this.id();
+    const relocation = this.relocation.value();
+    if (!id || !relocation) {
+      return;
+    }
+
+    this.downloading.set(true);
+    this.actionError.set(null);
+    try {
+      const blob = await this.api.downloadRelocationPdf(id);
+      savePdf(blob, pdfFileName(relocation.name));
+    } catch (error) {
+      this.actionError.set(this.failure(error, 'The PDF could not be downloaded.'));
+    } finally {
+      this.downloading.set(false);
     }
   }
 

@@ -26,6 +26,12 @@
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'calendar']"
         >Calendar</a
       >
+      <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'summary']"
+        >Summary</a
+      >
+      <button matButton="outlined" type="button" [disabled]="downloading()" (click)="downloadPdf()">
+        Download PDF
+      </button>
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'edit']"
         >Edit</a
       >
