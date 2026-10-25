@@ -8,6 +8,7 @@ import type {
   BudgetCategoryResponse,
   BudgetEstimateResponse,
   BudgetResponse,
+  CalendarEventResponse,
   ChecklistSuggestionResponse,
   ConfirmChecklistRequest,
   ConfirmInventoryListRequest,
@@ -18,10 +19,12 @@ import type {
   InventoryItemResponse,
   InventorySuggestionResponse,
   ItemRoom,
+  RelocationCalendarResponse,
   RelocationResponse,
   RelocationTaskResponse,
   RelocationTasksResponse,
   SaveBudgetCategoryRequest,
+  SaveCalendarEventRequest,
   SaveBudgetEstimateRequest,
   SaveBudgetRequest,
   SaveExpenseRequest,
@@ -452,6 +455,60 @@ export class ReloviaClient {
       }),
       'The item could not be saved.',
     );
+  }
+
+  getCalendar(relocationId: string): Promise<RelocationCalendarResponse> {
+    return this.unwrap(
+      reloviaApi.getRelocationCalendar({
+        client: this.client,
+        path: { relocationId },
+        throwOnError: true,
+      }),
+      'The calendar could not be loaded.',
+    );
+  }
+
+  createCalendarEvent(
+    relocationId: string,
+    body: SaveCalendarEventRequest,
+  ): Promise<CalendarEventResponse> {
+    return this.unwrap(
+      reloviaApi.createCalendarEvent({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The event could not be saved.',
+    );
+  }
+
+  updateCalendarEvent(
+    relocationId: string,
+    eventId: string,
+    body: SaveCalendarEventRequest,
+  ): Promise<CalendarEventResponse> {
+    return this.unwrap(
+      reloviaApi.updateCalendarEvent({
+        client: this.client,
+        path: { relocationId, eventId },
+        body,
+        throwOnError: true,
+      }),
+      'The event could not be saved.',
+    );
+  }
+
+  async deleteCalendarEvent(relocationId: string, eventId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteCalendarEvent({
+        client: this.client,
+        path: { relocationId, eventId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The event could not be deleted.');
+    }
   }
 
   async deleteInventoryItem(relocationId: string, itemId: string): Promise<void> {
