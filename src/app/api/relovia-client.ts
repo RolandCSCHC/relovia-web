@@ -222,6 +222,28 @@ export class ReloviaClient {
     }
   }
 
+  async downloadRelocationPdf(relocationId: string): Promise<Blob> {
+    return this.downloadPdf(`${apiOrigin}/api/relocations/${relocationId}/export`);
+  }
+
+  async downloadSummaryPdf(relocationId: string): Promise<Blob> {
+    return this.downloadPdf(`${apiOrigin}/api/relocations/${relocationId}/export/summary`);
+  }
+
+  private async downloadPdf(path: string): Promise<Blob> {
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const url = new URL(path);
+    if (timeZone) {
+      url.searchParams.set('timeZone', timeZone);
+    }
+
+    try {
+      return await firstValueFrom(this.http.get(url.toString(), { responseType: 'blob' }));
+    } catch (error) {
+      throw toApiError(error, 'The PDF could not be downloaded.');
+    }
+  }
+
   async downloadDocument(relocationId: string, documentId: string): Promise<Blob> {
     try {
       return await firstValueFrom(

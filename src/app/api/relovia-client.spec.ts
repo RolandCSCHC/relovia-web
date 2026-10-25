@@ -93,6 +93,28 @@ describe('ReloviaClient', () => {
     download.flush(new Blob(['%PDF']));
     await expect(downloaded).resolves.toBeInstanceOf(Blob);
   });
+
+  it('downloads a relocation pdf for the browser time zone', async () => {
+    const relocationId = '0199f0a1-7c00-7000-8000-000000000010';
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const url = new URL(`${apiOrigin}/api/relocations/${relocationId}/export`);
+    url.searchParams.set('timeZone', timeZone);
+    const client = TestBed.inject(ReloviaClient);
+    const downloaded = client.downloadRelocationPdf(relocationId);
+    const download = await nextRequest(url.toString());
+
+    expect(download.request.responseType).toBe('blob');
+    download.flush(new Blob(['%PDF']));
+    await expect(downloaded).resolves.toBeInstanceOf(Blob);
+
+    const summary = client.downloadSummaryPdf(relocationId);
+    const summaryUrl = new URL(`${apiOrigin}/api/relocations/${relocationId}/export/summary`);
+    summaryUrl.searchParams.set('timeZone', timeZone);
+    const summaryDownload = await nextRequest(summaryUrl.toString());
+    expect(summaryDownload.request.responseType).toBe('blob');
+    summaryDownload.flush(new Blob(['%PDF']));
+    await expect(summary).resolves.toBeInstanceOf(Blob);
+  });
 });
 
 async function nextRequest(url: string) {
