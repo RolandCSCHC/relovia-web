@@ -10,6 +10,8 @@ import type {
   BudgetResponse,
   CalendarEventResponse,
   ChecklistSuggestionResponse,
+  NotificationPreferenceResponse,
+  NotificationResponse,
   ConfirmChecklistRequest,
   ConfirmInventoryListRequest,
   CreateRelocationTaskRequest,
@@ -29,6 +31,7 @@ import type {
   SaveBudgetRequest,
   SaveExpenseRequest,
   SaveInventoryItemRequest,
+  SaveNotificationPreferenceRequest,
   SaveRelocationRequest,
   UpdateDocumentRequest,
   UpdateRelocationTaskRequest,
@@ -496,6 +499,52 @@ export class ReloviaClient {
         throwOnError: true,
       }),
       'The event could not be saved.',
+    );
+  }
+
+  listNotifications(): Promise<NotificationResponse[]> {
+    return this.unwrap(
+      reloviaApi.listNotifications({ client: this.client, throwOnError: true }),
+      'Reminders could not be loaded.',
+    );
+  }
+
+  markNotificationRead(notificationId: string): Promise<NotificationResponse> {
+    return this.unwrap(
+      reloviaApi.markNotificationRead({
+        client: this.client,
+        path: { notificationId },
+        throwOnError: true,
+      }),
+      'The reminder could not be marked read.',
+    );
+  }
+
+  async markNotificationsRead(): Promise<void> {
+    try {
+      await reloviaApi.markNotificationsRead({ client: this.client, throwOnError: true });
+    } catch (error) {
+      throw toApiError(error, 'The reminders could not be marked read.');
+    }
+  }
+
+  getNotificationPreference(): Promise<NotificationPreferenceResponse> {
+    return this.unwrap(
+      reloviaApi.getNotificationPreference({ client: this.client, throwOnError: true }),
+      'Reminder settings could not be loaded.',
+    );
+  }
+
+  updateNotificationPreference(
+    body: SaveNotificationPreferenceRequest,
+  ): Promise<NotificationPreferenceResponse> {
+    return this.unwrap(
+      reloviaApi.updateNotificationPreference({
+        client: this.client,
+        body,
+        throwOnError: true,
+      }),
+      'Reminder settings could not be saved.',
     );
   }
 
