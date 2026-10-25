@@ -6,6 +6,7 @@ import { DocumentsPage } from './documents/documents-page';
 import { InventoryPage } from './inventory/inventory-page';
 import { EarlyAccess } from './early-access/early-access';
 import { Home } from './home/home';
+import { SummaryPage } from './export/summary-page';
 import { NotificationsPage } from './notifications/notifications-page';
 import { ChecklistReview } from './relocations/checklist-review';
 import { RelocationEditor } from './relocations/relocation-editor';
@@ -24,6 +25,7 @@ export const routes: Routes = [
   { path: 'relocations/:id/inventory', canActivate: [authGuard], component: InventoryPage },
   { path: 'relocations/:id/documents', canActivate: [authGuard], component: DocumentsPage },
   { path: 'relocations/:id/calendar', canActivate: [authGuard], component: CalendarPage },
+  { path: 'relocations/:id/summary', canActivate: [authGuard], component: SummaryPage },
   { path: 'relocations/:id', canActivate: [authGuard], component: RelocationPage },
   { path: '**', redirectTo: '' },
 ];
