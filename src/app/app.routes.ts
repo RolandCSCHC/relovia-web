@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { BudgetPage } from './budget/budget-page';
+import { CalendarPage } from './calendar/calendar-page';
 import { authGuard, guestGuard, waitingGuard } from './core/auth.guard';
 import { DocumentsPage } from './documents/documents-page';
 import { InventoryPage } from './inventory/inventory-page';
@@ -20,6 +21,7 @@ export const routes: Routes = [
   { path: 'relocations/:id/budget', canActivate: [authGuard], component: BudgetPage },
   { path: 'relocations/:id/inventory', canActivate: [authGuard], component: InventoryPage },
   { path: 'relocations/:id/documents', canActivate: [authGuard], component: DocumentsPage },
+  { path: 'relocations/:id/calendar', canActivate: [authGuard], component: CalendarPage },
   { path: 'relocations/:id', canActivate: [authGuard], component: RelocationPage },
   { path: '**', redirectTo: '' },
 ];

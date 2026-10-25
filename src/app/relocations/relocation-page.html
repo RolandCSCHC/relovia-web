@@ -23,6 +23,9 @@
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'documents']"
         >Documents</a
       >
+      <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'calendar']"
+        >Calendar</a
+      >
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'edit']"
         >Edit</a
       >
@@ -40,7 +43,7 @@
 
   @if (confirmingDelete()) {
     <div class="panel confirm-delete">
-      <p class="meta">Delete this relocation, its tasks, and its documents?</p>
+      <p class="meta">Delete this relocation, its tasks, its documents, and its calendar?</p>
       <div class="actions">
         <button matButton="outlined" type="button" [disabled]="saving()" (click)="remove()">
           Delete relocation
