@@ -12,6 +12,7 @@ import { currencies, formatMoney, parseAmount, spentPercent, toAmount } from './
 
 type Editor =
   | { kind: 'currency'; code: string }
+  | { kind: 'income'; amount: string; currencyCode: string }
   | { kind: 'category'; id: string | null; name: string }
   | {
       kind: 'estimate';
@@ -65,6 +66,11 @@ export class BudgetPage {
   protected readonly currencyEditor = computed(() => {
     const editor = this.editor();
     return editor?.kind === 'currency' ? editor : null;
+  });
+
+  protected readonly incomeEditor = computed(() => {
+    const editor = this.editor();
+    return editor?.kind === 'income' ? editor : null;
   });
 
   protected readonly categoryEditor = computed(() => {
@@ -159,6 +165,18 @@ export class BudgetPage {
     this.open({ kind: 'currency', code: budget.currencyCode ?? '' });
   }
 
+  protected hasIncome(budget: BudgetResponse): boolean {
+    return budget.monthlyNetIncome != null && budget.monthlyNetIncomeCurrency != null;
+  }
+
+  protected openIncome(budget: BudgetResponse): void {
+    this.open({
+      kind: 'income',
+      amount: budget.monthlyNetIncome == null ? '' : String(budget.monthlyNetIncome),
+      currencyCode: budget.monthlyNetIncomeCurrency ?? budget.currencyCode ?? '',
+    });
+  }
+
   protected openEstimate(
     category: BudgetCategoryResponse,
     estimateId: string | null,
@@ -210,6 +228,16 @@ export class BudgetPage {
     );
   }
 
+  protected setIncomeAmount(amount: string): void {
+    this.editor.update((editor) => (editor?.kind === 'income' ? { ...editor, amount } : editor));
+  }
+
+  protected setIncomeCurrency(currencyCode: string): void {
+    this.editor.update((editor) =>
+      editor?.kind === 'income' ? { ...editor, currencyCode } : editor,
+    );
+  }
+
   protected async saveCurrency(): Promise<void> {
     const code = this.currencyEditor()?.code;
     const id = this.id();
@@ -225,6 +253,47 @@ export class BudgetPage {
     await this.run(async () => {
       await this.api.saveBudget(id, { currencyCode: code });
     }, 'The budget could not be saved.');
+  }
+
+  protected async saveIncome(): Promise<void> {
+    const editor = this.incomeEditor();
+    const id = this.id();
+    if (!editor || !id) {
+      return;
+    }
+
+    const text = editor.amount.trim();
+    const amount = parseAmount(text);
+    if (amount === null) {
+      this.error.set('Enter an amount greater than zero.');
+      return;
+    }
+
+    const fraction = text.split('.')[1];
+    if (fraction && fraction.length > 4) {
+      this.error.set('Amount can have at most 4 decimal places.');
+      return;
+    }
+
+    if (!editor.currencyCode) {
+      this.error.set('Choose a currency.');
+      return;
+    }
+
+    await this.run(async () => {
+      await this.api.saveMonthlyNetIncome(id, { amount, currencyCode: editor.currencyCode });
+    }, 'The income could not be saved.');
+  }
+
+  protected async clearIncome(): Promise<void> {
+    const id = this.id();
+    if (!id) {
+      return;
+    }
+
+    await this.run(async () => {
+      await this.api.saveMonthlyNetIncome(id, { amount: null, currencyCode: null });
+    }, 'The income could not be saved.');
   }
 
   protected async saveCategory(): Promise<void> {

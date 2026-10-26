@@ -2,6 +2,7 @@ import type {
   HousingFurnishing,
   HousingOptionResponse,
   HousingStatus,
+  RentPeriod,
   SaveHousingOptionRequest,
 } from '../api/generated';
 import { formatMoney, parseAmount } from '../budget/money';
@@ -25,6 +26,7 @@ export interface HousingInput {
   name: string;
   area: string;
   rent: string;
+  rentPeriod: '' | RentPeriod;
   deposit: string;
   currencyCode: string;
   size: string;
@@ -39,6 +41,7 @@ export function emptyHousingDraft(): HousingInput {
     name: '',
     area: '',
     rent: '',
+    rentPeriod: '',
     deposit: '',
     currencyCode: '',
     size: '',
@@ -54,6 +57,7 @@ export function housingDraft(home: HousingOptionResponse): HousingInput {
     name: home.name,
     area: home.area ?? '',
     rent: amountText(home.rent),
+    rentPeriod: home.rentPeriod ?? '',
     deposit: amountText(home.deposit),
     currencyCode: home.currencyCode ?? '',
     size: home.size ?? '',
@@ -77,6 +81,14 @@ export function housingProblem(input: HousingInput): string | null {
   const rent = amountProblem(input.rent);
   if (rent) {
     return rent;
+  }
+
+  if (input.rent.trim()) {
+    if (input.rentPeriod !== 'Weekly' && input.rentPeriod !== 'Monthly') {
+      return 'Choose weekly or monthly.';
+    }
+  } else if (input.rentPeriod) {
+    return 'A home with no rent has no rent period.';
   }
 
   const deposit = amountProblem(input.deposit);
@@ -116,6 +128,7 @@ export function housingRequest(input: HousingInput): SaveHousingOptionRequest {
     name: input.name.trim(),
     area: blankToNull(input.area),
     rent,
+    rentPeriod: rent !== null && input.rentPeriod ? input.rentPeriod : null,
     deposit,
     currencyCode: hasMoney ? input.currencyCode : null,
     size: blankToNull(input.size),
@@ -133,9 +146,7 @@ export function housingFacts(home: HousingOptionResponse): string[] {
   }
 
   const money = [
-    home.rent != null && home.currencyCode
-      ? `${formatMoney(home.rent, home.currencyCode, { exact: true })} rent`
-      : null,
+    home.rent != null && home.currencyCode ? rentLine(home) : null,
     home.deposit != null && home.currencyCode
       ? `${formatMoney(home.deposit, home.currencyCode, { exact: true })} deposit`
       : null,
@@ -158,6 +169,33 @@ export function housingFacts(home: HousingOptionResponse): string[] {
   }
 
   return lines;
+}
+
+function rentLine(home: HousingOptionResponse): string {
+  const money = formatMoney(home.rent ?? 0, home.currencyCode ?? '', { exact: true });
+  const period = periodWord(home.rentPeriod);
+  const amount = period ? `${money} ${period} rent` : `${money} rent`;
+  if (home.rentPercentOfIncome == null) {
+    return amount;
+  }
+
+  const share =
+    typeof home.rentPercentOfIncome === 'number'
+      ? home.rentPercentOfIncome
+      : Number(home.rentPercentOfIncome);
+  return `${amount} · ${share.toFixed(1)}% of income`;
+}
+
+function periodWord(period: RentPeriod | null): string {
+  if (period === 'Weekly') {
+    return 'weekly';
+  }
+
+  if (period === 'Monthly') {
+    return 'monthly';
+  }
+
+  return '';
 }
 
 function blankToNull(value: string): string | null {

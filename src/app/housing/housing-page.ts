@@ -82,10 +82,24 @@ export class HousingPage {
     key: 'name' | 'area' | 'rent' | 'deposit' | 'size' | 'availableOn' | 'notes',
     value: string,
   ): void {
-    this.draft.update((draft) => (draft ? { ...draft, [key]: value } : draft));
+    this.draft.update((draft) => {
+      if (!draft) {
+        return draft;
+      }
+
+      const next = { ...draft, [key]: value };
+      if (key === 'rent') {
+        next.rentPeriod = value.trim() ? next.rentPeriod || 'Monthly' : '';
+      }
+
+      return next;
+    });
   }
 
-  protected updateChoice(key: 'currencyCode' | 'furnishing' | 'status', value: string): void {
+  protected updateChoice(
+    key: 'currencyCode' | 'furnishing' | 'status' | 'rentPeriod',
+    value: string,
+  ): void {
     this.draft.update((draft) => (draft ? { ...draft, [key]: value } : draft));
   }
 

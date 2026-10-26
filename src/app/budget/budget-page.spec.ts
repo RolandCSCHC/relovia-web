@@ -8,6 +8,7 @@ import type {
   RelocationResponse,
   SaveBudgetEstimateRequest,
   SaveExpenseRequest,
+  SaveMonthlyNetIncomeRequest,
 } from '../api/generated';
 import { ReloviaClient } from '../api/relovia-client';
 import { BudgetPage } from './budget-page';
@@ -200,6 +201,45 @@ describe('BudgetPage', () => {
 
     expect(called).toBe(false);
     expect(root.textContent).toContain('Enter an amount greater than zero.');
+  });
+
+  it('saves a monthly net income without treating it as an estimate', async () => {
+    let saved: SaveMonthlyNetIncomeRequest | undefined;
+    const state = { budget: budget('EUR', []) };
+    const harness = await open({
+      getBudget: () => Promise.resolve(state.budget),
+      saveMonthlyNetIncome: (_id: string, body: SaveMonthlyNetIncomeRequest) => {
+        saved = body;
+        state.budget = {
+          ...state.budget,
+          monthlyNetIncome: body.amount,
+          monthlyNetIncomeCurrency: body.currencyCode,
+        };
+        return Promise.resolve(state.budget);
+      },
+    });
+    const root = harness.routeNativeElement!;
+
+    expect(root.textContent).toContain('Monthly net income is not set.');
+    expect(root.textContent).toContain('EUR $0.00');
+    clickButton(root, 'Set income');
+    harness.detectChanges();
+    const amount = root.querySelector('#income-amount');
+    setValue(amount, '4000');
+    const currency = root.querySelector('#income-currency');
+    if (!(currency instanceof HTMLSelectElement)) {
+      throw new Error('Missing income currency');
+    }
+    currency.value = 'NZD';
+    currency.dispatchEvent(new Event('change'));
+    amount?.closest('form')?.dispatchEvent(new Event('submit', { cancelable: true }));
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+
+    expect(saved).toEqual({ amount: 4000, currencyCode: 'NZD' });
+    expect(root.textContent).toContain('Monthly net income:');
+    expect(root.textContent).toContain('NZD $4,000.00');
+    expect(root.textContent).toContain('EUR $0.00');
   });
 });
 

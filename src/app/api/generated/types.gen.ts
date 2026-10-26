@@ -33,6 +33,8 @@ export type BudgetResponse = {
   unconverted: Array<UnconvertedAmountsResponse>;
   ratesAsOf: null | string;
   ratesUnavailable: boolean;
+  monthlyNetIncome?: null | number | string;
+  monthlyNetIncomeCurrency?: null | string;
 };
 
 export type BudgetTotalsResponse = {
@@ -152,6 +154,8 @@ export type HousingOptionResponse = {
   availableOn: null | string;
   status: HousingStatus;
   notes: null | string;
+  rentPeriod: null | RentPeriod;
+  rentPercentOfIncome: null | number | string;
 };
 
 export type HousingStatus = 'Considering' | 'Viewing' | 'Offered' | 'Chosen' | 'Dropped';
@@ -279,6 +283,8 @@ export type RelocationTaskStatus = 'Todo' | 'InProgress' | 'Done' | 'Skipped';
 
 export type ReminderKind = 'TaskDue' | 'Milestone' | 'Appointment' | 'DocumentExpiration';
 
+export type RentPeriod = 'Weekly' | 'Monthly';
+
 export type SaveBudgetCategoryRequest = {
   name: string;
 };
@@ -317,6 +323,7 @@ export type SaveHousingOptionRequest = {
   name: string;
   area?: null | string;
   rent?: null | number | string;
+  rentPeriod?: null | RentPeriod;
   deposit?: null | number | string;
   currencyCode?: null | string;
   size?: null | string;
@@ -351,6 +358,11 @@ export type SaveJobApplicationRequest = {
   status: JobApplicationStatus;
   includesSupport?: null | boolean;
   notes?: null | string;
+};
+
+export type SaveMonthlyNetIncomeRequest = {
+  amount?: null | number | string;
+  currencyCode?: null | string;
 };
 
 export type SaveNotificationPreferenceRequest = {
@@ -533,6 +545,25 @@ export type SaveBudgetResponses = {
 };
 
 export type SaveBudgetResponse = SaveBudgetResponses[keyof SaveBudgetResponses];
+
+export type SaveMonthlyNetIncomeData = {
+  body: SaveMonthlyNetIncomeRequest;
+  path: {
+    relocationId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/budget/income';
+};
+
+export type SaveMonthlyNetIncomeResponses = {
+  /**
+   * OK
+   */
+  200: BudgetResponse;
+};
+
+export type SaveMonthlyNetIncomeResponse =
+  SaveMonthlyNetIncomeResponses[keyof SaveMonthlyNetIncomeResponses];
 
 export type CreateBudgetCategoryData = {
   body: SaveBudgetCategoryRequest;

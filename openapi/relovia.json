@@ -161,6 +161,66 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/budget/income": {
+      "put": {
+        "tags": ["Budget"],
+        "summary": "Saves the optional monthly net income, or clears it. The budget currency must already exist.",
+        "operationId": "saveMonthlyNetIncome",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveMonthlyNetIncomeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveMonthlyNetIncomeRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveMonthlyNetIncomeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/relocations/{relocationId}/budget/categories": {
       "post": {
         "tags": ["Budget"],
@@ -2885,6 +2945,14 @@
           },
           "ratesUnavailable": {
             "type": "boolean"
+          },
+          "monthlyNetIncome": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "monthlyNetIncomeCurrency": {
+            "type": ["null", "string"]
           }
         }
       },
@@ -3244,7 +3312,9 @@
           "furnishing",
           "availableOn",
           "status",
-          "notes"
+          "notes",
+          "rentPeriod",
+          "rentPercentOfIncome"
         ],
         "type": "object",
         "properties": {
@@ -3293,6 +3363,21 @@
           },
           "notes": {
             "type": ["null", "string"]
+          },
+          "rentPeriod": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RentPeriod"
+              }
+            ]
+          },
+          "rentPercentOfIncome": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
           }
         }
       },
@@ -3760,6 +3845,10 @@
         "enum": ["TaskDue", "Milestone", "Appointment", "DocumentExpiration"],
         "type": "string"
       },
+      "RentPeriod": {
+        "enum": ["Weekly", "Monthly"],
+        "type": "string"
+      },
       "SaveBudgetCategoryRequest": {
         "required": ["name"],
         "type": "object",
@@ -3872,6 +3961,16 @@
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": ["null", "number", "string"],
             "format": "double"
+          },
+          "rentPeriod": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RentPeriod"
+              }
+            ]
           },
           "deposit": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
@@ -4014,6 +4113,19 @@
             "type": ["null", "boolean"]
           },
           "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "SaveMonthlyNetIncomeRequest": {
+        "type": "object",
+        "properties": {
+          "amount": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
             "type": ["null", "string"]
           }
         }

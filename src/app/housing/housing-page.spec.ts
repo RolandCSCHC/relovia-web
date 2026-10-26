@@ -21,9 +21,19 @@ describe('HousingPage', () => {
 
     expect(root.textContent).toContain('Kreuzberg flat');
     expect(root.textContent).toContain('Chosen');
-    expect(root.textContent).toContain('EUR $1,200.00 rent');
+    expect(root.textContent).toContain('EUR $1,200.00 monthly rent · 30.0% of income');
     expect(root.textContent).toContain('Pets allowed');
     expect(root.textContent).toContain('does not change the budget');
+  });
+
+  it('leaves the percentage out when the rent cannot be compared', async () => {
+    const harness = await open({
+      listHousing: () => Promise.resolve([{ ...flat(), rentPercentOfIncome: null }]),
+    });
+    const root = harness.routeNativeElement!;
+
+    expect(root.textContent).toContain('EUR $1,200.00 monthly rent');
+    expect(root.textContent).not.toContain('% of income');
   });
 
   it('refuses a blank name before calling the API', async () => {
@@ -58,6 +68,7 @@ describe('HousingPage', () => {
           name: body.name,
           area: body.area ?? null,
           rent: body.rent ?? null,
+          rentPeriod: body.rentPeriod ?? null,
           deposit: body.deposit ?? null,
           currencyCode: body.currencyCode ?? null,
           size: body.size ?? null,
@@ -65,6 +76,7 @@ describe('HousingPage', () => {
           availableOn: body.availableOn ?? null,
           status: body.status,
           notes: body.notes ?? null,
+          rentPercentOfIncome: null,
         });
         return Promise.resolve(stored[0]);
       },
@@ -75,6 +87,8 @@ describe('HousingPage', () => {
     harness.detectChanges();
     setValue(root.querySelector('#housing-name'), 'Kreuzberg flat');
     setValue(root.querySelector('#housing-rent'), '1200');
+    harness.detectChanges();
+    setSelect(root.querySelector('#housing-rent-period'), 'Weekly');
     setSelect(root.querySelector('#housing-currency'), 'EUR');
     setSelect(root.querySelector('#housing-status'), 'Chosen');
     root.querySelector('form')?.dispatchEvent(new Event('submit', { cancelable: true }));
@@ -84,6 +98,7 @@ describe('HousingPage', () => {
     expect(saved).toMatchObject({
       name: 'Kreuzberg flat',
       rent: 1200,
+      rentPeriod: 'Weekly',
       deposit: null,
       currencyCode: 'EUR',
       status: 'Chosen',
@@ -185,5 +200,7 @@ function flat(): HousingOptionResponse {
     availableOn: '2026-11-01',
     status: 'Chosen',
     notes: 'Pets allowed',
+    rentPeriod: 'Monthly',
+    rentPercentOfIncome: 30,
   };
 }

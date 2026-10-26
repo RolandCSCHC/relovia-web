@@ -50,6 +50,8 @@ describe('SummaryPage', () => {
       expect(root.textContent).toContain('passport.pdf');
       expect(root.textContent).toContain('0 of 1 done');
       expect(root.textContent).not.toContain('Print');
+      expect(root.textContent).not.toContain('Monthly net income');
+      expect(root.textContent).not.toContain('NZD');
 
       clickButton(root, 'Download Summary');
       await harness.fixture.whenStable();
@@ -213,6 +215,8 @@ function budget(): BudgetResponse {
     unconverted: [],
     ratesAsOf: '2026-10-17T00:00:00+00:00',
     ratesUnavailable: false,
+    monthlyNetIncome: 4000,
+    monthlyNetIncomeCurrency: 'NZD',
   };
 }
 

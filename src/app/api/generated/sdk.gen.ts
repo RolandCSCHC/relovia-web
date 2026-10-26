@@ -106,6 +106,8 @@ import type {
   MoveRelocationTaskLaterResponses,
   SaveBudgetData,
   SaveBudgetResponses,
+  SaveMonthlyNetIncomeData,
+  SaveMonthlyNetIncomeResponses,
   SignInWithGoogleData,
   SignInWithGoogleResponses,
   UpdateBudgetCategoryData,
@@ -202,6 +204,21 @@ export const saveBudget = <ThrowOnError extends boolean = false>(
 ): RequestResult<SaveBudgetResponses, unknown, ThrowOnError> =>
   (options.client ?? client).put<SaveBudgetResponses, unknown, ThrowOnError>({
     url: '/api/relocations/{relocationId}/budget',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Saves the optional monthly net income, or clears it. The budget currency must already exist.
+ */
+export const saveMonthlyNetIncome = <ThrowOnError extends boolean = false>(
+  options: Options<SaveMonthlyNetIncomeData, ThrowOnError>,
+): RequestResult<SaveMonthlyNetIncomeResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<SaveMonthlyNetIncomeResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/budget/income',
     ...options,
     headers: {
       'Content-Type': 'application/json',

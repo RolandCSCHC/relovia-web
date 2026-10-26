@@ -5,7 +5,8 @@
   <a matButton routerLink="/">Back to relocations</a>
 } @else if (relocation.hasValue() && homes.hasValue()) {
   <p class="meta summary">
-    Homes you are comparing. You type each one. Choosing a home does not change the budget.
+    Homes you are comparing. You type each one. Choosing a home does not change the budget. A rent
+    is shown as a share of monthly net income when that income is set.
   </p>
   @if (!relocation.value().isInternational) {
     <p class="meta summary">Housing comparison is for an international move.</p>
@@ -73,6 +74,20 @@
                 (input)="updateDraft('rent', value($event))"
               />
             </label>
+            @if (form.rent.trim()) {
+              <label class="field">
+                <span>Rent period <span class="required" aria-hidden="true">*</span></span>
+                <select
+                  id="housing-rent-period"
+                  aria-required="true"
+                  [value]="form.rentPeriod"
+                  (change)="updateChoice('rentPeriod', value($event))"
+                >
+                  <option value="Monthly">Monthly</option>
+                  <option value="Weekly">Weekly</option>
+                </select>
+              </label>
+            }
             <label class="field">
               Deposit
               <input

@@ -31,6 +31,7 @@ import type {
   SaveCalendarEventRequest,
   SaveBudgetEstimateRequest,
   SaveBudgetRequest,
+  SaveMonthlyNetIncomeRequest,
   SaveExpenseRequest,
   SaveHousingOptionRequest,
   SaveInventoryItemRequest,
@@ -311,6 +312,21 @@ export class ReloviaClient {
         throwOnError: true,
       }),
       'The budget could not be saved.',
+    );
+  }
+
+  saveMonthlyNetIncome(
+    relocationId: string,
+    body: SaveMonthlyNetIncomeRequest,
+  ): Promise<BudgetResponse> {
+    return this.unwrap(
+      reloviaApi.saveMonthlyNetIncome({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The income could not be saved.',
     );
   }
 

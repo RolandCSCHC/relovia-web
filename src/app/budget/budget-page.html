@@ -90,6 +90,78 @@
           <button matButton type="button" (click)="openCurrency(data)">Change currency</button>
         }
       </div>
+      @if (incomeEditor(); as income) {
+        <form class="fields" (submit)="saveIncome(); $event.preventDefault()">
+          <p class="meta">
+            Monthly net income is the amount you take home, in the currency you enter it. It is not
+            an estimate or an expense. A home's rent is shown as a share of it.
+          </p>
+          <div class="place">
+            <label class="field">
+              <span>Amount <span class="required" aria-hidden="true">*</span></span>
+              <input
+                id="income-amount"
+                type="number"
+                step="any"
+                min="0"
+                inputmode="decimal"
+                aria-required="true"
+                [value]="income.amount"
+                (input)="setIncomeAmount(value($event))"
+              />
+            </label>
+            <label class="field">
+              <span>Currency <span class="required" aria-hidden="true">*</span></span>
+              <select
+                id="income-currency"
+                aria-required="true"
+                [value]="income.currencyCode"
+                (change)="setIncomeCurrency(value($event))"
+              >
+                <option value="">Choose a currency</option>
+                @for (option of currencies; track option.code) {
+                  <option [value]="option.code">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+          </div>
+          @if (error(); as message) {
+            <p class="error-text" role="alert">{{ message }}</p>
+          }
+          <div class="actions">
+            <button matButton="filled" type="submit" [disabled]="saving()">Save income</button>
+            @if (hasIncome(data)) {
+              <button
+                matButton="outlined"
+                type="button"
+                [disabled]="saving()"
+                (click)="clearIncome()"
+              >
+                Clear income
+              </button>
+            }
+            <button matButton type="button" (click)="close()">Cancel</button>
+          </div>
+        </form>
+      } @else {
+        <div class="actions">
+          <span class="meta">
+            @if (hasIncome(data)) {
+              Monthly net income:
+              {{
+                formatMoney(data.monthlyNetIncome ?? 0, data.monthlyNetIncomeCurrency ?? currency, {
+                  exact: true,
+                })
+              }}
+            } @else {
+              Monthly net income is not set.
+            }
+          </span>
+          <button matButton type="button" (click)="openIncome(data)">
+            {{ hasIncome(data) ? 'Change income' : 'Set income' }}
+          </button>
+        </div>
+      }
     </section>
 
     @if (error() && !editor()) {
