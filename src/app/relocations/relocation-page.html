@@ -26,6 +26,16 @@
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'calendar']"
         >Calendar</a
       >
+      @if (relocation.value().isInternational) {
+        <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'housing']"
+          >Housing</a
+        >
+        <a
+          matButton="outlined"
+          [routerLink]="['/relocations', relocation.value().id, 'applications']"
+          >Applications</a
+        >
+      }
       <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'summary']"
         >Summary</a
       >
@@ -49,7 +59,9 @@
 
   @if (confirmingDelete()) {
     <div class="panel confirm-delete">
-      <p class="meta">Delete this relocation, its tasks, its documents, and its calendar?</p>
+      <p class="meta">
+        Delete this relocation, its tasks, documents, calendar, housing, and applications?
+      </p>
       <div class="actions">
         <button matButton="outlined" type="button" [disabled]="saving()" (click)="remove()">
           Delete relocation
