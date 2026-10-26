@@ -1,18 +1,16 @@
 import { Component, computed, inject, resource, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
-import { RelocationTabs } from '../relocations/relocation-tabs';
+import { relocationId } from '../relocations/relocation-id';
 import { TaskProgress } from '../relocations/task-progress';
 import { savePdf, summaryPdfFileName } from './file-name';
 import { buildSummary } from './summary';
 
 @Component({
   selector: 'app-summary-page',
-  imports: [MatButton, RelocationTabs, RouterLink, TaskProgress],
+  imports: [MatButton, RouterLink, TaskProgress],
   templateUrl: './summary-page.html',
   styleUrl: './summary-page.scss',
 })
@@ -21,9 +19,7 @@ export class SummaryPage {
 
   protected readonly downloading = signal(false);
   protected readonly downloadError = signal<string | null>(null);
-  protected readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
-  );
+  protected readonly id = relocationId();
 
   protected readonly relocation = resource({
     params: () => this.id(),

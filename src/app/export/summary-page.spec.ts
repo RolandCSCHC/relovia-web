@@ -31,8 +31,6 @@ describe('SummaryPage', () => {
       });
       const root = harness.routeNativeElement!;
 
-      expect(root.textContent).toContain('Berlin move');
-      expect(root.textContent).toContain('Santiago, Chile to Berlin, Germany');
       expect(root.textContent).toContain('Give notice');
       expect(root.textContent).not.toContain('Close the account');
       expect(root.textContent).toContain('Sheets');
@@ -44,7 +42,7 @@ describe('SummaryPage', () => {
       expect(root.textContent).toContain('0 of 1 done');
       expect(root.textContent).not.toContain('Print');
 
-      clickButton(root, 'Download PDF');
+      clickButton(root, 'Download Summary');
       await harness.fixture.whenStable();
       expect(downloaded).toBe(true);
     } finally {

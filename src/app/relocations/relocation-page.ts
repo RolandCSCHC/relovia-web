@@ -1,8 +1,6 @@
 import { Component, inject, resource, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import type {
   RelocationResponse,
   RelocationTaskResponse,
@@ -11,22 +9,19 @@ import type {
   TaskPriority,
 } from '../api/generated';
 import { ApiError, ReloviaClient } from '../api/relovia-client';
-import { pdfFileName, savePdf } from '../export/file-name';
-import { countryName } from './countries';
 import { formatDate } from './dates';
 import { labelFor, phases, priorities, purposes, relocationStatuses, taskStatuses } from './labels';
-import { RelocationTabs } from './relocation-tabs';
+import { relocationId } from './relocation-id';
 import { TaskProgress } from './task-progress';
 
 @Component({
   selector: 'app-relocation-page',
-  imports: [MatButton, RelocationTabs, RouterLink, TaskProgress],
+  imports: [MatButton, RouterLink, TaskProgress],
   templateUrl: './relocation-page.html',
   styleUrl: './relocation-page.scss',
 })
 export class RelocationPage {
   private readonly api = inject(ReloviaClient);
-  private readonly router = inject(Router);
 
   protected readonly formatDate = formatDate;
   protected readonly phases = phases;
@@ -41,11 +36,7 @@ export class RelocationPage {
   protected readonly deletingTaskId = signal<string | null>(null);
   protected readonly actionError = signal<string | null>(null);
   protected readonly saving = signal(false);
-  protected readonly confirmingDelete = signal(false);
-  protected readonly downloading = signal(false);
-  protected readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
-  );
+  protected readonly id = relocationId();
 
   protected readonly relocation = resource({
     params: () => this.id(),
@@ -56,13 +47,6 @@ export class RelocationPage {
     params: () => this.id(),
     loader: ({ params }) => this.api.listTasks(params),
   });
-
-  protected place(relocation: RelocationResponse, end: 'origin' | 'destination'): string {
-    const city = end === 'origin' ? relocation.originCity : relocation.destinationCity;
-    const country =
-      end === 'origin' ? relocation.originCountryCode : relocation.destinationCountryCode;
-    return city.trim() ? `${city}, ${countryName(country)}` : countryName(country);
-  }
 
   protected summary(relocation: RelocationResponse): string {
     const scope = relocation.isInternational ? 'International' : 'Domestic';
@@ -260,42 +244,6 @@ export class RelocationPage {
       this.actionError.set(this.failure(error, 'The task could not be deleted.'));
     } finally {
       this.saving.set(false);
-    }
-  }
-
-  protected async downloadPdf(): Promise<void> {
-    const id = this.id();
-    const relocation = this.relocation.value();
-    if (!id || !relocation) {
-      return;
-    }
-
-    this.downloading.set(true);
-    this.actionError.set(null);
-    try {
-      const blob = await this.api.downloadRelocationPdf(id);
-      savePdf(blob, pdfFileName(relocation.name));
-    } catch (error) {
-      this.actionError.set(this.failure(error, 'The PDF could not be downloaded.'));
-    } finally {
-      this.downloading.set(false);
-    }
-  }
-
-  protected async remove(): Promise<void> {
-    const id = this.id();
-    if (!id) {
-      return;
-    }
-
-    this.saving.set(true);
-    this.actionError.set(null);
-    try {
-      await this.api.deleteRelocation(id);
-      await this.router.navigateByUrl('/');
-    } catch (error) {
-      this.saving.set(false);
-      this.actionError.set(this.failure(error, 'The relocation could not be deleted.'));
     }
   }
 

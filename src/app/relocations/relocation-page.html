@@ -1,245 +1,205 @@
 @if (relocation.error() || tasks.error()) {
-  <h1 class="page-title">Relocation</h1>
   <p class="error-text">
     {{ relocation.error()?.message ?? tasks.error()?.message }}
   </p>
   <a matButton routerLink="/">Back to relocations</a>
 } @else if (relocation.hasValue() && tasks.hasValue()) {
-  <div class="heading-row">
-    <div>
-      <h1 class="page-title">{{ relocation.value().name }}</h1>
-      <p class="page-lead">
-        {{ place(relocation.value(), 'origin') }} to
-        {{ place(relocation.value(), 'destination') }}
-      </p>
+  <p class="meta summary">{{ summary(relocation.value()) }}</p>
+  <app-task-progress
+    class="summary"
+    [progress]="tasks.value().progress"
+    [taskCount]="tasks.value().tasks.length"
+  />
+
+  @if (actionError(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  @if (!adding()) {
+    <div class="actions task-toolbar">
+      <button matButton="outlined" type="button" (click)="startAdd()">Add task</button>
     </div>
-    <div class="actions">
-      <button matButton="outlined" type="button" [disabled]="downloading()" (click)="downloadPdf()">
-        Download PDF
-      </button>
-      <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'edit']"
-        >Edit</a
-      >
-      @if (!confirmingDelete()) {
-        <button matButton type="button" (click)="confirmingDelete.set(true)">Delete</button>
-      }
-    </div>
-  </div>
-  <app-relocation-tabs
-    [relocationId]="relocation.value().id"
-    [international]="relocation.value().isInternational"
-  >
-    <p class="meta summary">{{ summary(relocation.value()) }}</p>
-    <app-task-progress
-      class="summary"
-      [progress]="tasks.value().progress"
-      [taskCount]="tasks.value().tasks.length"
-    />
-
-    @if (confirmingDelete()) {
-      <div class="panel confirm-delete">
-        <p class="meta">
-          Delete this relocation, its tasks, documents, calendar, housing, and applications?
-        </p>
-        <div class="actions">
-          <button matButton="outlined" type="button" [disabled]="saving()" (click)="remove()">
-            Delete relocation
-          </button>
-          <button matButton type="button" (click)="confirmingDelete.set(false)">Cancel</button>
-        </div>
-      </div>
-    }
-
-    @if (actionError(); as message) {
-      <p class="error-text" role="alert">{{ message }}</p>
-    }
-
-    @if (!adding()) {
-      <div class="actions task-toolbar">
-        <button matButton="outlined" type="button" (click)="startAdd()">Add task</button>
-      </div>
-    } @else {
-      <form class="panel fields task-form" (submit)="saveAdd(); $event.preventDefault()">
+  } @else {
+    <form class="panel fields task-form" (submit)="saveAdd(); $event.preventDefault()">
+      <label class="field">
+        <span>Title <span class="required" aria-hidden="true">*</span></span>
+        <input
+          id="new-task-title"
+          aria-required="true"
+          [value]="addDraft().title"
+          maxlength="200"
+          (input)="updateAdd('title', editValue($event))"
+        />
+      </label>
+      <label class="field">
+        Due date
+        <input
+          id="new-task-due"
+          type="date"
+          [value]="addDraft().dueDate"
+          (input)="updateAdd('dueDate', editValue($event))"
+        />
+      </label>
+      <div class="place">
         <label class="field">
-          <span>Title <span class="required" aria-hidden="true">*</span></span>
-          <input
-            id="new-task-title"
+          <span>Phase <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="new-task-phase"
             aria-required="true"
-            [value]="addDraft().title"
-            maxlength="200"
-            (input)="updateAdd('title', editValue($event))"
-          />
+            [value]="addDraft().phase"
+            (change)="updateAddPhase(editValue($event))"
+          >
+            @for (option of phases; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
         </label>
         <label class="field">
-          Due date
-          <input
-            id="new-task-due"
-            type="date"
-            [value]="addDraft().dueDate"
-            (input)="updateAdd('dueDate', editValue($event))"
-          />
+          <span>Priority <span class="required" aria-hidden="true">*</span></span>
+          <select
+            id="new-task-priority"
+            aria-required="true"
+            [value]="addDraft().priority"
+            (change)="updateAddPriority(editValue($event))"
+          >
+            @for (option of priorities; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
         </label>
-        <div class="place">
-          <label class="field">
-            <span>Phase <span class="required" aria-hidden="true">*</span></span>
-            <select
-              id="new-task-phase"
-              aria-required="true"
-              [value]="addDraft().phase"
-              (change)="updateAddPhase(editValue($event))"
-            >
-              @for (option of phases; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
-          <label class="field">
-            <span>Priority <span class="required" aria-hidden="true">*</span></span>
-            <select
-              id="new-task-priority"
-              aria-required="true"
-              [value]="addDraft().priority"
-              (change)="updateAddPriority(editValue($event))"
-            >
-              @for (option of priorities; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
-        </div>
-        @if (addError(); as message) {
-          <p class="error-text" role="alert">{{ message }}</p>
-        }
-        <div class="actions">
-          <button matButton="filled" type="submit" [disabled]="saving()">Save task</button>
-          <button matButton type="button" (click)="adding.set(false)">Cancel</button>
-        </div>
-      </form>
-    }
-
-    @if (tasks.value().tasks.length === 0) {
-      <div class="panel empty-tasks">
-        <p class="meta">Confirm a checklist, or add a task of your own.</p>
-        <a matButton="filled" [routerLink]="['/relocations', relocation.value().id, 'checklist']">
-          Review checklist
-        </a>
       </div>
-    } @else {
-      <ol class="stack">
-        @for (task of tasks.value().tasks; track task.id) {
-          <li class="panel task" [attr.data-status]="task.status">
-            <div class="task-line">
-              <h2>{{ task.title }}</h2>
-              <label class="field status">
-                Status
-                <select
-                  [value]="task.status"
-                  [disabled]="saving() || editingId() === task.id"
-                  [attr.aria-label]="'Status for ' + task.title"
-                  (change)="changeStatus(task, $event)"
-                >
-                  @for (option of taskStatuses; track option.value) {
-                    <option [value]="option.value">{{ option.label }}</option>
-                  }
-                </select>
-              </label>
-            </div>
-            <div class="task-tags">
-              @if (task.dueDate) {
-                <span class="meta">Due {{ formatDate(task.dueDate) }}</span>
-              }
-              <span class="chip">{{ phaseLabel(task) }}</span>
-              <span class="chip" [class.accent]="task.priority === 'High'">{{
-                priorityLabel(task)
-              }}</span>
-              @if (task.documentIds.length > 0) {
-                <a [routerLink]="['/relocations', relocation.value().id, 'documents']">{{
-                  documentLabel(task)
-                }}</a>
-              }
-            </div>
-            @if (dependencyNote(task, tasks.value().tasks); as note) {
-              <p class="meta">{{ note }}</p>
-            }
-            @if (deletingTaskId() === task.id) {
-              <p class="meta">Delete this task?</p>
-              <div class="actions">
-                <button
-                  matButton="outlined"
-                  type="button"
-                  [disabled]="saving()"
-                  (click)="removeTask(task)"
-                >
-                  Delete task
-                </button>
-                <button matButton type="button" (click)="deletingTaskId.set(null)">Cancel</button>
-              </div>
-            } @else if (editingId() !== task.id) {
-              <div class="actions">
-                <button matButton type="button" (click)="startEdit(task)">Edit task</button>
-                <button matButton type="button" (click)="deletingTaskId.set(task.id)">
-                  Delete task
-                </button>
-              </div>
-            } @else {
-              <form class="fields" (submit)="saveEdit(task); $event.preventDefault()">
-                <label class="field">
-                  <span>Title <span class="required" aria-hidden="true">*</span></span>
-                  <input
-                    aria-required="true"
-                    [value]="editDraft().title"
-                    maxlength="200"
-                    (input)="updateEdit('title', editValue($event))"
-                  />
-                </label>
-                <label class="field">
-                  Due date
-                  <input
-                    type="date"
-                    [value]="editDraft().dueDate"
-                    (input)="updateEdit('dueDate', editValue($event))"
-                  />
-                </label>
-                <div class="place">
-                  <label class="field">
-                    <span>Phase <span class="required" aria-hidden="true">*</span></span>
-                    <select
-                      aria-required="true"
-                      [value]="editDraft().phase"
-                      (change)="updatePhase(editValue($event))"
-                    >
-                      @for (option of phases; track option.value) {
-                        <option [value]="option.value">{{ option.label }}</option>
-                      }
-                    </select>
-                  </label>
-                  <label class="field">
-                    <span>Priority <span class="required" aria-hidden="true">*</span></span>
-                    <select
-                      aria-required="true"
-                      [value]="editDraft().priority"
-                      (change)="updatePriority(editValue($event))"
-                    >
-                      @for (option of priorities; track option.value) {
-                        <option [value]="option.value">{{ option.label }}</option>
-                      }
-                    </select>
-                  </label>
-                </div>
-                @if (editError(); as message) {
-                  <p class="error-text" role="alert">{{ message }}</p>
+      @if (addError(); as message) {
+        <p class="error-text" role="alert">{{ message }}</p>
+      }
+      <div class="actions">
+        <button matButton="filled" type="submit" [disabled]="saving()">Save task</button>
+        <button matButton type="button" (click)="adding.set(false)">Cancel</button>
+      </div>
+    </form>
+  }
+
+  @if (tasks.value().tasks.length === 0) {
+    <div class="panel empty-tasks">
+      <p class="meta">Confirm a checklist, or add a task of your own.</p>
+      <a matButton="filled" [routerLink]="['/relocations', relocation.value().id, 'checklist']">
+        Review checklist
+      </a>
+    </div>
+  } @else {
+    <ol class="stack">
+      @for (task of tasks.value().tasks; track task.id) {
+        <li class="panel task" [attr.data-status]="task.status">
+          <div class="task-line">
+            <h2>{{ task.title }}</h2>
+            <label class="field status">
+              Status
+              <select
+                [value]="task.status"
+                [disabled]="saving() || editingId() === task.id"
+                [attr.aria-label]="'Status for ' + task.title"
+                (change)="changeStatus(task, $event)"
+              >
+                @for (option of taskStatuses; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
                 }
-                <div class="actions">
-                  <button matButton="filled" type="submit" [disabled]="saving()">Save task</button>
-                  <button matButton type="button" (click)="editingId.set(null)">Cancel</button>
-                </div>
-              </form>
+              </select>
+            </label>
+          </div>
+          <div class="task-tags">
+            @if (task.dueDate) {
+              <span class="meta">Due {{ formatDate(task.dueDate) }}</span>
             }
-          </li>
-        }
-      </ol>
-    }
-  </app-relocation-tabs>
+            <span class="chip">{{ phaseLabel(task) }}</span>
+            <span class="chip" [class.accent]="task.priority === 'High'">{{
+              priorityLabel(task)
+            }}</span>
+            @if (task.documentIds.length > 0) {
+              <a [routerLink]="['/relocations', relocation.value().id, 'documents']">{{
+                documentLabel(task)
+              }}</a>
+            }
+          </div>
+          @if (dependencyNote(task, tasks.value().tasks); as note) {
+            <p class="meta">{{ note }}</p>
+          }
+          @if (deletingTaskId() === task.id) {
+            <p class="meta">Delete this task?</p>
+            <div class="actions">
+              <button
+                matButton="outlined"
+                type="button"
+                [disabled]="saving()"
+                (click)="removeTask(task)"
+              >
+                Delete task
+              </button>
+              <button matButton type="button" (click)="deletingTaskId.set(null)">Cancel</button>
+            </div>
+          } @else if (editingId() !== task.id) {
+            <div class="actions">
+              <button matButton type="button" (click)="startEdit(task)">Edit task</button>
+              <button matButton type="button" (click)="deletingTaskId.set(task.id)">
+                Delete task
+              </button>
+            </div>
+          } @else {
+            <form class="fields" (submit)="saveEdit(task); $event.preventDefault()">
+              <label class="field">
+                <span>Title <span class="required" aria-hidden="true">*</span></span>
+                <input
+                  aria-required="true"
+                  [value]="editDraft().title"
+                  maxlength="200"
+                  (input)="updateEdit('title', editValue($event))"
+                />
+              </label>
+              <label class="field">
+                Due date
+                <input
+                  type="date"
+                  [value]="editDraft().dueDate"
+                  (input)="updateEdit('dueDate', editValue($event))"
+                />
+              </label>
+              <div class="place">
+                <label class="field">
+                  <span>Phase <span class="required" aria-hidden="true">*</span></span>
+                  <select
+                    aria-required="true"
+                    [value]="editDraft().phase"
+                    (change)="updatePhase(editValue($event))"
+                  >
+                    @for (option of phases; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Priority <span class="required" aria-hidden="true">*</span></span>
+                  <select
+                    aria-required="true"
+                    [value]="editDraft().priority"
+                    (change)="updatePriority(editValue($event))"
+                  >
+                    @for (option of priorities; track option.value) {
+                      <option [value]="option.value">{{ option.label }}</option>
+                    }
+                  </select>
+                </label>
+              </div>
+              @if (editError(); as message) {
+                <p class="error-text" role="alert">{{ message }}</p>
+              }
+              <div class="actions">
+                <button matButton="filled" type="submit" [disabled]="saving()">Save task</button>
+                <button matButton type="button" (click)="editingId.set(null)">Cancel</button>
+              </div>
+            </form>
+          }
+        </li>
+      }
+    </ol>
+  }
 } @else {
   <p class="page-lead">Loading relocation…</p>
 }

@@ -47,12 +47,6 @@ describe('RelocationPage', () => {
 
     expect(root.textContent).toContain('0 of 1 done');
     expect(root.textContent).toContain('Give notice');
-    expect(root.querySelector(`a[href="/relocations/${relocationId}/documents"]`)).not.toBeNull();
-    expect(root.querySelector(`a[href="/relocations/${relocationId}/housing"]`)).not.toBeNull();
-    expect(
-      root.querySelector(`a[href="/relocations/${relocationId}/applications"]`),
-    ).not.toBeNull();
-    expect(root.querySelector(`a[href="/relocations/${relocationId}/summary"]`)).not.toBeNull();
     const select = root.querySelector('select');
     if (!(select instanceof HTMLSelectElement)) {
       throw new Error('Missing status select');
@@ -143,36 +137,6 @@ describe('RelocationPage', () => {
 
     expect(deleted).toBe('0199f0a1-7c00-7000-8000-000000000021');
     expect(root.textContent).not.toContain('Give notice');
-  });
-
-  it('hides housing and applications on a domestic move', async () => {
-    TestBed.configureTestingModule({
-      providers: [
-        provideRouter([{ path: 'relocations/:id', component: RelocationPage }]),
-        {
-          provide: ReloviaClient,
-          useValue: {
-            getRelocation: () =>
-              Promise.resolve({
-                ...relocation(),
-                destinationCountryCode: 'CL',
-                isInternational: false,
-              }),
-            listTasks: () => Promise.resolve(taskList()),
-          },
-        },
-      ],
-    });
-
-    const harness = await RouterTestingHarness.create();
-    await harness.navigateByUrl(`/relocations/${relocationId}`);
-    await harness.fixture.whenStable();
-    harness.detectChanges();
-    const root = harness.routeNativeElement!;
-
-    expect(root.querySelector(`a[href="/relocations/${relocationId}/housing"]`)).toBeNull();
-    expect(root.querySelector(`a[href="/relocations/${relocationId}/applications"]`)).toBeNull();
-    expect(root.querySelector(`a[href="/relocations/${relocationId}/budget"]`)).not.toBeNull();
   });
 });
 

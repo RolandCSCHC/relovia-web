@@ -1,0 +1,56 @@
+@if (relocation.error()) {
+  <h1 class="page-title">Relocation</h1>
+  <p class="error-text">{{ relocation.error()?.message }}</p>
+  <a matButton routerLink="/">Back to relocations</a>
+} @else if (id(); as relocationId) {
+  @if (relocation.hasValue()) {
+    <div class="heading-row">
+      <div>
+        <h1 class="page-title">{{ relocation.value().name }}</h1>
+        <p class="page-lead">
+          {{ place(relocation.value(), 'origin') }} to
+          {{ place(relocation.value(), 'destination') }}
+        </p>
+      </div>
+      <div class="actions">
+        <button
+          matButton="outlined"
+          type="button"
+          [disabled]="downloading()"
+          (click)="downloadPdf()"
+        >
+          Download PDF
+        </button>
+        <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id, 'edit']"
+          >Edit</a
+        >
+        @if (!confirmingDelete()) {
+          <button matButton type="button" (click)="confirmingDelete.set(true)">Delete</button>
+        }
+      </div>
+    </div>
+    @if (confirmingDelete()) {
+      <div class="panel confirm-delete">
+        <p class="meta">
+          Delete this relocation, its tasks, documents, calendar, housing, and applications?
+        </p>
+        <div class="actions">
+          <button matButton="outlined" type="button" [disabled]="saving()" (click)="remove()">
+            Delete relocation
+          </button>
+          <button matButton type="button" (click)="confirmingDelete.set(false)">Cancel</button>
+        </div>
+      </div>
+    }
+    @if (actionError(); as message) {
+      <p class="error-text action-error" role="alert">{{ message }}</p>
+    }
+  }
+  <app-relocation-tabs
+    [relocationId]="relocationId"
+    [international]="relocation.value()?.isInternational ?? false"
+    [ready]="relocation.hasValue()"
+  >
+    <router-outlet />
+  </app-relocation-tabs>
+}

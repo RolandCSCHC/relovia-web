@@ -13,6 +13,7 @@ import { NotificationsPage } from './notifications/notifications-page';
 import { ChecklistReview } from './relocations/checklist-review';
 import { RelocationEditor } from './relocations/relocation-editor';
 import { RelocationPage } from './relocations/relocation-page';
+import { RelocationShell } from './relocations/relocation-shell';
 import { SignIn } from './sign-in/sign-in';
 
 export const routes: Routes = [
@@ -23,13 +24,20 @@ export const routes: Routes = [
   { path: 'relocations/new', canActivate: [authGuard], component: RelocationEditor },
   { path: 'relocations/:id/edit', canActivate: [authGuard], component: RelocationEditor },
   { path: 'relocations/:id/checklist', canActivate: [authGuard], component: ChecklistReview },
-  { path: 'relocations/:id/budget', canActivate: [authGuard], component: BudgetPage },
-  { path: 'relocations/:id/inventory', canActivate: [authGuard], component: InventoryPage },
-  { path: 'relocations/:id/documents', canActivate: [authGuard], component: DocumentsPage },
-  { path: 'relocations/:id/calendar', canActivate: [authGuard], component: CalendarPage },
-  { path: 'relocations/:id/housing', canActivate: [authGuard], component: HousingPage },
-  { path: 'relocations/:id/applications', canActivate: [authGuard], component: ApplicationsPage },
-  { path: 'relocations/:id/summary', canActivate: [authGuard], component: SummaryPage },
-  { path: 'relocations/:id', canActivate: [authGuard], component: RelocationPage },
+  {
+    path: 'relocations/:id',
+    canActivate: [authGuard],
+    component: RelocationShell,
+    children: [
+      { path: 'budget', component: BudgetPage },
+      { path: 'inventory', component: InventoryPage },
+      { path: 'documents', component: DocumentsPage },
+      { path: 'calendar', component: CalendarPage },
+      { path: 'housing', component: HousingPage },
+      { path: 'applications', component: ApplicationsPage },
+      { path: 'summary', component: SummaryPage },
+      { path: '', component: RelocationPage },
+    ],
+  },
   { path: '**', redirectTo: '' },
 ];

@@ -1,13 +1,11 @@
 import { Component, inject, resource, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import type { JobApplicationResponse } from '../api/generated';
 import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { labelFor } from '../relocations/labels';
-import { RelocationTabs } from '../relocations/relocation-tabs';
+import { relocationId } from '../relocations/relocation-id';
 import {
   applicationDraft,
   applicationFacts,
@@ -20,7 +18,7 @@ import {
 
 @Component({
   selector: 'app-applications-page',
-  imports: [MatButton, RelocationTabs, RouterLink],
+  imports: [MatButton, RouterLink],
   templateUrl: './applications-page.html',
   styleUrl: './applications-page.scss',
 })
@@ -38,9 +36,7 @@ export class ApplicationsPage {
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
 
-  protected readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
-  );
+  protected readonly id = relocationId();
 
   protected readonly relocation = resource({
     params: () => this.id(),

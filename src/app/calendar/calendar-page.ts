@@ -1,8 +1,6 @@
 import { Component, computed, inject, resource, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import type {
   CalendarEventKind,
   CalendarEventResponse,
@@ -12,7 +10,7 @@ import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { formatDate } from '../relocations/dates';
 import { labelFor } from '../relocations/labels';
-import { RelocationTabs } from '../relocations/relocation-tabs';
+import { relocationId } from '../relocations/relocation-id';
 import { eventKinds } from './labels';
 import {
   appointmentDay,
@@ -34,7 +32,7 @@ import {
 
 @Component({
   selector: 'app-calendar-page',
-  imports: [MatButton, RelocationTabs, RouterLink],
+  imports: [MatButton, RouterLink],
   templateUrl: './calendar-page.html',
   styleUrl: './calendar-page.scss',
 })
@@ -57,9 +55,7 @@ export class CalendarPage {
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
 
-  protected readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
-  );
+  protected readonly id = relocationId();
 
   protected readonly relocation = resource({
     params: () => this.id(),

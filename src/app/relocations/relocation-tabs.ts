@@ -16,6 +16,7 @@ interface RelocationTab {
 export class RelocationTabs {
   readonly relocationId = input.required<string>();
   readonly international = input(false);
+  readonly ready = input(true);
 
   protected readonly tabs = computed(() => {
     const id = this.relocationId();

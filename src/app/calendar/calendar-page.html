@@ -1,218 +1,206 @@
 @if (relocation.error() || calendar.error()) {
-  <h1 class="page-title">Calendar</h1>
   <p class="error-text">
     {{ relocation.error()?.message ?? calendar.error()?.message }}
   </p>
   <a matButton routerLink="/">Back to relocations</a>
 } @else if (relocation.hasValue() && calendar.hasValue()) {
-  <div class="heading-row">
-    <div>
-      <h1 class="page-title">Calendar</h1>
-      <p class="page-lead">{{ relocation.value().name }}</p>
+  <p class="meta summary">
+    Milestones and appointments for this move. A task due date stays on the task.
+  </p>
+
+  <div class="month-bar">
+    <div class="actions">
+      <button matButton type="button" (click)="shift(-1)">Previous</button>
+      <h2 id="calendar-month">{{ heading() }}</h2>
+      <button matButton type="button" (click)="shift(1)">Next</button>
+    </div>
+    <div class="actions">
+      <button matButton type="button" (click)="goToToday()">Today</button>
+      <button matButton="outlined" type="button" (click)="startAdd()">Add event</button>
     </div>
   </div>
-  <app-relocation-tabs
-    [relocationId]="relocation.value().id"
-    [international]="relocation.value().isInternational"
-  >
-    <p class="meta summary">
-      Milestones and appointments for this move. A task due date stays on the task.
-    </p>
 
-    <div class="month-bar">
-      <div class="actions">
-        <button matButton type="button" (click)="shift(-1)">Previous</button>
-        <h2 id="calendar-month">{{ heading() }}</h2>
-        <button matButton type="button" (click)="shift(1)">Next</button>
-      </div>
-      <div class="actions">
-        <button matButton type="button" (click)="goToToday()">Today</button>
-        <button matButton="outlined" type="button" (click)="startAdd()">Add event</button>
-      </div>
-    </div>
+  <ul class="legend">
+    <li><span class="swatch milestone"></span> Milestone</li>
+    <li><span class="swatch appointment"></span> Appointment</li>
+    <li><span class="swatch task"></span> Task due</li>
+  </ul>
 
-    <ul class="legend">
-      <li><span class="swatch milestone"></span> Milestone</li>
-      <li><span class="swatch appointment"></span> Appointment</li>
-      <li><span class="swatch task"></span> Task due</li>
-    </ul>
-
-    <div class="calendar" role="grid" [attr.aria-label]="heading()">
-      @for (weekday of weekdays; track weekday) {
-        <div class="weekday" role="columnheader">{{ weekday }}</div>
-      }
-      @for (day of days(); track day.date) {
-        @let marks = dayMarks(day.date);
-        @let shown = visibleMarks(marks);
-        <button
-          type="button"
-          class="day"
-          role="gridcell"
-          [class.outside]="!day.inMonth"
-          [attr.data-date]="day.date"
-          [attr.aria-pressed]="day.date === selected()"
-          [attr.aria-current]="isToday(day.date) ? 'date' : null"
-          [attr.aria-label]="dayLabel(day.date)"
-          (click)="choose(day.date)"
-        >
-          <span class="day-number">{{ dayNumber(day.date) }}</span>
-          @for (mark of shown.shown; track mark.id) {
-            <span
-              class="item"
-              [class.milestone]="mark.kind === 'milestone'"
-              [class.appointment]="mark.kind === 'appointment'"
-              [class.task]="mark.kind === 'task'"
-              >{{ mark.title }}</span
-            >
-          }
-          @if (shown.extra > 0) {
-            <span class="more">+{{ shown.extra }}</span>
-          }
-        </button>
-      }
-    </div>
-
-    @if (error(); as message) {
-      <p class="error-text" role="alert">{{ message }}</p>
+  <div class="calendar" role="grid" [attr.aria-label]="heading()">
+    @for (weekday of weekdays; track weekday) {
+      <div class="weekday" role="columnheader">{{ weekday }}</div>
     }
+    @for (day of days(); track day.date) {
+      @let marks = dayMarks(day.date);
+      @let shown = visibleMarks(marks);
+      <button
+        type="button"
+        class="day"
+        role="gridcell"
+        [class.outside]="!day.inMonth"
+        [attr.data-date]="day.date"
+        [attr.aria-pressed]="day.date === selected()"
+        [attr.aria-current]="isToday(day.date) ? 'date' : null"
+        [attr.aria-label]="dayLabel(day.date)"
+        (click)="choose(day.date)"
+      >
+        <span class="day-number">{{ dayNumber(day.date) }}</span>
+        @for (mark of shown.shown; track mark.id) {
+          <span
+            class="item"
+            [class.milestone]="mark.kind === 'milestone'"
+            [class.appointment]="mark.kind === 'appointment'"
+            [class.task]="mark.kind === 'task'"
+            >{{ mark.title }}</span
+          >
+        }
+        @if (shown.extra > 0) {
+          <span class="more">+{{ shown.extra }}</span>
+        }
+      </button>
+    }
+  </div>
 
-    <section id="day-agenda" class="agenda" [attr.aria-label]="formatDate(selected())">
-      <h2>{{ formatDate(selected()) }}</h2>
-      @if (eventsOn(selected()).length === 0 && tasksOn(selected()).length === 0) {
-        <p class="meta">Nothing on this day.</p>
-      }
-      @for (event of eventsOn(selected()); track event.id) {
-        <article class="panel entry" [attr.data-kind]="event.kind">
-          <div class="entry-line">
-            <h3>{{ event.title }}</h3>
-            <span class="chip" [class.accent]="event.kind === 'Milestone'">{{
-              labelFor(eventKinds, event.kind)
-            }}</span>
-          </div>
-          @if (event.kind === 'Appointment') {
-            <p class="meta">{{ timeLabel(event) }}</p>
-          }
-          @if (event.location) {
-            <p class="meta">{{ event.location }}</p>
-          }
-          @if (deletingId() === event.id) {
-            <p class="meta">Delete this event? The tasks stay.</p>
-            <div class="actions">
-              <button
-                matButton="outlined"
-                type="button"
-                [disabled]="saving()"
-                (click)="remove(event)"
-              >
-                Delete event
-              </button>
-              <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
-            </div>
-          } @else {
-            <div class="actions">
-              <button matButton type="button" (click)="startEdit(event)">Edit</button>
-              <button matButton type="button" (click)="deletingId.set(event.id)">Delete</button>
-            </div>
-          }
-        </article>
-      }
-      @for (task of tasksOn(selected()); track task.taskId) {
-        <article class="panel entry" data-kind="task">
-          <div class="entry-line">
-            <h3>{{ task.title }}</h3>
-            <span class="chip">Task due</span>
-          </div>
+  @if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  <section id="day-agenda" class="agenda" [attr.aria-label]="formatDate(selected())">
+    <h2>{{ formatDate(selected()) }}</h2>
+    @if (eventsOn(selected()).length === 0 && tasksOn(selected()).length === 0) {
+      <p class="meta">Nothing on this day.</p>
+    }
+    @for (event of eventsOn(selected()); track event.id) {
+      <article class="panel entry" [attr.data-kind]="event.kind">
+        <div class="entry-line">
+          <h3>{{ event.title }}</h3>
+          <span class="chip" [class.accent]="event.kind === 'Milestone'">{{
+            labelFor(eventKinds, event.kind)
+          }}</span>
+        </div>
+        @if (event.kind === 'Appointment') {
+          <p class="meta">{{ timeLabel(event) }}</p>
+        }
+        @if (event.location) {
+          <p class="meta">{{ event.location }}</p>
+        }
+        @if (deletingId() === event.id) {
+          <p class="meta">Delete this event? The tasks stay.</p>
           <div class="actions">
-            <a matButton [routerLink]="['/relocations', relocation.value().id]">Open tasks</a>
+            <button
+              matButton="outlined"
+              type="button"
+              [disabled]="saving()"
+              (click)="remove(event)"
+            >
+              Delete event
+            </button>
+            <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
           </div>
-        </article>
-      }
-    </section>
+        } @else {
+          <div class="actions">
+            <button matButton type="button" (click)="startEdit(event)">Edit</button>
+            <button matButton type="button" (click)="deletingId.set(event.id)">Delete</button>
+          </div>
+        }
+      </article>
+    }
+    @for (task of tasksOn(selected()); track task.taskId) {
+      <article class="panel entry" data-kind="task">
+        <div class="entry-line">
+          <h3>{{ task.title }}</h3>
+          <span class="chip">Task due</span>
+        </div>
+        <div class="actions">
+          <a matButton [routerLink]="['/relocations', relocation.value().id]">Open tasks</a>
+        </div>
+      </article>
+    }
+  </section>
 
-    @if ((adding() || editingId()) && draft(); as form) {
-      <div class="backdrop">
-        <button type="button" class="scrim" aria-label="Close" (click)="closeDialog()"></button>
-        <form
-          class="panel event-dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="event-dialog-title"
-          (keydown.escape)="closeDialog()"
-          (submit)="save(); $event.preventDefault()"
-        >
-          <h2 id="event-dialog-title">{{ editingId() ? 'Edit event' : 'Add event' }}</h2>
+  @if ((adding() || editingId()) && draft(); as form) {
+    <div class="backdrop">
+      <button type="button" class="scrim" aria-label="Close" (click)="closeDialog()"></button>
+      <form
+        class="panel event-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="event-dialog-title"
+        (keydown.escape)="closeDialog()"
+        (submit)="save(); $event.preventDefault()"
+      >
+        <h2 id="event-dialog-title">{{ editingId() ? 'Edit event' : 'Add event' }}</h2>
+        <label class="field">
+          <span>Kind</span>
+          <select id="event-kind" [value]="form.kind" (change)="updateKind(value($event))">
+            @for (option of eventKinds; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Title <span class="required" aria-hidden="true">*</span></span>
+          <input
+            id="event-title"
+            aria-required="true"
+            maxlength="200"
+            [value]="form.title"
+            (input)="updateDraft('title', value($event))"
+          />
+        </label>
+        @if (form.kind === 'Milestone') {
           <label class="field">
-            <span>Kind</span>
-            <select id="event-kind" [value]="form.kind" (change)="updateKind(value($event))">
-              @for (option of eventKinds; track option.value) {
-                <option [value]="option.value">{{ option.label }}</option>
-              }
-            </select>
-          </label>
-          <label class="field">
-            <span>Title <span class="required" aria-hidden="true">*</span></span>
+            <span>Date <span class="required" aria-hidden="true">*</span></span>
             <input
-              id="event-title"
+              id="event-date"
+              type="date"
               aria-required="true"
-              maxlength="200"
-              [value]="form.title"
-              (input)="updateDraft('title', value($event))"
+              [value]="form.occursOn"
+              (input)="updateDraft('occursOn', value($event))"
             />
           </label>
-          @if (form.kind === 'Milestone') {
+        } @else {
+          <div class="place">
             <label class="field">
-              <span>Date <span class="required" aria-hidden="true">*</span></span>
+              <span>Starts <span class="required" aria-hidden="true">*</span></span>
               <input
-                id="event-date"
-                type="date"
+                id="event-start"
+                type="datetime-local"
                 aria-required="true"
-                [value]="form.occursOn"
-                (input)="updateDraft('occursOn', value($event))"
+                [value]="form.startsAt"
+                (input)="updateDraft('startsAt', value($event))"
               />
             </label>
-          } @else {
-            <div class="place">
-              <label class="field">
-                <span>Starts <span class="required" aria-hidden="true">*</span></span>
-                <input
-                  id="event-start"
-                  type="datetime-local"
-                  aria-required="true"
-                  [value]="form.startsAt"
-                  (input)="updateDraft('startsAt', value($event))"
-                />
-              </label>
-              <label class="field">
-                Ends
-                <input
-                  id="event-end"
-                  type="datetime-local"
-                  [value]="form.endsAt"
-                  (input)="updateDraft('endsAt', value($event))"
-                />
-              </label>
-            </div>
-          }
-          <label class="field">
-            Location
-            <input
-              id="event-location"
-              maxlength="200"
-              [value]="form.location"
-              (input)="updateDraft('location', value($event))"
-            />
-          </label>
-          @if (formError(); as message) {
-            <p class="error-text" role="alert">{{ message }}</p>
-          }
-          <div class="actions">
-            <button matButton="filled" type="submit" [disabled]="saving()">Save event</button>
-            <button matButton type="button" (click)="closeDialog()">Cancel</button>
+            <label class="field">
+              Ends
+              <input
+                id="event-end"
+                type="datetime-local"
+                [value]="form.endsAt"
+                (input)="updateDraft('endsAt', value($event))"
+              />
+            </label>
           </div>
-        </form>
-      </div>
-    }
-  </app-relocation-tabs>
+        }
+        <label class="field">
+          Location
+          <input
+            id="event-location"
+            maxlength="200"
+            [value]="form.location"
+            (input)="updateDraft('location', value($event))"
+          />
+        </label>
+        @if (formError(); as message) {
+          <p class="error-text" role="alert">{{ message }}</p>
+        }
+        <div class="actions">
+          <button matButton="filled" type="submit" [disabled]="saving()">Save event</button>
+          <button matButton type="button" (click)="closeDialog()">Cancel</button>
+        </div>
+      </form>
+    </div>
+  }
 } @else {
   <p class="page-lead">Loading calendar…</p>
 }

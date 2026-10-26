@@ -1,13 +1,11 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, inject, resource, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import type { BudgetCategoryResponse, BudgetResponse } from '../api/generated';
 import { ReloviaClient } from '../api/relovia-client';
 import { asCount, formatDate } from '../relocations/dates';
-import { RelocationTabs } from '../relocations/relocation-tabs';
+import { relocationId } from '../relocations/relocation-id';
 import { failureMessage } from './api-failure';
 import { ExpenseSection } from './expense-section';
 import { currencies, formatMoney, parseAmount, spentPercent, toAmount } from './money';
@@ -31,7 +29,7 @@ interface ConfirmDelete {
 
 @Component({
   selector: 'app-budget-page',
-  imports: [ExpenseSection, MatButton, NgTemplateOutlet, RelocationTabs, RouterLink],
+  imports: [ExpenseSection, MatButton, NgTemplateOutlet, RouterLink],
   templateUrl: './budget-page.html',
   styleUrl: './budget-page.scss',
 })
@@ -47,9 +45,7 @@ export class BudgetPage {
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
 
-  protected readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
-  );
+  protected readonly id = relocationId();
 
   protected readonly relocation = resource({
     params: () => this.id(),

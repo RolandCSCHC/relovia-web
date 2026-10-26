@@ -1,14 +1,12 @@
 import { Component, inject, resource, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButton } from '@angular/material/button';
-import { ActivatedRoute, RouterLink } from '@angular/router';
-import { map } from 'rxjs';
+import { RouterLink } from '@angular/router';
 import type { DocumentCategory, DocumentResponse, RelocationTaskResponse } from '../api/generated';
 import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { formatDate } from '../relocations/dates';
 import { labelFor } from '../relocations/labels';
-import { RelocationTabs } from '../relocations/relocation-tabs';
+import { relocationId } from '../relocations/relocation-id';
 import { documentFileProblem, formatBytes, isExpired } from './file-rules';
 import { documentCategories } from './labels';
 
@@ -24,7 +22,7 @@ interface UploadDraft extends DocumentDraft {
 
 @Component({
   selector: 'app-documents-page',
-  imports: [MatButton, RelocationTabs, RouterLink],
+  imports: [MatButton, RouterLink],
   templateUrl: './documents-page.html',
   styleUrl: './documents-page.scss',
 })
@@ -45,9 +43,7 @@ export class DocumentsPage {
   protected readonly error = signal<string | null>(null);
   protected readonly saving = signal(false);
 
-  protected readonly id = toSignal(
-    inject(ActivatedRoute).paramMap.pipe(map((params) => params.get('id') ?? undefined)),
-  );
+  protected readonly id = relocationId();
 
   protected readonly relocation = resource({
     params: () => this.id(),
