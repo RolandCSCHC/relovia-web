@@ -36,6 +36,7 @@ describe('App', () => {
     );
     expect(compiled.querySelector('[aria-label="Switch to dark theme"]')).not.toBeNull();
     expect(compiled.textContent).not.toContain('Sign out');
+    expect(compiled.querySelector('.topbar')?.textContent).not.toContain('Relocations');
     expect(compiled.textContent).not.toContain('Notifications');
     TestBed.inject(HttpTestingController).expectNone(`${apiOrigin}/api/notifications`);
   });
@@ -84,7 +85,15 @@ describe('App', () => {
     await fixture.whenStable();
     fixture.detectChanges();
 
-    const link = fixture.nativeElement.querySelector('a[href="/notifications"]') as HTMLElement;
+    const topbar = fixture.nativeElement.querySelector('.topbar') as HTMLElement;
+    const relocations = [...topbar.querySelectorAll('a')].find((link) =>
+      link.textContent?.includes('Relocations'),
+    );
+    const link = topbar.querySelector('a[href="/notifications"]') as HTMLElement;
+    expect(relocations).toBeTruthy();
+    expect(relocations!.compareDocumentPosition(link) & Node.DOCUMENT_POSITION_FOLLOWING).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING,
+    );
     expect(link.textContent).toContain('Notifications');
     expect(link.querySelector('.unread')?.textContent?.trim()).toBe('1');
     expect(link.getAttribute('aria-label')).toBe('Notifications, 1 unread');

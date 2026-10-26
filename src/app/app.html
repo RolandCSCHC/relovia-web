@@ -18,6 +18,7 @@
     </a>
     <span class="spacer"></span>
     @if (session.user(); as user) {
+      <a matButton routerLink="/">Relocations</a>
       <a matButton routerLink="/notifications" [attr.aria-label]="notificationsLabel()">
         Notifications
         @if (unreadCount() > 0) {
