@@ -1,0 +1,196 @@
+@if (relocation.error() || applications.error()) {
+  <h1 class="page-title">Applications</h1>
+  <p class="error-text">
+    {{ relocation.error()?.message ?? applications.error()?.message }}
+  </p>
+  <a matButton routerLink="/">Back to relocations</a>
+} @else if (relocation.hasValue() && applications.hasValue()) {
+  <div class="heading-row">
+    <div>
+      <h1 class="page-title">Applications</h1>
+      <p class="page-lead">{{ relocation.value().name }}</p>
+    </div>
+    <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id]"
+      >Back to relocation</a
+    >
+  </div>
+  <p class="meta summary">
+    Roles you have applied for. You type each one. A next date is not added to the calendar.
+  </p>
+  @if (!relocation.value().isInternational) {
+    <p class="meta summary">Job applications are for an international move.</p>
+  }
+
+  @if (relocation.value().isInternational) {
+    <div class="toolbar">
+      <button matButton="outlined" type="button" (click)="startAdd()">Add application</button>
+    </div>
+  }
+
+  @if (adding() || editingId()) {
+    @if (draft(); as form) {
+      <div class="backdrop">
+        <button type="button" class="scrim" aria-label="Close" (click)="closeDialog()"></button>
+        <form
+          class="panel dialog"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="application-dialog-title"
+          (keydown.escape)="closeDialog()"
+          (submit)="save(); $event.preventDefault()"
+        >
+          <h2 id="application-dialog-title">
+            {{ editingId() ? 'Edit application' : 'Add application' }}
+          </h2>
+          <div class="place">
+            <label class="field">
+              <span>Employer <span class="required" aria-hidden="true">*</span></span>
+              <input
+                id="application-employer"
+                aria-required="true"
+                [value]="form.employer"
+                maxlength="200"
+                (input)="updateDraft('employer', value($event))"
+              />
+            </label>
+            <label class="field">
+              <span>Role <span class="required" aria-hidden="true">*</span></span>
+              <input
+                id="application-role"
+                aria-required="true"
+                [value]="form.role"
+                maxlength="200"
+                (input)="updateDraft('role', value($event))"
+              />
+            </label>
+          </div>
+          <label class="field">
+            Location
+            <input
+              id="application-location"
+              [value]="form.location"
+              maxlength="200"
+              (input)="updateDraft('location', value($event))"
+            />
+          </label>
+          <div class="place">
+            <label class="field">
+              Applied
+              <input
+                id="application-applied"
+                type="date"
+                [value]="form.appliedOn"
+                (input)="updateDraft('appliedOn', value($event))"
+              />
+            </label>
+            <label class="field">
+              Next date
+              <input
+                id="application-next"
+                type="date"
+                [value]="form.nextOn"
+                (input)="updateDraft('nextOn', value($event))"
+              />
+            </label>
+          </div>
+          <div class="place">
+            <label class="field">
+              <span>Status <span class="required" aria-hidden="true">*</span></span>
+              <select
+                id="application-status"
+                aria-required="true"
+                [value]="form.status"
+                (change)="updateChoice('status', value($event))"
+              >
+                @for (option of applicationStatuses; track option.value) {
+                  <option [value]="option.value">{{ option.label }}</option>
+                }
+              </select>
+            </label>
+            <label class="field">
+              Visa or relocation support
+              <select
+                id="application-support"
+                [value]="form.includesSupport"
+                (change)="updateChoice('includesSupport', value($event))"
+              >
+                <option value="">Not sure</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
+              </select>
+            </label>
+          </div>
+          <label class="field">
+            Notes
+            <textarea
+              id="application-notes"
+              rows="3"
+              maxlength="1000"
+              [value]="form.notes"
+              (input)="updateDraft('notes', value($event))"
+            ></textarea>
+          </label>
+          @if (formError(); as message) {
+            <p class="error-text" role="alert">{{ message }}</p>
+          }
+          <div class="actions">
+            <button matButton="filled" type="submit" [disabled]="saving()">Save</button>
+            <button matButton type="button" (click)="closeDialog()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    }
+  }
+
+  @if (error(); as message) {
+    <p class="error-text" role="alert">{{ message }}</p>
+  }
+
+  @if (applications.value().length === 0) {
+    @if (relocation.value().isInternational) {
+      <div class="panel empty">
+        <p class="meta">No applications yet.</p>
+      </div>
+    }
+  } @else {
+    <ol class="stack">
+      @for (application of applications.value(); track application.id) {
+        <li class="panel option" [attr.data-status]="application.status">
+          <div class="option-line">
+            <h2>{{ application.employer }}</h2>
+            <span
+              class="chip"
+              [class.strong]="application.status === 'Offer' || application.status === 'Accepted'"
+            >
+              {{ labelFor(applicationStatuses, application.status) }}
+            </span>
+          </div>
+          @for (line of facts(application); track line) {
+            <p class="meta">{{ line }}</p>
+          }
+          @if (deletingId() === application.id) {
+            <p class="meta">Delete this application?</p>
+            <div class="actions">
+              <button
+                matButton="outlined"
+                type="button"
+                [disabled]="saving()"
+                (click)="remove(application)"
+              >
+                Delete application
+              </button>
+              <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+            </div>
+          } @else {
+            <div class="actions">
+              <button matButton type="button" (click)="startEdit(application)">Edit</button>
+              <button matButton type="button" (click)="deletingId.set(application.id)">
+                Delete
+              </button>
+            </div>
+          }
+        </li>
+      }
+    </ol>
+  }
+}

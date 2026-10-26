@@ -1,0 +1,60 @@
+.summary,
+.toolbar,
+.empty {
+  margin-top: var(--space-4);
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  background: color-mix(in srgb, var(--mat-sys-on-surface) 32%, transparent);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 40rem);
+  max-height: min(100%, 42rem);
+  overflow: auto;
+}
+
+.dialog h2 {
+  margin: 0;
+  font: var(--mat-sys-title-large);
+}
+
+.option-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.option-line h2 {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  overflow-wrap: anywhere;
+}
+
+.option[data-status='Chosen'] {
+  border-left: 0.4rem solid var(--mat-sys-primary);
+}
