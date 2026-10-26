@@ -7,6 +7,7 @@ import { map } from 'rxjs';
 import type { BudgetCategoryResponse, BudgetResponse } from '../api/generated';
 import { ReloviaClient } from '../api/relovia-client';
 import { asCount, formatDate } from '../relocations/dates';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import { failureMessage } from './api-failure';
 import { ExpenseSection } from './expense-section';
 import { currencies, formatMoney, parseAmount, spentPercent, toAmount } from './money';
@@ -30,7 +31,7 @@ interface ConfirmDelete {
 
 @Component({
   selector: 'app-budget-page',
-  imports: [MatButton, NgTemplateOutlet, RouterLink, ExpenseSection],
+  imports: [ExpenseSection, MatButton, NgTemplateOutlet, RelocationTabs, RouterLink],
   templateUrl: './budget-page.html',
   styleUrl: './budget-page.scss',
 })

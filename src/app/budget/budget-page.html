@@ -12,363 +12,364 @@
       <h1 class="page-title">Budget</h1>
       <p class="page-lead">{{ relocation.value().name }}</p>
     </div>
-    <div class="actions">
-      <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id]"
-        >Back to relocation</a
-      >
-    </div>
   </div>
-
-  @if (currency === null || currencyEditor()) {
-    <form class="panel fields section" (submit)="saveCurrency(); $event.preventDefault()">
-      <h2 class="panel-title">
-        {{ currency === null ? 'Set up your budget' : 'Change the budget currency' }}
-      </h2>
-      <p class="meta">
-        Totals are shown in this currency. You can enter estimates and expenses in any currency;
-        they are converted with the latest exchange rates, and the original amounts are kept.
-      </p>
-      <label class="field">
-        <span>Budget currency <span class="required" aria-hidden="true">*</span></span>
-        <select id="budget-currency" aria-required="true" (change)="setCode(value($event))">
-          <option value="" [selected]="!currencyEditor()?.code">Choose a currency</option>
-          @for (option of currencies; track option.code) {
-            <option [value]="option.code" [selected]="option.code === currencyEditor()?.code">
-              {{ option.label }}
-            </option>
+  <app-relocation-tabs
+    [relocationId]="relocation.value().id"
+    [international]="relocation.value().isInternational"
+  >
+    @if (currency === null || currencyEditor()) {
+      <form class="panel fields section" (submit)="saveCurrency(); $event.preventDefault()">
+        <h2 class="panel-title">
+          {{ currency === null ? 'Set up your budget' : 'Change the budget currency' }}
+        </h2>
+        <p class="meta">
+          Totals are shown in this currency. You can enter estimates and expenses in any currency;
+          they are converted with the latest exchange rates, and the original amounts are kept.
+        </p>
+        <label class="field">
+          <span>Budget currency <span class="required" aria-hidden="true">*</span></span>
+          <select id="budget-currency" aria-required="true" (change)="setCode(value($event))">
+            <option value="" [selected]="!currencyEditor()?.code">Choose a currency</option>
+            @for (option of currencies; track option.code) {
+              <option [value]="option.code" [selected]="option.code === currencyEditor()?.code">
+                {{ option.label }}
+              </option>
+            }
+          </select>
+        </label>
+        @if (error(); as message) {
+          <p class="error-text" role="alert">{{ message }}</p>
+        }
+        <div class="actions">
+          <button matButton="filled" type="submit" [disabled]="saving()">Save currency</button>
+          @if (currency !== null) {
+            <button matButton type="button" (click)="close()">Cancel</button>
           }
-        </select>
-      </label>
-      @if (error(); as message) {
-        <p class="error-text" role="alert">{{ message }}</p>
-      }
-      <div class="actions">
-        <button matButton="filled" type="submit" [disabled]="saving()">Save currency</button>
-        @if (currency !== null) {
-          <button matButton type="button" (click)="close()">Cancel</button>
-        }
-      </div>
-    </form>
-  }
-
-  @if (currency !== null) {
-    <section class="panel section summary" aria-label="Budget summary">
-      <div class="figures">
-        <div class="figure">
-          <span class="meta">Estimated</span>
-          <strong>{{ formatMoney(data.totals.estimated, currency) }}</strong>
         </div>
-        <div class="figure">
-          <span class="meta">Spent</span>
-          <strong>{{ formatMoney(data.totals.actual, currency) }}</strong>
-        </div>
-        <div class="figure" [class.over]="isOver(data.totals)">
-          <span class="meta">Remaining</span>
-          <strong>{{ remainingLabel(data.totals.remaining, currency) }}</strong>
-        </div>
-      </div>
-      <div
-        class="meter"
-        role="progressbar"
-        aria-label="Share of the estimate spent"
-        aria-valuemin="0"
-        aria-valuemax="100"
-        [attr.aria-valuenow]="spentPercent(data.totals.estimated, data.totals.actual)"
-      >
-        <span
-          class="meter-fill"
-          [style.width.%]="spentPercent(data.totals.estimated, data.totals.actual)"
-        ></span>
-      </div>
-      @if (data.ratesUnavailable) {
-        <p class="error-text" role="alert">
-          Exchange rates could not be loaded right now, so amounts in other currencies are not
-          counted. Try again in a moment.
-        </p>
-      }
-      @if (data.unconverted.length > 0) {
-        <p class="meta">
-          Not counted, because there is no exchange rate to {{ currency }}:
-          {{ unconvertedNote(data) }}.
-        </p>
-      }
-      @if (data.ratesAsOf; as asOf) {
-        <p class="meta">
-          Amounts in other currencies use the rates of {{ formatDate(asOf.slice(0, 10)) }}.
-        </p>
-      }
-      <div class="actions">
-        <span class="meta">Budget currency: {{ currency }}</span>
-        @if (!currencyEditor()) {
-          <button matButton type="button" (click)="openCurrency(data)">Change currency</button>
-        }
-      </div>
-    </section>
-
-    @if (error() && !editor()) {
-      <p class="error-text section" role="alert">{{ error() }}</p>
+      </form>
     }
 
-    <ul class="stack categories">
-      @for (category of data.categories; track category.id) {
-        <li class="panel category">
-          <div class="category-line">
-            @if (categoryEditor()?.id === category.id) {
-              <form class="inline-form" (submit)="saveCategory(); $event.preventDefault()">
-                <label class="field">
-                  Category name
-                  <input
-                    maxlength="100"
-                    [value]="categoryEditor()?.name"
-                    (input)="setName(value($event))"
-                  />
-                </label>
-                @if (error(); as message) {
-                  <p class="error-text" role="alert">{{ message }}</p>
-                }
+    @if (currency !== null) {
+      <section class="panel section summary" aria-label="Budget summary">
+        <div class="figures">
+          <div class="figure">
+            <span class="meta">Estimated</span>
+            <strong>{{ formatMoney(data.totals.estimated, currency) }}</strong>
+          </div>
+          <div class="figure">
+            <span class="meta">Spent</span>
+            <strong>{{ formatMoney(data.totals.actual, currency) }}</strong>
+          </div>
+          <div class="figure" [class.over]="isOver(data.totals)">
+            <span class="meta">Remaining</span>
+            <strong>{{ remainingLabel(data.totals.remaining, currency) }}</strong>
+          </div>
+        </div>
+        <div
+          class="meter"
+          role="progressbar"
+          aria-label="Share of the estimate spent"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          [attr.aria-valuenow]="spentPercent(data.totals.estimated, data.totals.actual)"
+        >
+          <span
+            class="meter-fill"
+            [style.width.%]="spentPercent(data.totals.estimated, data.totals.actual)"
+          ></span>
+        </div>
+        @if (data.ratesUnavailable) {
+          <p class="error-text" role="alert">
+            Exchange rates could not be loaded right now, so amounts in other currencies are not
+            counted. Try again in a moment.
+          </p>
+        }
+        @if (data.unconverted.length > 0) {
+          <p class="meta">
+            Not counted, because there is no exchange rate to {{ currency }}:
+            {{ unconvertedNote(data) }}.
+          </p>
+        }
+        @if (data.ratesAsOf; as asOf) {
+          <p class="meta">
+            Amounts in other currencies use the rates of {{ formatDate(asOf.slice(0, 10)) }}.
+          </p>
+        }
+        <div class="actions">
+          <span class="meta">Budget currency: {{ currency }}</span>
+          @if (!currencyEditor()) {
+            <button matButton type="button" (click)="openCurrency(data)">Change currency</button>
+          }
+        </div>
+      </section>
+
+      @if (error() && !editor()) {
+        <p class="error-text section" role="alert">{{ error() }}</p>
+      }
+
+      <ul class="stack categories">
+        @for (category of data.categories; track category.id) {
+          <li class="panel category">
+            <div class="category-line">
+              @if (categoryEditor()?.id === category.id) {
+                <form class="inline-form" (submit)="saveCategory(); $event.preventDefault()">
+                  <label class="field">
+                    Category name
+                    <input
+                      maxlength="100"
+                      [value]="categoryEditor()?.name"
+                      (input)="setName(value($event))"
+                    />
+                  </label>
+                  @if (error(); as message) {
+                    <p class="error-text" role="alert">{{ message }}</p>
+                  }
+                  <div class="actions">
+                    <button matButton="filled" type="submit" [disabled]="saving()">
+                      Save name
+                    </button>
+                    <button matButton type="button" (click)="close()">Cancel</button>
+                  </div>
+                </form>
+              } @else {
+                <h2>{{ category.name }}</h2>
                 <div class="actions">
-                  <button matButton="filled" type="submit" [disabled]="saving()">Save name</button>
-                  <button matButton type="button" (click)="close()">Cancel</button>
+                  <button
+                    matButton
+                    type="button"
+                    [attr.aria-label]="'Rename ' + category.name"
+                    (click)="open({ kind: 'category', id: category.id, name: category.name })"
+                  >
+                    Rename
+                  </button>
+                  <button
+                    matButton
+                    type="button"
+                    [attr.aria-label]="'Delete ' + category.name"
+                    (click)="askDelete('category', category.id)"
+                  >
+                    Delete
+                  </button>
                 </div>
-              </form>
-            } @else {
-              <h2>{{ category.name }}</h2>
+              }
+            </div>
+
+            @if (isConfirming('category', category.id)) {
+              <p class="meta">Delete this category and its estimates?</p>
               <div class="actions">
                 <button
-                  matButton
+                  matButton="outlined"
                   type="button"
-                  [attr.aria-label]="'Rename ' + category.name"
-                  (click)="open({ kind: 'category', id: category.id, name: category.name })"
+                  [disabled]="saving()"
+                  (click)="removeCategory(category)"
                 >
-                  Rename
+                  Delete category
                 </button>
+                <button matButton type="button" (click)="confirmDelete.set(null)">Cancel</button>
+              </div>
+            }
+
+            <p class="meta category-figures">
+              Estimated {{ formatMoney(category.estimated, currency) }} · Spent
+              {{ formatMoney(category.actual, currency) }} ·
+              <span [class.over-text]="isOver(category)">{{
+                remainingLabel(category.remaining, currency)
+              }}</span>
+            </p>
+            <div
+              class="meter"
+              role="progressbar"
+              [attr.aria-label]="'Share of the ' + category.name + ' estimate spent'"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="spentPercent(category.estimated, category.actual)"
+            >
+              <span
+                class="meter-fill"
+                [class.over-fill]="isOver(category)"
+                [style.width.%]="spentPercent(category.estimated, category.actual)"
+              ></span>
+            </div>
+
+            @if (category.estimates.length > 0) {
+              <ul class="estimates">
+                @for (estimate of category.estimates; track estimate.id) {
+                  <li class="estimate">
+                    @if (estimateEditor()?.id === estimate.id) {
+                      <ng-container
+                        [ngTemplateOutlet]="estimateForm"
+                        [ngTemplateOutletContext]="{ category: category }"
+                      />
+                    } @else {
+                      <span>{{ estimate.label }}</span>
+                      <span class="estimate-amount">
+                        <strong class="amount">{{
+                          formatMoney(estimate.amount, estimate.currencyCode, { exact: true })
+                        }}</strong>
+                        @if (converted(estimate, currency); as note) {
+                          <span class="meta">{{ note }}</span>
+                        }
+                      </span>
+                      @if (isConfirming('estimate', estimate.id)) {
+                        <span class="actions">
+                          <button
+                            matButton="outlined"
+                            type="button"
+                            [disabled]="saving()"
+                            (click)="removeEstimate(estimate.id)"
+                          >
+                            Delete estimate
+                          </button>
+                          <button matButton type="button" (click)="confirmDelete.set(null)">
+                            Cancel
+                          </button>
+                        </span>
+                      } @else {
+                        <span class="actions">
+                          <button
+                            matButton
+                            type="button"
+                            [attr.aria-label]="'Edit ' + estimate.label"
+                            (click)="openEstimate(category, estimate.id, data)"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            matButton
+                            type="button"
+                            [attr.aria-label]="'Delete ' + estimate.label"
+                            (click)="askDelete('estimate', estimate.id)"
+                          >
+                            Delete
+                          </button>
+                        </span>
+                      }
+                    }
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (category.shopping.length > 0) {
+              <p class="meta">To buy</p>
+              <ul class="estimates">
+                @for (line of category.shopping; track line.itemId) {
+                  <li class="estimate">
+                    <span>{{ line.name }}</span>
+                    <span class="estimate-amount">
+                      @if (line.estimatedPrice !== null) {
+                        <span
+                          >Estimate
+                          {{
+                            formatMoney(line.estimatedPrice, line.currencyCode, { exact: true })
+                          }}</span
+                        >
+                        @if (
+                          converted(
+                            {
+                              currencyCode: line.currencyCode,
+                              convertedAmount: line.convertedEstimated,
+                            },
+                            currency
+                          );
+                          as note
+                        ) {
+                          <span class="meta">{{ note }}</span>
+                        }
+                      }
+                      @if (line.actualPrice !== null) {
+                        <span
+                          >Paid
+                          {{
+                            formatMoney(line.actualPrice, line.currencyCode, { exact: true })
+                          }}</span
+                        >
+                        @if (
+                          converted(
+                            {
+                              currencyCode: line.currencyCode,
+                              convertedAmount: line.convertedActual,
+                            },
+                            currency
+                          );
+                          as note
+                        ) {
+                          <span class="meta">{{ note }}</span>
+                        }
+                      }
+                    </span>
+                  </li>
+                }
+              </ul>
+            }
+
+            @if (estimateEditor(); as form) {
+              @if (form.id === null && form.categoryId === category.id) {
+                <ng-container
+                  [ngTemplateOutlet]="estimateForm"
+                  [ngTemplateOutletContext]="{ category: category }"
+                />
+              }
+            }
+            @if (estimateEditor()?.id !== null || estimateEditor()?.categoryId !== category.id) {
+              <div class="actions">
                 <button
-                  matButton
+                  matButton="outlined"
                   type="button"
-                  [attr.aria-label]="'Delete ' + category.name"
-                  (click)="askDelete('category', category.id)"
+                  [attr.aria-label]="'Add estimate to ' + category.name"
+                  (click)="openEstimate(category, null, data)"
                 >
-                  Delete
+                  Add estimate
                 </button>
               </div>
             }
-          </div>
+          </li>
+        }
+      </ul>
 
-          @if (isConfirming('category', category.id)) {
-            <p class="meta">Delete this category and its estimates?</p>
-            <div class="actions">
-              <button
-                matButton="outlined"
-                type="button"
-                [disabled]="saving()"
-                (click)="removeCategory(category)"
-              >
-                Delete category
-              </button>
-              <button matButton type="button" (click)="confirmDelete.set(null)">Cancel</button>
-            </div>
-          }
-
-          <p class="meta category-figures">
-            Estimated {{ formatMoney(category.estimated, currency) }} · Spent
-            {{ formatMoney(category.actual, currency) }} ·
-            <span [class.over-text]="isOver(category)">{{
-              remainingLabel(category.remaining, currency)
-            }}</span>
-          </p>
-          <div
-            class="meter"
-            role="progressbar"
-            [attr.aria-label]="'Share of the ' + category.name + ' estimate spent'"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            [attr.aria-valuenow]="spentPercent(category.estimated, category.actual)"
-          >
-            <span
-              class="meter-fill"
-              [class.over-fill]="isOver(category)"
-              [style.width.%]="spentPercent(category.estimated, category.actual)"
-            ></span>
-          </div>
-
-          @if (category.estimates.length > 0) {
-            <ul class="estimates">
-              @for (estimate of category.estimates; track estimate.id) {
-                <li class="estimate">
-                  @if (estimateEditor()?.id === estimate.id) {
-                    <ng-container
-                      [ngTemplateOutlet]="estimateForm"
-                      [ngTemplateOutletContext]="{ category: category }"
-                    />
-                  } @else {
-                    <span>{{ estimate.label }}</span>
-                    <span class="estimate-amount">
-                      <strong class="amount">{{
-                        formatMoney(estimate.amount, estimate.currencyCode, { exact: true })
-                      }}</strong>
-                      @if (converted(estimate, currency); as note) {
-                        <span class="meta">{{ note }}</span>
-                      }
-                    </span>
-                    @if (isConfirming('estimate', estimate.id)) {
-                      <span class="actions">
-                        <button
-                          matButton="outlined"
-                          type="button"
-                          [disabled]="saving()"
-                          (click)="removeEstimate(estimate.id)"
-                        >
-                          Delete estimate
-                        </button>
-                        <button matButton type="button" (click)="confirmDelete.set(null)">
-                          Cancel
-                        </button>
-                      </span>
-                    } @else {
-                      <span class="actions">
-                        <button
-                          matButton
-                          type="button"
-                          [attr.aria-label]="'Edit ' + estimate.label"
-                          (click)="openEstimate(category, estimate.id, data)"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          matButton
-                          type="button"
-                          [attr.aria-label]="'Delete ' + estimate.label"
-                          (click)="askDelete('estimate', estimate.id)"
-                        >
-                          Delete
-                        </button>
-                      </span>
-                    }
-                  }
-                </li>
-              }
-            </ul>
-          }
-
-          @if (category.shopping.length > 0) {
-            <p class="meta">To buy</p>
-            <ul class="estimates">
-              @for (line of category.shopping; track line.itemId) {
-                <li class="estimate">
-                  <span>{{ line.name }}</span>
-                  <span class="estimate-amount">
-                    @if (line.estimatedPrice !== null) {
-                      <span
-                        >Estimate
-                        {{
-                          formatMoney(line.estimatedPrice, line.currencyCode, { exact: true })
-                        }}</span
-                      >
-                      @if (
-                        converted(
-                          {
-                            currencyCode: line.currencyCode,
-                            convertedAmount: line.convertedEstimated,
-                          },
-                          currency
-                        );
-                        as note
-                      ) {
-                        <span class="meta">{{ note }}</span>
-                      }
-                    }
-                    @if (line.actualPrice !== null) {
-                      <span
-                        >Paid
-                        {{
-                          formatMoney(line.actualPrice, line.currencyCode, { exact: true })
-                        }}</span
-                      >
-                      @if (
-                        converted(
-                          {
-                            currencyCode: line.currencyCode,
-                            convertedAmount: line.convertedActual,
-                          },
-                          currency
-                        );
-                        as note
-                      ) {
-                        <span class="meta">{{ note }}</span>
-                      }
-                    }
-                  </span>
-                </li>
-              }
-            </ul>
-          }
-
-          @if (estimateEditor(); as form) {
-            @if (form.id === null && form.categoryId === category.id) {
-              <ng-container
-                [ngTemplateOutlet]="estimateForm"
-                [ngTemplateOutletContext]="{ category: category }"
+      @if (categoryEditor(); as form) {
+        @if (form.id === null) {
+          <form class="panel fields section" (submit)="saveCategory(); $event.preventDefault()">
+            <label class="field">
+              <span>Category name <span class="required" aria-hidden="true">*</span></span>
+              <input
+                id="new-category-name"
+                aria-required="true"
+                maxlength="100"
+                [value]="form.name"
+                (input)="setName(value($event))"
               />
+            </label>
+            @if (error(); as message) {
+              <p class="error-text" role="alert">{{ message }}</p>
             }
-          }
-          @if (estimateEditor()?.id !== null || estimateEditor()?.categoryId !== category.id) {
             <div class="actions">
-              <button
-                matButton="outlined"
-                type="button"
-                [attr.aria-label]="'Add estimate to ' + category.name"
-                (click)="openEstimate(category, null, data)"
-              >
-                Add estimate
-              </button>
+              <button matButton="filled" type="submit" [disabled]="saving()">Save category</button>
+              <button matButton type="button" (click)="close()">Cancel</button>
             </div>
-          }
-        </li>
+          </form>
+        }
+      } @else {
+        <div class="actions section">
+          <button
+            matButton="outlined"
+            type="button"
+            (click)="open({ kind: 'category', id: null, name: '' })"
+          >
+            Add category
+          </button>
+        </div>
       }
-    </ul>
 
-    @if (categoryEditor(); as form) {
-      @if (form.id === null) {
-        <form class="panel fields section" (submit)="saveCategory(); $event.preventDefault()">
-          <label class="field">
-            <span>Category name <span class="required" aria-hidden="true">*</span></span>
-            <input
-              id="new-category-name"
-              aria-required="true"
-              maxlength="100"
-              [value]="form.name"
-              (input)="setName(value($event))"
-            />
-          </label>
-          @if (error(); as message) {
-            <p class="error-text" role="alert">{{ message }}</p>
-          }
-          <div class="actions">
-            <button matButton="filled" type="submit" [disabled]="saving()">Save category</button>
-            <button matButton type="button" (click)="close()">Cancel</button>
-          </div>
-        </form>
-      }
-    } @else {
-      <div class="actions section">
-        <button
-          matButton="outlined"
-          type="button"
-          (click)="open({ kind: 'category', id: null, name: '' })"
-        >
-          Add category
-        </button>
-      </div>
+      <app-expense-section
+        class="section"
+        [relocationId]="relocation.value().id"
+        [budget]="data"
+        [tasks]="tasks.value()"
+        (changed)="budget.reload()"
+      />
     }
-
-    <app-expense-section
-      class="section"
-      [relocationId]="relocation.value().id"
-      [budget]="data"
-      [tasks]="tasks.value()"
-      (changed)="budget.reload()"
-    />
-  }
+  </app-relocation-tabs>
 } @else {
   <p class="page-lead">Loading budget…</p>
 }

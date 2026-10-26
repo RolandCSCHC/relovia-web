@@ -15,11 +15,12 @@ import { pdfFileName, savePdf } from '../export/file-name';
 import { countryName } from './countries';
 import { formatDate } from './dates';
 import { labelFor, phases, priorities, purposes, relocationStatuses, taskStatuses } from './labels';
+import { RelocationTabs } from './relocation-tabs';
 import { TaskProgress } from './task-progress';
 
 @Component({
   selector: 'app-relocation-page',
-  imports: [MatButton, RouterLink, TaskProgress],
+  imports: [MatButton, RelocationTabs, RouterLink, TaskProgress],
   templateUrl: './relocation-page.html',
   styleUrl: './relocation-page.scss',
 })

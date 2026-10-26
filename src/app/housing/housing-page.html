@@ -10,208 +10,210 @@
       <h1 class="page-title">Housing</h1>
       <p class="page-lead">{{ relocation.value().name }}</p>
     </div>
-    <a matButton="outlined" [routerLink]="['/relocations', relocation.value().id]"
-      >Back to relocation</a
-    >
   </div>
-  <p class="meta summary">
-    Homes you are comparing. You type each one. Choosing a home does not change the budget.
-  </p>
-  @if (!relocation.value().isInternational) {
-    <p class="meta summary">Housing comparison is for an international move.</p>
-  }
-
-  @if (relocation.value().isInternational) {
-    <div class="toolbar">
-      <button matButton="outlined" type="button" (click)="startAdd()">Add home</button>
-    </div>
-  }
-
-  @if (adding() || editingId()) {
-    @if (draft(); as form) {
-      <div class="backdrop">
-        <button type="button" class="scrim" aria-label="Close" (click)="closeDialog()"></button>
-        <form
-          class="panel dialog"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="housing-dialog-title"
-          (keydown.escape)="closeDialog()"
-          (submit)="save(); $event.preventDefault()"
-        >
-          <h2 id="housing-dialog-title">{{ editingId() ? 'Edit home' : 'Add home' }}</h2>
-          <label class="field">
-            <span>Name or address <span class="required" aria-hidden="true">*</span></span>
-            <input
-              id="housing-name"
-              aria-required="true"
-              [value]="form.name"
-              maxlength="200"
-              (input)="updateDraft('name', value($event))"
-            />
-          </label>
-          <div class="place">
-            <label class="field">
-              Area
-              <input
-                id="housing-area"
-                [value]="form.area"
-                maxlength="200"
-                (input)="updateDraft('area', value($event))"
-              />
-            </label>
-            <label class="field">
-              Size
-              <input
-                id="housing-size"
-                [value]="form.size"
-                maxlength="80"
-                (input)="updateDraft('size', value($event))"
-              />
-            </label>
-          </div>
-          <div class="place">
-            <label class="field">
-              Rent
-              <input
-                id="housing-rent"
-                type="number"
-                step="any"
-                min="0"
-                inputmode="decimal"
-                [value]="form.rent"
-                (input)="updateDraft('rent', value($event))"
-              />
-            </label>
-            <label class="field">
-              Deposit
-              <input
-                id="housing-deposit"
-                type="number"
-                step="any"
-                min="0"
-                inputmode="decimal"
-                [value]="form.deposit"
-                (input)="updateDraft('deposit', value($event))"
-              />
-            </label>
-            <label class="field">
-              Currency
-              <select
-                id="housing-currency"
-                [value]="form.currencyCode"
-                (change)="updateChoice('currencyCode', value($event))"
-              >
-                <option value="">None</option>
-                @for (currency of currencies; track currency.code) {
-                  <option [value]="currency.code">{{ currency.label }}</option>
-                }
-              </select>
-            </label>
-          </div>
-          <div class="place">
-            <label class="field">
-              Furnished
-              <select
-                id="housing-furnishing"
-                [value]="form.furnishing"
-                (change)="updateChoice('furnishing', value($event))"
-              >
-                <option value="">Not sure</option>
-                @for (option of furnishings; track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </select>
-            </label>
-            <label class="field">
-              Available
-              <input
-                id="housing-available"
-                type="date"
-                [value]="form.availableOn"
-                (input)="updateDraft('availableOn', value($event))"
-              />
-            </label>
-            <label class="field">
-              <span>Status <span class="required" aria-hidden="true">*</span></span>
-              <select
-                id="housing-status"
-                aria-required="true"
-                [value]="form.status"
-                (change)="updateChoice('status', value($event))"
-              >
-                @for (option of housingStatuses; track option.value) {
-                  <option [value]="option.value">{{ option.label }}</option>
-                }
-              </select>
-            </label>
-          </div>
-          <label class="field">
-            Notes
-            <textarea
-              id="housing-notes"
-              rows="3"
-              maxlength="1000"
-              [value]="form.notes"
-              (input)="updateDraft('notes', value($event))"
-            ></textarea>
-          </label>
-          @if (formError(); as message) {
-            <p class="error-text" role="alert">{{ message }}</p>
-          }
-          <div class="actions">
-            <button matButton="filled" type="submit" [disabled]="saving()">Save</button>
-            <button matButton type="button" (click)="closeDialog()">Cancel</button>
-          </div>
-        </form>
-      </div>
+  <app-relocation-tabs
+    [relocationId]="relocation.value().id"
+    [international]="relocation.value().isInternational"
+  >
+    <p class="meta summary">
+      Homes you are comparing. You type each one. Choosing a home does not change the budget.
+    </p>
+    @if (!relocation.value().isInternational) {
+      <p class="meta summary">Housing comparison is for an international move.</p>
     }
-  }
 
-  @if (error(); as message) {
-    <p class="error-text" role="alert">{{ message }}</p>
-  }
-
-  @if (homes.value().length === 0) {
     @if (relocation.value().isInternational) {
-      <div class="panel empty">
-        <p class="meta">No homes yet.</p>
+      <div class="toolbar">
+        <button matButton="outlined" type="button" (click)="startAdd()">Add home</button>
       </div>
     }
-  } @else {
-    <ol class="stack">
-      @for (home of homes.value(); track home.id) {
-        <li class="panel option" [attr.data-status]="home.status">
-          <div class="option-line">
-            <h2>{{ home.name }}</h2>
-            <span class="chip" [class.strong]="home.status === 'Chosen'">
-              {{ labelFor(housingStatuses, home.status) }}
-            </span>
-          </div>
-          @for (line of facts(home); track line) {
-            <p class="meta">{{ line }}</p>
-          }
-          @if (deletingId() === home.id) {
-            <p class="meta">Delete this home?</p>
-            <div class="actions">
-              <button
-                matButton="outlined"
-                type="button"
-                [disabled]="saving()"
-                (click)="remove(home)"
-              >
-                Delete home
-              </button>
-              <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+
+    @if (adding() || editingId()) {
+      @if (draft(); as form) {
+        <div class="backdrop">
+          <button type="button" class="scrim" aria-label="Close" (click)="closeDialog()"></button>
+          <form
+            class="panel dialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="housing-dialog-title"
+            (keydown.escape)="closeDialog()"
+            (submit)="save(); $event.preventDefault()"
+          >
+            <h2 id="housing-dialog-title">{{ editingId() ? 'Edit home' : 'Add home' }}</h2>
+            <label class="field">
+              <span>Name or address <span class="required" aria-hidden="true">*</span></span>
+              <input
+                id="housing-name"
+                aria-required="true"
+                [value]="form.name"
+                maxlength="200"
+                (input)="updateDraft('name', value($event))"
+              />
+            </label>
+            <div class="place">
+              <label class="field">
+                Area
+                <input
+                  id="housing-area"
+                  [value]="form.area"
+                  maxlength="200"
+                  (input)="updateDraft('area', value($event))"
+                />
+              </label>
+              <label class="field">
+                Size
+                <input
+                  id="housing-size"
+                  [value]="form.size"
+                  maxlength="80"
+                  (input)="updateDraft('size', value($event))"
+                />
+              </label>
             </div>
-          } @else {
-            <div class="actions">
-              <button matButton type="button" (click)="startEdit(home)">Edit</button>
-              <button matButton type="button" (click)="deletingId.set(home.id)">Delete</button>
+            <div class="place">
+              <label class="field">
+                Rent
+                <input
+                  id="housing-rent"
+                  type="number"
+                  step="any"
+                  min="0"
+                  inputmode="decimal"
+                  [value]="form.rent"
+                  (input)="updateDraft('rent', value($event))"
+                />
+              </label>
+              <label class="field">
+                Deposit
+                <input
+                  id="housing-deposit"
+                  type="number"
+                  step="any"
+                  min="0"
+                  inputmode="decimal"
+                  [value]="form.deposit"
+                  (input)="updateDraft('deposit', value($event))"
+                />
+              </label>
+              <label class="field">
+                Currency
+                <select
+                  id="housing-currency"
+                  [value]="form.currencyCode"
+                  (change)="updateChoice('currencyCode', value($event))"
+                >
+                  <option value="">None</option>
+                  @for (currency of currencies; track currency.code) {
+                    <option [value]="currency.code">{{ currency.label }}</option>
+                  }
+                </select>
+              </label>
             </div>
-          }
-        </li>
+            <div class="place">
+              <label class="field">
+                Furnished
+                <select
+                  id="housing-furnishing"
+                  [value]="form.furnishing"
+                  (change)="updateChoice('furnishing', value($event))"
+                >
+                  <option value="">Not sure</option>
+                  @for (option of furnishings; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+              <label class="field">
+                Available
+                <input
+                  id="housing-available"
+                  type="date"
+                  [value]="form.availableOn"
+                  (input)="updateDraft('availableOn', value($event))"
+                />
+              </label>
+              <label class="field">
+                <span>Status <span class="required" aria-hidden="true">*</span></span>
+                <select
+                  id="housing-status"
+                  aria-required="true"
+                  [value]="form.status"
+                  (change)="updateChoice('status', value($event))"
+                >
+                  @for (option of housingStatuses; track option.value) {
+                    <option [value]="option.value">{{ option.label }}</option>
+                  }
+                </select>
+              </label>
+            </div>
+            <label class="field">
+              Notes
+              <textarea
+                id="housing-notes"
+                rows="3"
+                maxlength="1000"
+                [value]="form.notes"
+                (input)="updateDraft('notes', value($event))"
+              ></textarea>
+            </label>
+            @if (formError(); as message) {
+              <p class="error-text" role="alert">{{ message }}</p>
+            }
+            <div class="actions">
+              <button matButton="filled" type="submit" [disabled]="saving()">Save</button>
+              <button matButton type="button" (click)="closeDialog()">Cancel</button>
+            </div>
+          </form>
+        </div>
       }
-    </ol>
-  }
+    }
+
+    @if (error(); as message) {
+      <p class="error-text" role="alert">{{ message }}</p>
+    }
+
+    @if (homes.value().length === 0) {
+      @if (relocation.value().isInternational) {
+        <div class="panel empty">
+          <p class="meta">No homes yet.</p>
+        </div>
+      }
+    } @else {
+      <ol class="stack">
+        @for (home of homes.value(); track home.id) {
+          <li class="panel option" [attr.data-status]="home.status">
+            <div class="option-line">
+              <h2>{{ home.name }}</h2>
+              <span class="chip" [class.strong]="home.status === 'Chosen'">
+                {{ labelFor(housingStatuses, home.status) }}
+              </span>
+            </div>
+            @for (line of facts(home); track line) {
+              <p class="meta">{{ line }}</p>
+            }
+            @if (deletingId() === home.id) {
+              <p class="meta">Delete this home?</p>
+              <div class="actions">
+                <button
+                  matButton="outlined"
+                  type="button"
+                  [disabled]="saving()"
+                  (click)="remove(home)"
+                >
+                  Delete home
+                </button>
+                <button matButton type="button" (click)="deletingId.set(null)">Cancel</button>
+              </div>
+            } @else {
+              <div class="actions">
+                <button matButton type="button" (click)="startEdit(home)">Edit</button>
+                <button matButton type="button" (click)="deletingId.set(home.id)">Delete</button>
+              </div>
+            }
+          </li>
+        }
+      </ol>
+    }
+  </app-relocation-tabs>
 }

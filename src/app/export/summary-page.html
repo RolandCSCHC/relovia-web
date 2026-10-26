@@ -9,97 +9,101 @@
       <p class="page-lead">{{ data.route }}</p>
     </div>
     <div class="actions">
-      <a matButton="outlined" [routerLink]="['/relocations', data.id]">Back to relocation</a>
       <button matButton="outlined" type="button" [disabled]="downloading()" (click)="downloadPdf()">
         Download PDF
       </button>
     </div>
   </div>
-  @if (downloadError(); as message) {
-    <p class="error-text" role="alert">{{ message }}</p>
-  }
-  <p class="meta summary">{{ data.details }}</p>
-  <app-task-progress class="summary" [progress]="data.progress" [taskCount]="data.taskCount" />
+  <app-relocation-tabs
+    [relocationId]="data.id"
+    [international]="relocation.value()?.isInternational ?? false"
+  >
+    @if (downloadError(); as message) {
+      <p class="error-text" role="alert">{{ message }}</p>
+    }
+    <p class="meta summary">{{ data.details }}</p>
+    <app-task-progress class="summary" [progress]="data.progress" [taskCount]="data.taskCount" />
 
-  <section class="block">
-    <h2>Open tasks</h2>
-    @if (data.openTasks.length === 0) {
-      <p class="meta">No open tasks.</p>
-    } @else {
-      @for (task of data.openTasks; track task.title) {
+    <section class="block">
+      <h2>Open tasks</h2>
+      @if (data.openTasks.length === 0) {
+        <p class="meta">No open tasks.</p>
+      } @else {
+        @for (task of data.openTasks; track task.title) {
+          <div class="item">
+            <h3>{{ task.title }}</h3>
+            <p class="meta">{{ task.meta }}</p>
+            @if (task.note) {
+              <p class="meta">{{ task.note }}</p>
+            }
+          </div>
+        }
+      }
+    </section>
+
+    <section class="block">
+      <h2>Money</h2>
+      @if (data.money; as money) {
+        <div class="figures">
+          <div class="figure">
+            <span class="meta">Estimated</span>
+            <strong>{{ money.estimated }}</strong>
+          </div>
+          <div class="figure">
+            <span class="meta">Spent</span>
+            <strong>{{ money.spent }}</strong>
+          </div>
+          <div class="figure" [class.over]="money.over">
+            <span class="meta">Remaining</span>
+            <strong>{{ money.remaining }}</strong>
+          </div>
+        </div>
+        @if (money.ratesUnavailable) {
+          <p class="error-text">{{ money.ratesUnavailable }}</p>
+        }
+        @if (money.unconverted) {
+          <p class="meta">{{ money.unconverted }}</p>
+        }
+        @if (money.rates) {
+          <p class="meta">{{ money.rates }}</p>
+        }
+        @for (category of money.categories; track category.name) {
+          <p class="meta" [class.over-text]="category.over">
+            {{ category.name }} · {{ category.remaining }}
+          </p>
+        }
+      } @else {
+        <p class="meta">The budget is not set up yet.</p>
+      }
+    </section>
+
+    <section class="block">
+      <h2>Still to pack</h2>
+      @if (data.packing.empty) {
+        <p class="meta">{{ data.packing.empty }}</p>
+      }
+      @for (item of data.packing.items; track item.title) {
         <div class="item">
-          <h3>{{ task.title }}</h3>
-          <p class="meta">{{ task.meta }}</p>
-          @if (task.note) {
-            <p class="meta">{{ task.note }}</p>
-          }
+          <h3>{{ item.title }}</h3>
+          <p class="meta">{{ item.meta }}</p>
         </div>
       }
-    }
-  </section>
+    </section>
 
-  <section class="block">
-    <h2>Money</h2>
-    @if (data.money; as money) {
-      <div class="figures">
-        <div class="figure">
-          <span class="meta">Estimated</span>
-          <strong>{{ money.estimated }}</strong>
-        </div>
-        <div class="figure">
-          <span class="meta">Spent</span>
-          <strong>{{ money.spent }}</strong>
-        </div>
-        <div class="figure" [class.over]="money.over">
-          <span class="meta">Remaining</span>
-          <strong>{{ money.remaining }}</strong>
-        </div>
-      </div>
-      @if (money.ratesUnavailable) {
-        <p class="error-text">{{ money.ratesUnavailable }}</p>
+    <section class="block">
+      <h2>Dates</h2>
+      @if (data.dates.length === 0) {
+        <p class="meta">No dates yet.</p>
+      } @else {
+        @for (date of data.dates; track date.date + date.text) {
+          <div class="item">
+            <h3>{{ date.when }}</h3>
+            <p class="meta">{{ date.text }}</p>
+          </div>
+        }
       }
-      @if (money.unconverted) {
-        <p class="meta">{{ money.unconverted }}</p>
-      }
-      @if (money.rates) {
-        <p class="meta">{{ money.rates }}</p>
-      }
-      @for (category of money.categories; track category.name) {
-        <p class="meta" [class.over-text]="category.over">
-          {{ category.name }} · {{ category.remaining }}
-        </p>
-      }
-    } @else {
-      <p class="meta">The budget is not set up yet.</p>
-    }
-  </section>
-
-  <section class="block">
-    <h2>Still to pack</h2>
-    @if (data.packing.empty) {
-      <p class="meta">{{ data.packing.empty }}</p>
-    }
-    @for (item of data.packing.items; track item.title) {
-      <div class="item">
-        <h3>{{ item.title }}</h3>
-        <p class="meta">{{ item.meta }}</p>
-      </div>
-    }
-  </section>
-
-  <section class="block">
-    <h2>Dates</h2>
-    @if (data.dates.length === 0) {
-      <p class="meta">No dates yet.</p>
-    } @else {
-      @for (date of data.dates; track date.date + date.text) {
-        <div class="item">
-          <h3>{{ date.when }}</h3>
-          <p class="meta">{{ date.text }}</p>
-        </div>
-      }
-    }
-  </section>
+    </section>
+  </app-relocation-tabs>
 } @else {
   <h1 class="page-title">Summary</h1>
   <p class="page-lead">Loading summary…</p>

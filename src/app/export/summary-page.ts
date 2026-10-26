@@ -5,13 +5,14 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import { TaskProgress } from '../relocations/task-progress';
 import { savePdf, summaryPdfFileName } from './file-name';
 import { buildSummary } from './summary';
 
 @Component({
   selector: 'app-summary-page',
-  imports: [MatButton, RouterLink, TaskProgress],
+  imports: [MatButton, RelocationTabs, RouterLink, TaskProgress],
   templateUrl: './summary-page.html',
   styleUrl: './summary-page.scss',
 })

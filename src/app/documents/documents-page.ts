@@ -8,6 +8,7 @@ import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { formatDate } from '../relocations/dates';
 import { labelFor } from '../relocations/labels';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import { documentFileProblem, formatBytes, isExpired } from './file-rules';
 import { documentCategories } from './labels';
 
@@ -23,7 +24,7 @@ interface UploadDraft extends DocumentDraft {
 
 @Component({
   selector: 'app-documents-page',
-  imports: [MatButton, RouterLink],
+  imports: [MatButton, RelocationTabs, RouterLink],
   templateUrl: './documents-page.html',
   styleUrl: './documents-page.scss',
 })

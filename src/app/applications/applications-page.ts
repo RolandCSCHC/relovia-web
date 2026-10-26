@@ -7,6 +7,7 @@ import type { JobApplicationResponse } from '../api/generated';
 import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { labelFor } from '../relocations/labels';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import {
   applicationDraft,
   applicationFacts,
@@ -19,7 +20,7 @@ import {
 
 @Component({
   selector: 'app-applications-page',
-  imports: [MatButton, RouterLink],
+  imports: [MatButton, RelocationTabs, RouterLink],
   templateUrl: './applications-page.html',
   styleUrl: './applications-page.scss',
 })

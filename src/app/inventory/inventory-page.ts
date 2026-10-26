@@ -20,6 +20,7 @@ import { failureMessage } from '../budget/api-failure';
 import { currencies, formatMoney, parseAmount } from '../budget/money';
 import { asCount } from '../relocations/dates';
 import { labelFor } from '../relocations/labels';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import {
   acquisitions,
   itemCategories,
@@ -58,7 +59,7 @@ interface RoomGroup {
 
 @Component({
   selector: 'app-inventory-page',
-  imports: [InventoryStarter, MatButton, NgTemplateOutlet, RouterLink],
+  imports: [InventoryStarter, MatButton, NgTemplateOutlet, RelocationTabs, RouterLink],
   templateUrl: './inventory-page.html',
   styleUrl: './inventory-page.scss',
 })

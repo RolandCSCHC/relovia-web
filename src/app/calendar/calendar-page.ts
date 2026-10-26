@@ -12,6 +12,7 @@ import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { formatDate } from '../relocations/dates';
 import { labelFor } from '../relocations/labels';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import { eventKinds } from './labels';
 import {
   appointmentDay,
@@ -33,7 +34,7 @@ import {
 
 @Component({
   selector: 'app-calendar-page',
-  imports: [MatButton, RouterLink],
+  imports: [MatButton, RelocationTabs, RouterLink],
   templateUrl: './calendar-page.html',
   styleUrl: './calendar-page.scss',
 })

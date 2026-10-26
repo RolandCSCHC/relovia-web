@@ -8,6 +8,7 @@ import { ReloviaClient } from '../api/relovia-client';
 import { failureMessage } from '../budget/api-failure';
 import { currencies } from '../budget/money';
 import { labelFor } from '../relocations/labels';
+import { RelocationTabs } from '../relocations/relocation-tabs';
 import {
   emptyHousingDraft,
   furnishings,
@@ -21,7 +22,7 @@ import {
 
 @Component({
   selector: 'app-housing-page',
-  imports: [MatButton, RouterLink],
+  imports: [MatButton, RelocationTabs, RouterLink],
   templateUrl: './housing-page.html',
   styleUrl: './housing-page.scss',
 })
