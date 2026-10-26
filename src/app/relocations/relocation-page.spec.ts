@@ -218,6 +218,61 @@ describe('RelocationPage', () => {
     );
   });
 
+  it('moves a task later and hides the move that does not exist', async () => {
+    let moved: string | undefined;
+    const tasks = taskList();
+    tasks.tasks = [
+      tasks.tasks[0],
+      {
+        ...tasks.tasks[0],
+        id: '0199f0a1-7c00-7000-8000-000000000022',
+        code: 'book-movers',
+        title: 'Book movers',
+        dueDate: '2026-11-01',
+        position: 1,
+      },
+    ];
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([{ path: 'relocations/:id', component: RelocationPage }]),
+        {
+          provide: ReloviaClient,
+          useValue: {
+            getRelocation: () => Promise.resolve(relocation()),
+            listTasks: () => Promise.resolve(tasks),
+            moveTaskLater: (_relocationId: string, taskId: string) => {
+              moved = taskId;
+              tasks.tasks = [tasks.tasks[1], tasks.tasks[0]];
+              return Promise.resolve(tasks);
+            },
+          },
+        },
+      ],
+    });
+
+    const harness = await RouterTestingHarness.create();
+    await harness.navigateByUrl(`/relocations/${relocationId}`);
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+    const root = harness.routeNativeElement!;
+
+    const titles = () =>
+      [...root.querySelectorAll('.task h2')].map((heading) => heading.textContent?.trim());
+    const taskItems = () => [...root.querySelectorAll('.task')];
+    expect(titles()).toEqual(['Give notice', 'Book movers']);
+    expect(taskItems()[0].textContent).not.toContain('Move earlier');
+    expect(taskItems()[0].textContent).toContain('Move later');
+    expect(taskItems()[1].textContent).toContain('Move earlier');
+    expect(taskItems()[1].textContent).not.toContain('Move later');
+
+    clickButton(root, 'Move later');
+    await harness.fixture.whenStable();
+    harness.detectChanges();
+
+    expect(moved).toBe('0199f0a1-7c00-7000-8000-000000000021');
+    expect(titles()).toEqual(['Book movers', 'Give notice']);
+  });
+
   it('rejects a link that is not an http address', async () => {
     let created = false;
     TestBed.configureTestingModule({
@@ -312,6 +367,7 @@ function taskList(): RelocationTasksResponse {
         sourceTemplateTaskId: null,
         dependencies: [],
         documentIds: [],
+        position: 0,
       },
     ],
   };

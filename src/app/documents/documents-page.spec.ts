@@ -254,6 +254,7 @@ function task(): RelocationTaskResponse {
     sourceTemplateTaskId: null,
     dependencies: [],
     documentIds: [documentId],
+    position: 0,
   };
 }
 

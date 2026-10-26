@@ -108,7 +108,7 @@
     </div>
   } @else {
     <ol class="stack">
-      @for (task of tasks.value().tasks; track task.id) {
+      @for (task of tasks.value().tasks; track task.id; let first = $first; let last = $last) {
         <li class="panel task" [attr.data-status]="task.status">
           <div class="task-line">
             <h2>{{ task.title }}</h2>
@@ -168,6 +168,26 @@
             </div>
           } @else if (editingId() !== task.id) {
             <div class="actions">
+              @if (!first) {
+                <button
+                  matButton
+                  type="button"
+                  [disabled]="saving()"
+                  (click)="moveTask(task, 'earlier')"
+                >
+                  Move earlier
+                </button>
+              }
+              @if (!last) {
+                <button
+                  matButton
+                  type="button"
+                  [disabled]="saving()"
+                  (click)="moveTask(task, 'later')"
+                >
+                  Move later
+                </button>
+              }
               <button matButton type="button" (click)="startEdit(task)">Edit task</button>
               <button matButton type="button" (click)="deletingTaskId.set(task.id)">
                 Delete task

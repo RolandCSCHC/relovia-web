@@ -267,6 +267,7 @@ export type RelocationTaskResponse = {
   sourceTemplateTaskId: null | string;
   dependencies: Array<TaskDependencyResponse>;
   documentIds: Array<string>;
+  position: number | string;
 };
 
 export type RelocationTasksResponse = {
@@ -1490,6 +1491,46 @@ export type UpdateRelocationTaskResponses = {
 
 export type UpdateRelocationTaskResponse =
   UpdateRelocationTaskResponses[keyof UpdateRelocationTaskResponses];
+
+export type MoveRelocationTaskEarlierData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    taskId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/tasks/{taskId}/earlier';
+};
+
+export type MoveRelocationTaskEarlierResponses = {
+  /**
+   * OK
+   */
+  200: RelocationTasksResponse;
+};
+
+export type MoveRelocationTaskEarlierResponse =
+  MoveRelocationTaskEarlierResponses[keyof MoveRelocationTaskEarlierResponses];
+
+export type MoveRelocationTaskLaterData = {
+  body?: never;
+  path: {
+    relocationId: string;
+    taskId: string;
+  };
+  query?: never;
+  url: '/api/relocations/{relocationId}/tasks/{taskId}/later';
+};
+
+export type MoveRelocationTaskLaterResponses = {
+  /**
+   * OK
+   */
+  200: RelocationTasksResponse;
+};
+
+export type MoveRelocationTaskLaterResponse =
+  MoveRelocationTaskLaterResponses[keyof MoveRelocationTaskLaterResponses];
 
 export type GetServiceInfoData = {
   body?: never;

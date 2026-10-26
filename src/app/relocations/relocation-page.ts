@@ -238,6 +238,32 @@ export class RelocationPage {
     }
   }
 
+  protected async moveTask(
+    task: RelocationTaskResponse,
+    direction: 'earlier' | 'later',
+  ): Promise<void> {
+    const id = this.id();
+    if (!id) {
+      return;
+    }
+
+    this.saving.set(true);
+    this.actionError.set(null);
+    try {
+      if (direction === 'earlier') {
+        await this.api.moveTaskEarlier(id, task.id);
+      } else {
+        await this.api.moveTaskLater(id, task.id);
+      }
+
+      this.tasks.reload();
+    } catch (error) {
+      this.actionError.set(this.failure(error, 'The task could not be moved.'));
+    } finally {
+      this.saving.set(false);
+    }
+  }
+
   protected async removeTask(task: RelocationTaskResponse): Promise<void> {
     const id = this.id();
     if (!id) {

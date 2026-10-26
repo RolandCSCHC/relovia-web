@@ -73,7 +73,8 @@ export function buildSummary(input: {
     details: details(relocation),
     progress: input.tasks.progress,
     taskCount: input.tasks.tasks.length,
-    openTasks: input.tasks.tasks
+    openTasks: [...input.tasks.tasks]
+      .sort((left, right) => asCount(left.position) - asCount(right.position))
       .filter((task) => task.status === 'Todo' || task.status === 'InProgress')
       .map((task) => openTask(task, input.tasks.tasks)),
     money: money(input.budget),

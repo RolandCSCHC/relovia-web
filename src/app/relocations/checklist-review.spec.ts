@@ -60,6 +60,7 @@ describe('ChecklistReview', () => {
             sourceTemplateTaskId: null,
             dependencies: [],
             documentIds: [],
+            position: 0,
           },
         ],
       });

@@ -261,6 +261,28 @@ export class ReloviaClient {
     }
   }
 
+  moveTaskEarlier(relocationId: string, taskId: string): Promise<RelocationTasksResponse> {
+    return this.unwrap(
+      reloviaApi.moveRelocationTaskEarlier({
+        client: this.client,
+        path: { relocationId, taskId },
+        throwOnError: true,
+      }),
+      'The task could not be moved.',
+    );
+  }
+
+  moveTaskLater(relocationId: string, taskId: string): Promise<RelocationTasksResponse> {
+    return this.unwrap(
+      reloviaApi.moveRelocationTaskLater({
+        client: this.client,
+        path: { relocationId, taskId },
+        throwOnError: true,
+      }),
+      'The task could not be moved.',
+    );
+  }
+
   async deleteTask(relocationId: string, taskId: string): Promise<void> {
     try {
       await reloviaApi.deleteRelocationTask({

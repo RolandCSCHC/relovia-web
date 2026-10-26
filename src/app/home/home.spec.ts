@@ -24,6 +24,7 @@ describe('Home', () => {
           sourceTemplateTaskId: null,
           dependencies: [],
           documentIds: [],
+          position: 0,
         },
       ],
     };

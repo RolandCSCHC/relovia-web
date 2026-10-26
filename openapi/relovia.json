@@ -2632,6 +2632,104 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/tasks/{taskId}/earlier": {
+      "post": {
+        "tags": ["RelocationTasks"],
+        "summary": "Swaps this task with the one before it. The first task has no earlier move.",
+        "operationId": "moveRelocationTaskEarlier",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/tasks/{taskId}/later": {
+      "post": {
+        "tags": ["RelocationTasks"],
+        "summary": "Swaps this task with the one after it. The last task has no later move.",
+        "operationId": "moveRelocationTaskLater",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "taskId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RelocationTasksResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/": {
       "get": {
         "tags": ["ServiceInfo"],
@@ -3576,7 +3674,8 @@
           "status",
           "sourceTemplateTaskId",
           "dependencies",
-          "documentIds"
+          "documentIds",
+          "position"
         ],
         "type": "object",
         "properties": {
@@ -3630,6 +3729,11 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          "position": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": ["integer", "string"],
+            "format": "int32"
           }
         }
       },

@@ -100,6 +100,10 @@ import type {
   MarkNotificationReadResponses,
   MarkNotificationsReadData,
   MarkNotificationsReadResponses,
+  MoveRelocationTaskEarlierData,
+  MoveRelocationTaskEarlierResponses,
+  MoveRelocationTaskLaterData,
+  MoveRelocationTaskLaterResponses,
   SaveBudgetData,
   SaveBudgetResponses,
   SignInWithGoogleData,
@@ -868,6 +872,28 @@ export const updateRelocationTask = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Swaps this task with the one before it. The first task has no earlier move.
+ */
+export const moveRelocationTaskEarlier = <ThrowOnError extends boolean = false>(
+  options: Options<MoveRelocationTaskEarlierData, ThrowOnError>,
+): RequestResult<MoveRelocationTaskEarlierResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<MoveRelocationTaskEarlierResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/tasks/{taskId}/earlier',
+    ...options,
+  });
+
+/**
+ * Swaps this task with the one after it. The last task has no later move.
+ */
+export const moveRelocationTaskLater = <ThrowOnError extends boolean = false>(
+  options: Options<MoveRelocationTaskLaterData, ThrowOnError>,
+): RequestResult<MoveRelocationTaskLaterResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<MoveRelocationTaskLaterResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/tasks/{taskId}/later',
+    ...options,
   });
 
 /**

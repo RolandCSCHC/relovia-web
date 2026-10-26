@@ -31,6 +31,13 @@ describe('SummaryPage', () => {
       });
       const root = harness.routeNativeElement!;
 
+      const openTasks = [...root.querySelectorAll('section')]
+        .find((section) => section.querySelector('h2')?.textContent?.trim() === 'Open tasks')
+        ?.querySelectorAll('h3');
+      expect([...(openTasks ?? [])].map((heading) => heading.textContent?.trim())).toEqual([
+        'Book the flight',
+        'Give notice',
+      ]);
       expect(root.textContent).toContain('Give notice');
       expect(root.textContent).not.toContain('Tell the landlord in writing.');
       expect(root.textContent).not.toContain('https://example.com/notice');
@@ -142,6 +149,23 @@ function tasks(): RelocationTasksResponse {
         sourceTemplateTaskId: null,
         dependencies: [],
         documentIds: [],
+        position: 1,
+      },
+      {
+        id: '0199f0a1-7c00-7000-8000-000000000023',
+        code: 'book-flight',
+        title: 'Book the flight',
+        description: null,
+        url: null,
+        daysBeforeMove: 14,
+        dueDate: '2026-09-01',
+        phase: 'Moving',
+        priority: 'Normal',
+        status: 'Todo',
+        sourceTemplateTaskId: null,
+        dependencies: [],
+        documentIds: [],
+        position: 0,
       },
       {
         id: '0199f0a1-7c00-7000-8000-000000000022',
@@ -157,6 +181,7 @@ function tasks(): RelocationTasksResponse {
         sourceTemplateTaskId: null,
         dependencies: [],
         documentIds: [],
+        position: 2,
       },
     ],
   };
@@ -165,7 +190,7 @@ function tasks(): RelocationTasksResponse {
 function doneOnly(): RelocationTasksResponse {
   return {
     progress: { done: 1, counted: 1, ratio: 1 },
-    tasks: [tasks().tasks[1]],
+    tasks: [tasks().tasks.find((task) => task.status === 'Done')!],
   };
 }
 
