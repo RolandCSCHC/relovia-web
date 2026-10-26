@@ -18,9 +18,11 @@ import type {
   DocumentResponse,
   ExpenseResponse,
   Furnishing,
+  HousingOptionResponse,
   InventoryItemResponse,
   InventorySuggestionResponse,
   ItemRoom,
+  JobApplicationResponse,
   RelocationCalendarResponse,
   RelocationResponse,
   RelocationTaskResponse,
@@ -30,7 +32,9 @@ import type {
   SaveBudgetEstimateRequest,
   SaveBudgetRequest,
   SaveExpenseRequest,
+  SaveHousingOptionRequest,
   SaveInventoryItemRequest,
+  SaveJobApplicationRequest,
   SaveNotificationPreferenceRequest,
   SaveRelocationRequest,
   UpdateDocumentRequest,
@@ -491,6 +495,114 @@ export class ReloviaClient {
       }),
       'The calendar could not be loaded.',
     );
+  }
+
+  listHousing(relocationId: string): Promise<HousingOptionResponse[]> {
+    return this.unwrap(
+      reloviaApi.listHousingOptions({
+        client: this.client,
+        path: { relocationId },
+        throwOnError: true,
+      }),
+      'Homes could not be loaded.',
+    );
+  }
+
+  createHousing(
+    relocationId: string,
+    body: SaveHousingOptionRequest,
+  ): Promise<HousingOptionResponse> {
+    return this.unwrap(
+      reloviaApi.createHousingOption({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The home could not be saved.',
+    );
+  }
+
+  updateHousing(
+    relocationId: string,
+    optionId: string,
+    body: SaveHousingOptionRequest,
+  ): Promise<HousingOptionResponse> {
+    return this.unwrap(
+      reloviaApi.updateHousingOption({
+        client: this.client,
+        path: { relocationId, optionId },
+        body,
+        throwOnError: true,
+      }),
+      'The home could not be saved.',
+    );
+  }
+
+  async deleteHousing(relocationId: string, optionId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteHousingOption({
+        client: this.client,
+        path: { relocationId, optionId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The home could not be deleted.');
+    }
+  }
+
+  listApplications(relocationId: string): Promise<JobApplicationResponse[]> {
+    return this.unwrap(
+      reloviaApi.listJobApplications({
+        client: this.client,
+        path: { relocationId },
+        throwOnError: true,
+      }),
+      'Applications could not be loaded.',
+    );
+  }
+
+  createApplication(
+    relocationId: string,
+    body: SaveJobApplicationRequest,
+  ): Promise<JobApplicationResponse> {
+    return this.unwrap(
+      reloviaApi.createJobApplication({
+        client: this.client,
+        path: { relocationId },
+        body,
+        throwOnError: true,
+      }),
+      'The application could not be saved.',
+    );
+  }
+
+  updateApplication(
+    relocationId: string,
+    applicationId: string,
+    body: SaveJobApplicationRequest,
+  ): Promise<JobApplicationResponse> {
+    return this.unwrap(
+      reloviaApi.updateJobApplication({
+        client: this.client,
+        path: { relocationId, applicationId },
+        body,
+        throwOnError: true,
+      }),
+      'The application could not be saved.',
+    );
+  }
+
+  async deleteApplication(relocationId: string, applicationId: string): Promise<void> {
+    try {
+      await reloviaApi.deleteJobApplication({
+        client: this.client,
+        path: { relocationId, applicationId },
+        throwOnError: true,
+      });
+    } catch (error) {
+      throw toApiError(error, 'The application could not be deleted.');
+    }
   }
 
   createCalendarEvent(

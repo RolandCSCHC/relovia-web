@@ -24,8 +24,12 @@ import type {
   CreateDocumentResponses,
   CreateExpenseData,
   CreateExpenseResponses,
+  CreateHousingOptionData,
+  CreateHousingOptionResponses,
   CreateInventoryItemData,
   CreateInventoryItemResponses,
+  CreateJobApplicationData,
+  CreateJobApplicationResponses,
   CreateRelocationData,
   CreateRelocationResponses,
   CreateRelocationTaskData,
@@ -40,8 +44,12 @@ import type {
   DeleteDocumentResponses,
   DeleteExpenseData,
   DeleteExpenseResponses,
+  DeleteHousingOptionData,
+  DeleteHousingOptionResponses,
   DeleteInventoryItemData,
   DeleteInventoryItemResponses,
+  DeleteJobApplicationData,
+  DeleteJobApplicationResponses,
   DeleteRelocationData,
   DeleteRelocationResponses,
   DeleteRelocationTaskData,
@@ -74,8 +82,12 @@ import type {
   ListDocumentsResponses,
   ListExpensesData,
   ListExpensesResponses,
+  ListHousingOptionsData,
+  ListHousingOptionsResponses,
   ListInventoryItemsData,
   ListInventoryItemsResponses,
+  ListJobApplicationsData,
+  ListJobApplicationsResponses,
   ListNotificationsData,
   ListNotificationsResponses,
   ListRelocationsData,
@@ -102,8 +114,12 @@ import type {
   UpdateDocumentResponses,
   UpdateExpenseData,
   UpdateExpenseResponses,
+  UpdateHousingOptionData,
+  UpdateHousingOptionResponses,
   UpdateInventoryItemData,
   UpdateInventoryItemResponses,
+  UpdateJobApplicationData,
+  UpdateJobApplicationResponses,
   UpdateNotificationPreferenceData,
   UpdateNotificationPreferenceResponses,
   UpdateRelocationData,
@@ -269,28 +285,6 @@ export const updateBudgetEstimate = <ThrowOnError extends boolean = false>(
       'Content-Type': 'application/json',
       ...options.headers,
     },
-  });
-
-/**
- * Downloads the relocation as a PDF. The file is not stored.
- */
-export const downloadRelocationPdf = <ThrowOnError extends boolean = false>(
-  options: Options<DownloadRelocationPdfData, ThrowOnError>,
-): RequestResult<DownloadRelocationPdfResponses, unknown, ThrowOnError> =>
-  (options.client ?? client).get<DownloadRelocationPdfResponses, unknown, ThrowOnError>({
-    url: '/api/relocations/{relocationId}/export',
-    ...options,
-  });
-
-/**
- * Downloads the summary as a PDF. The file is not stored.
- */
-export const downloadRelocationSummaryPdf = <ThrowOnError extends boolean = false>(
-  options: Options<DownloadRelocationSummaryPdfData, ThrowOnError>,
-): RequestResult<DownloadRelocationSummaryPdfResponses, unknown, ThrowOnError> =>
-  (options.client ?? client).get<DownloadRelocationSummaryPdfResponses, unknown, ThrowOnError>({
-    url: '/api/relocations/{relocationId}/export/summary',
-    ...options,
   });
 
 /**
@@ -499,6 +493,58 @@ export const updateExpense = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Lists homes the signed-in user is comparing for this relocation.
+ */
+export const listHousingOptions = <ThrowOnError extends boolean = false>(
+  options: Options<ListHousingOptionsData, ThrowOnError>,
+): RequestResult<ListHousingOptionsResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<ListHousingOptionsResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/housing',
+    ...options,
+  });
+
+/**
+ * Adds a home to compare. The budget, tasks, and calendar stay unchanged.
+ */
+export const createHousingOption = <ThrowOnError extends boolean = false>(
+  options: Options<CreateHousingOptionData, ThrowOnError>,
+): RequestResult<CreateHousingOptionResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateHousingOptionResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/housing',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes a home. The relocation's budget and tasks stay.
+ */
+export const deleteHousingOption = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteHousingOptionData, ThrowOnError>,
+): RequestResult<DeleteHousingOptionResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteHousingOptionResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/housing/{optionId}',
+    ...options,
+  });
+
+/**
+ * Updates a home. Choosing it does not copy the rent into the budget.
+ */
+export const updateHousingOption = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateHousingOptionData, ThrowOnError>,
+): RequestResult<UpdateHousingOptionResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateHousingOptionResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/housing/{optionId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Lists the relocation's belongings, by room and then by name.
  */
 export const listInventoryItems = <ThrowOnError extends boolean = false>(
@@ -577,6 +623,58 @@ export const updateInventoryItem = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Lists job applications the signed-in user is tracking for this relocation.
+ */
+export const listJobApplications = <ThrowOnError extends boolean = false>(
+  options: Options<ListJobApplicationsData, ThrowOnError>,
+): RequestResult<ListJobApplicationsResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<ListJobApplicationsResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/applications',
+    ...options,
+  });
+
+/**
+ * Adds a job application. The next date is not written to the calendar.
+ */
+export const createJobApplication = <ThrowOnError extends boolean = false>(
+  options: Options<CreateJobApplicationData, ThrowOnError>,
+): RequestResult<CreateJobApplicationResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<CreateJobApplicationResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/applications',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Deletes a job application. The relocation's calendar stays.
+ */
+export const deleteJobApplication = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteJobApplicationData, ThrowOnError>,
+): RequestResult<DeleteJobApplicationResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).delete<DeleteJobApplicationResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/applications/{applicationId}',
+    ...options,
+  });
+
+/**
+ * Updates a job application. The calendar stays unchanged.
+ */
+export const updateJobApplication = <ThrowOnError extends boolean = false>(
+  options: Options<UpdateJobApplicationData, ThrowOnError>,
+): RequestResult<UpdateJobApplicationResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).put<UpdateJobApplicationResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/applications/{applicationId}',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
  * Lists the signed-in user's in-app reminders, unread first.
  */
 export const listNotifications = <ThrowOnError extends boolean = false>(
@@ -633,6 +731,28 @@ export const updateNotificationPreference = <ThrowOnError extends boolean = fals
       'Content-Type': 'application/json',
       ...options.headers,
     },
+  });
+
+/**
+ * Downloads the relocation as a PDF. The file is not stored.
+ */
+export const downloadRelocationPdf = <ThrowOnError extends boolean = false>(
+  options: Options<DownloadRelocationPdfData, ThrowOnError>,
+): RequestResult<DownloadRelocationPdfResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<DownloadRelocationPdfResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/export',
+    ...options,
+  });
+
+/**
+ * Downloads the summary as a PDF. The file is not stored.
+ */
+export const downloadRelocationSummaryPdf = <ThrowOnError extends boolean = false>(
+  options: Options<DownloadRelocationSummaryPdfData, ThrowOnError>,
+): RequestResult<DownloadRelocationSummaryPdfResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).get<DownloadRelocationSummaryPdfResponses, unknown, ThrowOnError>({
+    url: '/api/relocations/{relocationId}/export/summary',
+    ...options,
   });
 
 /**

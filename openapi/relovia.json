@@ -6,7 +6,7 @@
   },
   "servers": [
     {
-      "url": "http://127.0.0.1:5081/"
+      "url": "http://localhost:5080/"
     }
   ],
   "paths": {
@@ -475,74 +475,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/relocations/{relocationId}/export": {
-      "get": {
-        "tags": ["Export"],
-        "summary": "Downloads the relocation as a PDF. The file is not stored.",
-        "operationId": "downloadRelocationPdf",
-        "parameters": [
-          {
-            "name": "relocationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "timeZone",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/pdf": {}
-            }
-          }
-        }
-      }
-    },
-    "/api/relocations/{relocationId}/export/summary": {
-      "get": {
-        "tags": ["Export"],
-        "summary": "Downloads the summary as a PDF. The file is not stored.",
-        "operationId": "downloadRelocationSummaryPdf",
-        "parameters": [
-          {
-            "name": "relocationId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          },
-          {
-            "name": "timeZone",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/pdf": {}
-            }
           }
         }
       }
@@ -1328,6 +1260,212 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/housing": {
+      "get": {
+        "tags": ["Housing"],
+        "summary": "Lists homes the signed-in user is comparing for this relocation.",
+        "operationId": "listHousingOptions",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HousingOptionResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HousingOptionResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HousingOptionResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Housing"],
+        "summary": "Adds a home to compare. The budget, tasks, and calendar stay unchanged.",
+        "operationId": "createHousingOption",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveHousingOptionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveHousingOptionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveHousingOptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HousingOptionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HousingOptionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HousingOptionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/housing/{optionId}": {
+      "put": {
+        "tags": ["Housing"],
+        "summary": "Updates a home. Choosing it does not copy the rent into the budget.",
+        "operationId": "updateHousingOption",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveHousingOptionRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveHousingOptionRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveHousingOptionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/HousingOptionResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HousingOptionResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HousingOptionResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Housing"],
+        "summary": "Deletes a home. The relocation's budget and tasks stay.",
+        "operationId": "deleteHousingOption",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "optionId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/relocations/{relocationId}/inventory": {
       "get": {
         "tags": ["Inventory"],
@@ -1655,6 +1793,212 @@
         }
       }
     },
+    "/api/relocations/{relocationId}/applications": {
+      "get": {
+        "tags": ["JobApplications"],
+        "summary": "Lists job applications the signed-in user is tracking for this relocation.",
+        "operationId": "listJobApplications",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobApplicationResponse"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobApplicationResponse"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/JobApplicationResponse"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["JobApplications"],
+        "summary": "Adds a job application. The next date is not written to the calendar.",
+        "operationId": "createJobApplication",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobApplicationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobApplicationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/applications/{applicationId}": {
+      "put": {
+        "tags": ["JobApplications"],
+        "summary": "Updates a job application. The calendar stays unchanged.",
+        "operationId": "updateJobApplication",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobApplicationRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobApplicationRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveJobApplicationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationResponse"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobApplicationResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": ["JobApplications"],
+        "summary": "Deletes a job application. The relocation's calendar stays.",
+        "operationId": "deleteJobApplication",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "applicationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/notifications": {
       "get": {
         "tags": ["Notifications"],
@@ -1816,6 +2160,72 @@
                   "$ref": "#/components/schemas/NotificationPreferenceResponse"
                 }
               }
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/export": {
+      "get": {
+        "tags": ["RelocationExport"],
+        "summary": "Downloads the relocation as a PDF. The file is not stored.",
+        "operationId": "downloadRelocationPdf",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
+            }
+          }
+        }
+      }
+    },
+    "/api/relocations/{relocationId}/export/summary": {
+      "get": {
+        "tags": ["RelocationExport"],
+        "summary": "Downloads the summary as a PDF. The file is not stored.",
+        "operationId": "downloadRelocationSummaryPdf",
+        "parameters": [
+          {
+            "name": "relocationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "timeZone",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/pdf": {}
             }
           }
         }
@@ -2714,6 +3124,78 @@
         "enum": ["Furnished", "Unfurnished"],
         "type": "string"
       },
+      "HousingFurnishing": {
+        "enum": ["Furnished", "Unfurnished"],
+        "type": "string"
+      },
+      "HousingOptionResponse": {
+        "required": [
+          "id",
+          "name",
+          "area",
+          "rent",
+          "deposit",
+          "currencyCode",
+          "size",
+          "furnishing",
+          "availableOn",
+          "status",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "area": {
+            "type": ["null", "string"]
+          },
+          "rent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "deposit": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": ["null", "string"]
+          },
+          "size": {
+            "type": ["null", "string"]
+          },
+          "furnishing": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/HousingFurnishing"
+              }
+            ]
+          },
+          "availableOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HousingStatus"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "HousingStatus": {
+        "enum": ["Considering", "Viewing", "Offered", "Chosen", "Dropped"],
+        "type": "string"
+      },
       "IFormFile": {
         "type": "string",
         "format": "binary"
@@ -2867,6 +3349,56 @@
       },
       "ItemRoom": {
         "enum": ["Kitchen", "Bathroom", "Bedroom", "LivingRoom", "DiningRoom", "Office", "Other"],
+        "type": "string"
+      },
+      "JobApplicationResponse": {
+        "required": [
+          "id",
+          "employer",
+          "role",
+          "location",
+          "appliedOn",
+          "nextOn",
+          "status",
+          "includesSupport",
+          "notes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "employer": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "location": {
+            "type": ["null", "string"]
+          },
+          "appliedOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "nextOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobApplicationStatus"
+          },
+          "includesSupport": {
+            "type": ["null", "boolean"]
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "JobApplicationStatus": {
+        "enum": ["Applied", "Interviewing", "Offer", "Accepted", "Rejected", "Withdrawn"],
         "type": "string"
       },
       "MovingAction": {
@@ -3208,6 +3740,54 @@
           }
         }
       },
+      "SaveHousingOptionRequest": {
+        "required": ["name", "status"],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "area": {
+            "type": ["null", "string"]
+          },
+          "rent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "deposit": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": ["null", "number", "string"],
+            "format": "double"
+          },
+          "currencyCode": {
+            "type": ["null", "string"]
+          },
+          "size": {
+            "type": ["null", "string"]
+          },
+          "furnishing": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/HousingFurnishing"
+              }
+            ]
+          },
+          "availableOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/HousingStatus"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
       "SaveInventoryItemRequest": {
         "required": ["name", "quantity", "acquisition", "priority"],
         "type": "object",
@@ -3282,6 +3862,38 @@
           "budgetCategoryId": {
             "type": ["null", "string"],
             "format": "uuid"
+          },
+          "notes": {
+            "type": ["null", "string"]
+          }
+        }
+      },
+      "SaveJobApplicationRequest": {
+        "required": ["employer", "role", "status"],
+        "type": "object",
+        "properties": {
+          "employer": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "location": {
+            "type": ["null", "string"]
+          },
+          "appliedOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "nextOn": {
+            "type": ["null", "string"],
+            "format": "date"
+          },
+          "status": {
+            "$ref": "#/components/schemas/JobApplicationStatus"
+          },
+          "includesSupport": {
+            "type": ["null", "boolean"]
           },
           "notes": {
             "type": ["null", "string"]
@@ -3667,10 +4279,19 @@
       "name": "Expenses"
     },
     {
+      "name": "Housing"
+    },
+    {
       "name": "Inventory"
     },
     {
+      "name": "JobApplications"
+    },
+    {
       "name": "Notifications"
+    },
+    {
+      "name": "RelocationExport"
     },
     {
       "name": "Relocations"
