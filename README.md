@@ -29,6 +29,8 @@ Feature folders, and no global state library.
 - `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks.
 - `src/app/budget` sets the budget currency, manages categories and estimates, compares them with spending, and records estimates and expenses in any currency. Totals are shown in the budget currency using the API's converted amounts, and amounts are formatted as the currency code plus `$` (`CLP $30,944,444`, `NZD $1,200.00`).
 - `src/app/calendar` shows one month for a relocation. Milestones are dates, appointments have a time, and task due dates appear on the same grid without becoming events. Add, edit, and delete apply only to the events.
+- `src/app/housing` compares homes the user types for an international move. Rent and deposit stay in the currency they were entered in. One home can be chosen, and that does not change the budget.
+- `src/app/applications` tracks job applications the user types for an international move. A next date stays on the application and is not added to the calendar.
 - `src/app/notifications` lists in-app reminders and the preference for channel and lead time. The top bar links here once someone is signed in, and shows how many reminders are unread.
 - `src/app/documents` keeps a relocation's private files. Add document opens a dialog for a PDF, JPEG, PNG, or WebP up to 10 MB, plus a category, an expiration date, and the tasks that file supports. Download and delete stay on this relocation.
 - `src/app/export` is the summary of one relocation: the route and date, progress, open tasks, money totals, what is still to pack, and the dates. Download PDF on that page is the summary. Download PDF on the relocation is the full packet.
