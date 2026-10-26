@@ -14,6 +14,8 @@ describe('Home', () => {
           id: '0199f0a1-7c00-7000-8000-000000000021',
           code: 'give-notice',
           title: 'Give notice',
+          description: null,
+          url: null,
           daysBeforeMove: 60,
           dueDate: '2026-10-02',
           phase: 'Housing',

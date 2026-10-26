@@ -87,6 +87,8 @@ export type CreateRelocationTaskRequest = {
   dueDate?: null | string;
   phase: TaskPhase;
   priority: TaskPriority;
+  description?: null | string;
+  url?: null | string;
 };
 
 export type CurrentUserResponse = {
@@ -255,6 +257,8 @@ export type RelocationTaskResponse = {
   id: string;
   code: string;
   title: string;
+  description: null | string;
+  url: null | string;
   daysBeforeMove: number | string;
   dueDate: null | string;
   phase: TaskPhase;
@@ -445,6 +449,8 @@ export type UpdateRelocationTaskRequest = {
   phase: TaskPhase;
   priority: TaskPriority;
   status: RelocationTaskStatus;
+  description?: null | string;
+  url?: null | string;
 };
 
 export type SignInWithGoogleData = {

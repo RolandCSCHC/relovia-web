@@ -68,6 +68,27 @@
           </select>
         </label>
       </div>
+      <label class="field">
+        Description
+        <textarea
+          id="new-task-description"
+          rows="3"
+          maxlength="1000"
+          [value]="addDraft().description"
+          (input)="updateAdd('description', editValue($event))"
+        ></textarea>
+      </label>
+      <label class="field">
+        Link
+        <input
+          id="new-task-link"
+          type="url"
+          inputmode="url"
+          maxlength="2048"
+          [value]="addDraft().url"
+          (input)="updateAdd('url', editValue($event))"
+        />
+      </label>
       @if (addError(); as message) {
         <p class="error-text" role="alert">{{ message }}</p>
       }
@@ -121,6 +142,16 @@
           </div>
           @if (dependencyNote(task, tasks.value().tasks); as note) {
             <p class="meta">{{ note }}</p>
+          }
+          @if (editingId() !== task.id) {
+            @if (task.description) {
+              <p class="task-description">{{ task.description }}</p>
+            }
+            @if (task.url) {
+              <a class="task-link" [href]="task.url" target="_blank" rel="noopener noreferrer">{{
+                task.url
+              }}</a>
+            }
           }
           @if (deletingTaskId() === task.id) {
             <p class="meta">Delete this task?</p>
@@ -187,6 +218,27 @@
                   </select>
                 </label>
               </div>
+              <label class="field">
+                Description
+                <textarea
+                  id="edit-task-description"
+                  rows="3"
+                  maxlength="1000"
+                  [value]="editDraft().description"
+                  (input)="updateEdit('description', editValue($event))"
+                ></textarea>
+              </label>
+              <label class="field">
+                Link
+                <input
+                  id="edit-task-link"
+                  type="url"
+                  inputmode="url"
+                  maxlength="2048"
+                  [value]="editDraft().url"
+                  (input)="updateEdit('url', editValue($event))"
+                />
+              </label>
               @if (editError(); as message) {
                 <p class="error-text" role="alert">{{ message }}</p>
               }

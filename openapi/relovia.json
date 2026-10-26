@@ -2960,6 +2960,12 @@
           },
           "priority": {
             "$ref": "#/components/schemas/TaskPriority"
+          },
+          "description": {
+            "type": ["null", "string"]
+          },
+          "url": {
+            "type": ["null", "string"]
           }
         }
       },
@@ -3561,6 +3567,8 @@
           "id",
           "code",
           "title",
+          "description",
+          "url",
           "daysBeforeMove",
           "dueDate",
           "phase",
@@ -3581,6 +3589,12 @@
           },
           "title": {
             "type": "string"
+          },
+          "description": {
+            "type": ["null", "string"]
+          },
+          "url": {
+            "type": ["null", "string"]
           },
           "daysBeforeMove": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -4251,6 +4265,12 @@
           },
           "status": {
             "$ref": "#/components/schemas/RelocationTaskStatus"
+          },
+          "description": {
+            "type": ["null", "string"]
+          },
+          "url": {
+            "type": ["null", "string"]
           }
         }
       }

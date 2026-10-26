@@ -244,6 +244,8 @@ function task(): RelocationTaskResponse {
     id: taskId,
     code: 'give-notice',
     title: 'Give notice',
+    description: null,
+    url: null,
     daysBeforeMove: 60,
     dueDate: '2026-10-02',
     phase: 'Housing',

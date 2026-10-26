@@ -63,3 +63,16 @@
     font: var(--mat-sys-label-medium);
   }
 }
+
+.task-description {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: var(--mat-sys-body-medium);
+}
+
+.task-link {
+  color: var(--mat-sys-primary);
+  font: var(--mat-sys-body-medium);
+  overflow-wrap: anywhere;
+}

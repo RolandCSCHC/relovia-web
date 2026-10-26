@@ -32,6 +32,8 @@ describe('SummaryPage', () => {
       const root = harness.routeNativeElement!;
 
       expect(root.textContent).toContain('Give notice');
+      expect(root.textContent).not.toContain('Tell the landlord in writing.');
+      expect(root.textContent).not.toContain('https://example.com/notice');
       expect(root.textContent).not.toContain('Close the account');
       expect(root.textContent).toContain('Sheets');
       expect(root.textContent).toContain('Not packed');
@@ -130,6 +132,8 @@ function tasks(): RelocationTasksResponse {
         id: '0199f0a1-7c00-7000-8000-000000000021',
         code: 'give-notice',
         title: 'Give notice',
+        description: 'Tell the landlord in writing.',
+        url: 'https://example.com/notice',
         daysBeforeMove: 60,
         dueDate: '2026-10-02',
         phase: 'Housing',
@@ -143,6 +147,8 @@ function tasks(): RelocationTasksResponse {
         id: '0199f0a1-7c00-7000-8000-000000000022',
         code: 'close-account',
         title: 'Close the account',
+        description: null,
+        url: null,
         daysBeforeMove: 1,
         dueDate: '2026-11-30',
         phase: 'Finances',

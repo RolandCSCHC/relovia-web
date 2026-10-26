@@ -95,7 +95,7 @@ export class RelocationPage {
     this.deletingTaskId.set(null);
   }
 
-  protected updateAdd(key: 'title' | 'dueDate', value: string): void {
+  protected updateAdd(key: 'title' | 'dueDate' | 'description' | 'url', value: string): void {
     this.addDraft.update((draft) => ({ ...draft, [key]: value }));
   }
 
@@ -114,21 +114,24 @@ export class RelocationPage {
       return;
     }
 
+    const draft = this.addDraft();
     const titleError = titleProblem(title);
-    if (titleError) {
-      this.addError.set(titleError);
+    const noteError = detailProblem(draft);
+    if (titleError || noteError) {
+      this.addError.set(titleError ?? noteError);
       return;
     }
 
     this.saving.set(true);
     this.addError.set(null);
     try {
-      const draft = this.addDraft();
       await this.api.createTask(id, {
         title,
         dueDate: draft.dueDate || null,
         phase: draft.phase,
         priority: draft.priority,
+        description: blankToNull(draft.description),
+        url: blankToNull(draft.url),
       });
       this.adding.set(false);
       this.tasks.reload();
@@ -149,6 +152,8 @@ export class RelocationPage {
       dueDate: task.dueDate ?? '',
       phase: task.phase,
       priority: task.priority,
+      description: task.description ?? '',
+      url: task.url ?? '',
     });
   }
 
@@ -156,7 +161,7 @@ export class RelocationPage {
     return (event.target as HTMLInputElement).value;
   }
 
-  protected updateEdit(key: 'title' | 'dueDate', value: string): void {
+  protected updateEdit(key: 'title' | 'dueDate' | 'description' | 'url', value: string): void {
     this.editDraft.update((draft) => ({ ...draft, [key]: value }));
   }
 
@@ -185,6 +190,8 @@ export class RelocationPage {
         phase: task.phase,
         priority: task.priority,
         status,
+        description: task.description,
+        url: task.url,
       });
       this.tasks.reload();
     } catch (error) {
@@ -204,8 +211,9 @@ export class RelocationPage {
     }
 
     const titleError = titleProblem(title);
-    if (titleError) {
-      this.editError.set(titleError);
+    const noteError = detailProblem(draft);
+    if (titleError || noteError) {
+      this.editError.set(titleError ?? noteError);
       return;
     }
 
@@ -218,6 +226,8 @@ export class RelocationPage {
         phase: draft.phase,
         priority: draft.priority,
         status: task.status,
+        description: blankToNull(draft.description),
+        url: blankToNull(draft.url),
       });
       this.editingId.set(null);
       this.tasks.reload();
@@ -257,12 +267,16 @@ function emptyTaskDraft(): {
   dueDate: string;
   phase: TaskPhase;
   priority: TaskPriority;
+  description: string;
+  url: string;
 } {
   return {
     title: '',
     dueDate: '',
     phase: phases[0].value,
     priority: priorities[1].value,
+    description: '',
+    url: '',
   };
 }
 
@@ -276,4 +290,40 @@ function titleProblem(title: string): string | null {
   }
 
   return null;
+}
+
+function detailProblem(draft: { description: string; url: string }): string | null {
+  const description = draft.description.trim();
+  if (description.length > 1000) {
+    return 'Description must be 1000 characters or fewer.';
+  }
+
+  const url = draft.url.trim();
+  if (url.length > 2048) {
+    return 'Link must be 2048 characters or fewer.';
+  }
+
+  if (url.length > 0 && !isWebAddress(url)) {
+    return 'Link must be an absolute http or https address.';
+  }
+
+  return null;
+}
+
+function isWebAddress(value: string): boolean {
+  if (/\s/.test(value)) {
+    return false;
+  }
+
+  try {
+    const url = new URL(value);
+    return (url.protocol === 'http:' || url.protocol === 'https:') && url.hostname.length > 0;
+  } catch {
+    return false;
+  }
+}
+
+function blankToNull(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
