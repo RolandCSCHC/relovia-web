@@ -1,12 +1,11 @@
 import { Routes } from '@angular/router';
 import { BudgetPage } from './budget/budget-page';
 import { CalendarPage } from './calendar/calendar-page';
-import { authGuard, guestGuard, waitingGuard } from './core/auth.guard';
+import { authGuard, guestGuard } from './core/auth.guard';
 import { DocumentsPage } from './documents/documents-page';
 import { HousingPage } from './housing/housing-page';
 import { ApplicationsPage } from './applications/applications-page';
 import { InventoryPage } from './inventory/inventory-page';
-import { EarlyAccess } from './early-access/early-access';
 import { Home } from './home/home';
 import { SummaryPage } from './export/summary-page';
 import { NotificationsPage } from './notifications/notifications-page';
@@ -18,7 +17,6 @@ import { SignIn } from './sign-in/sign-in';
 
 export const routes: Routes = [
   { path: 'sign-in', canActivate: [guestGuard], component: SignIn },
-  { path: 'early-access', canActivate: [waitingGuard], component: EarlyAccess },
   { path: '', canActivate: [authGuard], component: Home },
   { path: 'notifications', canActivate: [authGuard], component: NotificationsPage },
   { path: 'relocations/new', canActivate: [authGuard], component: RelocationEditor },

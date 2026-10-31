@@ -50,7 +50,6 @@ describe('App', () => {
       avatarUrl: null,
       preferredCurrency: 'USD',
       preferredLanguage: 'en',
-      hasAccess: true,
     });
     await loaded;
 

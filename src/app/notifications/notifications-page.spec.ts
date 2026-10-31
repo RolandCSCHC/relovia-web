@@ -122,7 +122,6 @@ async function open(client: Partial<ReloviaClient>): Promise<RouterTestingHarnes
     avatarUrl: null,
     preferredCurrency: 'USD',
     preferredLanguage: 'en',
-    hasAccess: true,
   });
   const harness = await RouterTestingHarness.create();
   await harness.navigateByUrl('/notifications');

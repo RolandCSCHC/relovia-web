@@ -10,8 +10,6 @@ export interface CurrentUser {
   avatarUrl: string | null;
   preferredCurrency: string;
   preferredLanguage: string;
-  /** False while the app is still closed and this account is not on the allow list. */
-  hasAccess: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
