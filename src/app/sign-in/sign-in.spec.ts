@@ -27,15 +27,14 @@ describe('SignIn', () => {
     expect(link?.getAttribute('href')).toBe(googleSignInUrl);
   });
 
-  it('says the app is a work in progress and that signing in only registers interest', async () => {
+  it('invites a visitor to sign in and plan a move', async () => {
     const fixture = TestBed.createComponent(Outlet);
     await TestBed.inject(Router).navigateByUrl('/sign-in');
     fixture.detectChanges();
 
     const text = (fixture.nativeElement as HTMLElement).textContent;
-    expect(text).toContain('work in progress');
-    expect(text).toContain('not open yet');
-    expect(text).toContain('the developer will get an email');
+    expect(text).toContain('Sign in');
+    expect(text).toContain('Plan a move');
   });
 
   it('explains a sign-in error from the API redirect', async () => {
