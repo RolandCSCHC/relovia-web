@@ -1,8 +1,26 @@
 # relovia-web
 
-Angular app for Relovia. Sign-in goes through `relovia-api`. This app never handles a Google access token, refresh token, or ID token.
+I built the Relovia web app in Angular. It is the interface for a relocation planner: several moves, a checklist the person confirms into their own tasks, a budget, an inventory, private documents, a calendar, reminders, and, on an international move, homes and job applications. Sign-in, the database, and the files belong to `relovia-api`. This app never handles a Google access token, refresh token, or ID token.
 
-Setup and local commands are in [docs/setup.md](docs/setup.md).
+The app is [relovia.rolandschlosser.dev](https://relovia.rolandschlosser.dev). The API is [api.relovia.rolandschlosser.dev](https://api.relovia.rolandschlosser.dev). Setup and local commands are in [docs/setup.md](docs/setup.md).
+
+## Architecture
+
+The app uses standalone components and is zoneless. Feature folders are the same vertical slices as the API: `sign-in`, `home`, `relocations`, `budget`, `inventory`, `documents`, `calendar`, `housing`, `applications`, `notifications`, and `export`. Screen state stays on the component that shows it, in signals: which row is open, whether a save is in flight, and the draft being edited. HTTP stays on RxJS, through Angular's `HttpClient`. The session is the piece routes share. The unread count in the top bar comes from `NotificationInbox`, which loads reminders with a `resource` once someone is signed in.
+
+`src/app/core` holds the API origin, a functional HTTP interceptor, the session, functional route guards, and the theme. The session calls `GET /api/auth/me` once and shares that result. The guards wait for it, and a signed-out visitor goes to the sign-in page. Sign-in is a browser navigation to `GET /api/auth/google`, so the Google handshake never enters this app. After the callback, the API redirects back here with the session cookie already set. Sign-out is `POST /api/auth/logout`.
+
+Requests to the API origin are sent with credentials. `POST`, `PUT`, `PATCH`, and `DELETE` also send `X-XSRF-TOKEN`, copied from the `XSRF-TOKEN` cookie, which is the name the API's antiforgery middleware expects. The session cookie itself is host-only and `SameSite=Lax`. The site and the API are `relovia.rolandschlosser.dev` and `api.relovia.rolandschlosser.dev`, so the browser treats the call as same-site and sends the cookie. Locally, port 4200 calling port 5080 is the same arrangement.
+
+The HTTP contract is generated, then hidden behind a facade. `openapi/relovia.json` is the API's OpenAPI document, and `npm run api:generate` writes a typed Angular client with `@hey-api/openapi-ts`. Screens call `ReloviaClient`, which uses that client, maps a failure to one `ApiError` with a status and field messages, and leaves the generated folder out of ESLint. The base URL is the API origin from `src/environments`, so production does not call the localhost server written in the document. The generated client uses `HttpClient`, so the credentialed interceptor still runs.
+
+One relocation is a shell route with child routes for its tabs. The shell shows the name, the route, and the actions that apply to the whole move: download the PDF, edit, and delete. The tabs are tasks, inventory, budget, documents, calendar, and a summary. Housing and applications join the bar when the move is international. Feature pages do not repeat the title. The checklist is its own page, before those tasks exist: the API returns a suggestion, the person selects, deselects, and edits lines, and confirm is the call that writes them.
+
+Rules the screens share live in plain functions next to the feature, with their own tests. Money formatting, dates, which files may be chosen, and the checklist draft are examples. The budget shows the API's converted amounts and formats a price as the currency code plus `$`, so `CLP $30,944,444` and `NZD $1,200.00` stay distinct. An amount with no exchange rate stays on screen and is left out of the total.
+
+The look is the Evergreen palette: sand surfaces, forest green, and gold, set as explicit light and dark Material system colors in `src/styles.scss`. The theme is a signal, stored in `localStorage` under `relovia-color-scheme`. An effect writes `color-scheme` on the document. Layout uses the spacing tokens in that file (`--space-1` through `--space-8`, `--page-max`). The shell is the top bar and a centered column.
+
+Vitest covers the guards, the client wrapper, and those plain rules. GitHub Actions runs lint, Prettier, the tests, and the production build on pushes to `main` and on pull requests. The production build is static and is hosted on Vercel.
 
 ## Stack
 
@@ -17,36 +35,21 @@ Setup and local commands are in [docs/setup.md](docs/setup.md).
 | Node.js         | 24.21.0, pinned in `.node-version`            |
 | npm             | 11.19.0, pinned by `packageManager`           |
 
-## Shape
-
-Feature folders, and no global state library.
+## Screens
 
 - `src/app/core` holds the API origin, the credentialed HTTP interceptor, the session, the route guards, and the theme.
-- `src/app/api` holds the generated client and the small wrapper the screens call.
-- `src/app/sign-in` is the welcome page. It says the app is a work in progress and starts Google sign-in, which also tells the developer you are interested.
-- `src/app/early-access` thanks signed-in people who do not have access yet. `GET /api/auth/me` returns `hasAccess`, and `authGuard` sends everyone without it here.
+- `src/app/api` holds the generated client and `ReloviaClient`, the wrapper the screens call.
+- `src/app/sign-in` starts Google sign-in.
 - `src/app/home` lists relocations and their progress.
-- `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks.
-- `src/app/budget` sets the budget currency, manages categories and estimates, compares them with spending, and records estimates and expenses in any currency. Totals are shown in the budget currency using the API's converted amounts, and amounts are formatted as the currency code plus `$` (`CLP $30,944,444`, `NZD $1,200.00`).
-- `src/app/calendar` shows one month for a relocation. Milestones are dates, appointments have a time, and task due dates appear on the same grid without becoming events. Add, edit, and delete apply only to the events.
-- `src/app/housing` compares homes the user types for an international move. Rent and deposit stay in the currency they were entered in. One home can be chosen, and that does not change the budget.
-- `src/app/applications` tracks job applications the user types for an international move. A next date stays on the application and is not added to the calendar.
-- `src/app/notifications` lists in-app reminders and the preference for channel and lead time. The top bar links here once someone is signed in, and shows how many reminders are unread.
-- `src/app/documents` keeps a relocation's private files. Add document opens a dialog for a PDF, JPEG, PNG, or WebP up to 10 MB, plus a category, an expiration date, and the tasks that file supports. Download and delete stay on this relocation.
-- `src/app/export` is the summary of one relocation: the date and status, progress, open tasks, money totals, what is still to pack, and the dates. Download Summary on that page is the summary. Download PDF above the tabs is the full packet.
-- `src/app/inventory` lists a relocation's belongings by room. Room and category come from fixed lists. Each item is owned or still to purchase, can be marked bring, sell, donate, store, or discard, and tracks packing only when it is being brought. A price on something still to buy is counted in a budget category (Furnishing by default). Prices stay in the currency they were entered in. Owned items are not a new cost. Start from a list to review a furnished or unfurnished shopping list, for every room or one room, and add the items you keep. Items already on the list are left out. Prices are added afterwards.
-
-Local UI state uses signals. HTTP uses RxJS.
-
-## Talking to the API
-
-Locally the API origin is `http://localhost:5080`. The production build, served at `https://relovia.rolandschlosser.dev`, uses `https://api.relovia.rolandschlosser.dev`. Both come from `src/environments`.
-
-Requests to that origin are sent with credentials. `POST`, `PUT`, `PATCH`, and `DELETE` also send `X-XSRF-TOKEN`, copied from the `XSRF-TOKEN` cookie.
-
-Google sign-in is a browser navigation to `GET /api/auth/google`, not an HTTP call from Angular. After the callback, the API redirects back here. The route guards call `GET /api/auth/me` before they choose a page. Sign-out is `POST /api/auth/logout`.
-
-The theme choice is stored in `localStorage` under `relovia-color-scheme`. Page layout uses the spacing tokens in `src/styles.scss` (`--space-1` through `--space-8`, `--page-max`) and the `.page-title` and `.page-lead` classes. The shell is the top bar and the centered page column. The Evergreen palette is a set of explicit light and dark Material system colors in `src/styles.scss`; `.chip` is the small label.
+- `src/app/relocations` edits a relocation, reviews its checklist, and lists its tasks. A task can carry a description, a link, and a position. Move earlier and move later swap that position with a neighbor.
+- `src/app/budget` sets the budget currency and an optional monthly net income, manages categories and estimates, compares them with spending, and records estimates and expenses in any currency. Totals use the API's converted amounts.
+- `src/app/inventory` lists belongings by room. Each item is owned or still to purchase, and can be marked bring, sell, donate, store, or discard. Packing is tracked when the item is being brought. A price on something still to buy counts in a budget category. Start from a list reviews a furnished or unfurnished shopping list and adds the items the person keeps.
+- `src/app/documents` keeps a relocation's private files. Add document takes a PDF, JPEG, PNG, or WebP up to 10 MB, plus a category, an expiration date, and the tasks that file supports.
+- `src/app/calendar` shows one month. Milestones are dates, appointments have a time, and task due dates appear on the same grid. Add, edit, and delete apply to the events.
+- `src/app/housing` compares homes typed in for an international move. Rent and deposit stay in the currency they were entered in. When monthly net income is set, a home with rent shows that rent as a percentage of income. One home can be chosen, and choosing it leaves the budget as it is.
+- `src/app/applications` tracks job applications typed in for an international move. A next date stays on the application.
+- `src/app/notifications` lists in-app reminders and the preference for channel and lead time. The top bar shows how many are unread.
+- `src/app/export` is the summary: the date and status, progress, open tasks, money totals, what is still to pack, and the dates. Download Summary on that page is the short PDF. Download PDF on the shell is the full packet.
 
 ## API client
 
